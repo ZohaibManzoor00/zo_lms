@@ -4,7 +4,7 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 
 import { buttonVariants } from "@/components/ui/button";
-import { AppLogo } from "@/components/ui/logo";
+import { AppLogo } from "@/components/ui/app-logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { UserDropdown } from "./user-dropdown";
 
@@ -49,7 +49,11 @@ export function Navbar() {
           <div className="flex items-center gap-x-2">
             <ThemeToggle />
             {isPending ? null : session ? (
-              <UserDropdown name={session.user.name} email={session.user.email} image={session.user.image ?? ""} />
+              <UserDropdown
+                name={session.user.name}
+                email={session.user.email}
+                image={session.user.image ?? ""}
+              />
             ) : (
               <>
                 <Link
