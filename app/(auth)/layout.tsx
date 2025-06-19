@@ -1,5 +1,5 @@
 import { buttonVariants } from "@/components/ui/button";
-import AppLogo from "@/components/ui/logo";
+import { AppLogo } from "@/components/ui/logo";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
