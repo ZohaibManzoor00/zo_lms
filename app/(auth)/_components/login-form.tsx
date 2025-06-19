@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
@@ -14,28 +14,50 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GithubIcon, Loader2 } from "lucide-react";
+import { GithubIcon, Loader2, Send } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-    const [githubPending, startGithubTransition] = useTransition();
+  const [githubPending, startGithubTransition] = useTransition();
+  const [email, setEmail] = useState("");
+  const [emailPending, startEmailTransition] = useTransition();
+  const router = useRouter();
 
-    const signInWithGithub = async () => {
-      startGithubTransition(async () => {
-        await authClient.signIn.social({
-          provider: "github",
-          callbackURL: "/",
-          fetchOptions: {
-            onSuccess: () => {
-              toast.success("Signed in with Github, you will be redirected...");
-            },
-            onError: () => {
-              toast.error("Something went wrong");
-            },
+  const signInWithGithub = async () => {
+    startGithubTransition(async () => {
+      await authClient.signIn.social({
+        provider: "github",
+        callbackURL: "/",
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Signed in with Github, you will be redirected...");
           },
-        });
+          onError: () => {
+            toast.error("Something went wrong");
+          },
+        },
       });
-    };
- 
+    });
+  };
+
+  const signInWithEmail = () => {
+    startEmailTransition(async () => {
+      await authClient.emailOtp.sendVerificationOtp({
+        email,
+        type: "sign-in",
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Verification OTP sent to your email");
+            router.push(`/verify-email?email=${email}`);
+          },
+          onError: () => {
+            toast.error("Something went wrong");
+          },
+        },
+      });
+    });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -74,12 +96,34 @@ export default function LoginForm() {
         <div className="grid gap-3">
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" placeholder="email@example.com" />
+            <Input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              id="email"
+              placeholder="email@example.com"
+              required
+            />
           </div>
 
-          <Button className="w-full">Continue with Email</Button>
+          <Button
+            disabled={emailPending}
+            className="w-full"
+            onClick={signInWithEmail}
+          >
+            {emailPending ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                <span>Sending Verification OTP...</span>
+              </>
+            ) : (
+              <>
+                <Send className="size-4" />
+                <span>Continue with Email</span>
+              </>
+            )}
+          </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

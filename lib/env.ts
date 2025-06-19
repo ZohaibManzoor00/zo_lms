@@ -8,6 +8,7 @@ export const env = createEnv({
     AUTH_GITHUB_SECRET: z.string().min(1),
     BETTER_AUTH_SECRET: z.string().min(1),
     BETTER_AUTH_URL: z.string().url(),
+    RESEND_API_KEY: z.string().min(1),
   },
   experimental__runtimeEnv: {},
 });
