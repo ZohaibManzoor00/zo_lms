@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
@@ -13,6 +13,7 @@ import {
   UploadIcon,
   XIcon,
 } from "lucide-react";
+import Image from "next/image";
 
 interface UploaderProps {
   id: string | null;
@@ -102,7 +103,8 @@ export default function FileUploader() {
         xhr.setRequestHeader("Content-Type", file.type);
         xhr.send(file);
       });
-    } catch {
+    } catch (error) {
+      console.error(error);
       toast.error("Failed to upload file");
       setFileState((prev) => ({
         ...prev,
@@ -113,120 +115,106 @@ export default function FileUploader() {
     }
   };
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-      setFileState({
-        id: uuid(),
-        file,
-        isDeleting: false,
-        error: false,
-        uploading: false,
-        progress: 0,
-        objectUrl: URL.createObjectURL(file),
-        fileType: "image",
-      });
-      uploadFile(file);
-    }
-  }, []);
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+          URL.revokeObjectURL(fileState.objectUrl);
+        }
+        setFileState({
+          id: uuid(),
+          file,
+          isDeleting: false,
+          error: false,
+          uploading: false,
+          progress: 0,
+          objectUrl: URL.createObjectURL(file),
+          fileType: "image",
+        });
+        uploadFile(file);
+      }
+    },
+    [fileState.objectUrl]
+  );
+
+  const maxSizeMB = 5;
+
+  const onDropRejected = useCallback(
+    (rejectedFiles: any[]) => {
+      const rejection = rejectedFiles[0];
+
+      if (rejection.errors) {
+        const error = rejection.errors[0];
+
+        switch (error.code) {
+          case "file-too-large":
+            toast.error(`File is too large. Maximum size is ${maxSizeMB}MB.`);
+            break;
+          case "file-invalid-type":
+            toast.error(
+              "File type not supported. Please upload an image file."
+            );
+            break;
+          case "too-many-files":
+            toast.error("You can only upload one file at a time.");
+            break;
+          default:
+            toast.error("File upload failed. Please try again.");
+        }
+      }
+    },
+    [maxSizeMB]
+  );
 
   const renderContent = () => {
     if (fileState.uploading) {
       return (
-        <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
-          <div className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
-            <Loader2 className="size-5 animate-spin text-primary" />
-          </div>
-          <p className="mb-1.5 text-sm font-medium">Uploading...</p>
-          <p className="text-muted-foreground text-xs">
-            {fileState.progress}% complete
-          </p>
-        </div>
+        <RenderUploadingState
+          progress={fileState.progress}
+          file={fileState.file as File}
+        />
       );
     }
 
     if (fileState.error) {
-      return (
-        <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
-          <div className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full bg-destructive/10">
-            <AlertCircleIcon className="size-5 text-destructive" />
-          </div>
-          <p className="mb-1.5 text-sm font-medium text-destructive">
-            Upload failed
-          </p>
-          <p className="text-muted-foreground text-xs">Please try again</p>
-        </div>
-      );
+      return <RenderErrorState />;
     }
 
     if (fileState.objectUrl) {
       return (
-        <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
-          <div className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full bg-green-500/10">
-            <ImageIcon className="size-5 text-green-600" />
-          </div>
-          <p className="mb-1.5 text-sm font-medium">
-            File uploaded successfully
-          </p>
-          <p className="text-muted-foreground text-xs">
-            {fileState.file?.name}
-          </p>
-        </div>
+        <RenderSuccessState
+          fileName={fileState.file?.name}
+          previewUrl={fileState.objectUrl}
+        />
       );
     }
 
     return (
-      <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
-        <div
-          className={`mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${
-            isDragActive
-              ? "bg-primary/10 border-primary scale-110"
-              : "bg-background border-border"
-          }`}
-          aria-hidden="true"
-        >
-          <ImageIcon
-            className={`size-5 transition-all duration-200 ${
-              isDragActive ? "text-primary scale-110" : "opacity-60"
-            }`}
-          />
-        </div>
-        <p
-          className={`mb-1.5 -mt-1 text-sm font-medium transition-colors duration-200 ${
-            isDragActive ? "text-primary" : ""
-          }`}
-        >
-          {isDragActive ? "Drop your image here" : "Drop your image here"}
-        </p>
-        <p className="text-muted-foreground text-xs">
-          SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)
-        </p>
-        {!isDragActive && (
-          <Button
-            variant="outline"
-            className="mt-4 cursor-pointer"
-            onClick={open}
-            type="button"
-          >
-            <UploadIcon
-              className="-ms-1 size-4 opacity-60"
-              aria-hidden="true"
-            />
-            Select image
-          </Button>
-        )}
-      </div>
+      <RenderDefaultState
+        isDragActive={isDragActive}
+        maxSizeMB={maxSizeMB}
+        open={open}
+      />
     );
   };
 
-  const maxSizeMB = 5;
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
     onDrop,
+    onDropRejected,
     accept: { "image/*": [] },
     maxFiles: 1,
     multiple: false,
     maxSize: maxSizeMB * 1024 * 1024, // 5MB
   });
+
+  useEffect(() => {
+    return () => {
+      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+        URL.revokeObjectURL(fileState.objectUrl);
+      }
+    };
+  }, [fileState.objectUrl]);
 
   return (
     <div className="flex flex-col gap-2" {...getRootProps()}>
@@ -251,15 +239,16 @@ export default function FileUploader() {
             <Button
               type="button"
               className="focus-visible:border-ring focus-visible:ring-ring/50 z-50 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:ring-[3px]"
-              onClick={() =>
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
                 setFileState((prev) => ({
                   ...prev,
                   isDeleting: true,
                   file: null,
                   objectUrl: undefined,
                   id: null,
-                }))
-              }
+                }));
+              }}
               aria-label="Remove image"
             >
               <XIcon className="size-4" aria-hidden="true" />
@@ -267,6 +256,118 @@ export default function FileUploader() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+interface RenderUploadingStateProps {
+  progress: number;
+  file: File;
+}
+
+function RenderUploadingState({ progress, file }: RenderUploadingStateProps) {
+  return (
+    <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
+      <div className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
+        <Loader2 className="size-5 animate-spin text-primary" />
+      </div>
+      <p className="mb-1.5 text-sm font-medium truncate max-w-xs">
+        Uploading {file.name}...
+      </p>
+      <p className="text-muted-foreground text-xs">{progress}% complete</p>
+    </div>
+  );
+}
+
+function RenderErrorState() {
+  return (
+    <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
+      <div className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+        <AlertCircleIcon className="size-5 text-destructive" />
+      </div>
+      <p className="mb-1.5 text-sm font-medium text-destructive">
+        Upload failed
+      </p>
+      <p className="text-muted-foreground text-xs">Please try again</p>
+    </div>
+  );
+}
+
+interface RenderSuccessStateProps {
+  fileName?: string;
+  previewUrl: string;
+}
+
+function RenderSuccessState({ fileName, previewUrl }: RenderSuccessStateProps) {
+  return (
+    <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
+      <div className="mb-4 flex size-11 shrink-0 items-center justify-center rounded-full bg-green-500/10">
+        <ImageIcon className="size-5 text-green-600" />
+      </div>
+      <p className="mb-1.5 -mt-2 text-sm font-medium">
+        File uploaded successfully
+      </p>
+      <p className="mb-4 text-muted-foreground text-xs">{fileName}</p>
+      <div className="relative h-32 w-full max-w-48 overflow-hidden rounded-lg border">
+        <Image
+          src={previewUrl}
+          alt="Uploaded image"
+          fill
+          className="object-cover"
+        />
+      </div>
+    </div>
+  );
+}
+
+interface RenderDefaultStateProps {
+  isDragActive: boolean;
+  maxSizeMB: number;
+  open: () => void;
+}
+
+function RenderDefaultState({
+  isDragActive,
+  maxSizeMB,
+  open,
+}: RenderDefaultStateProps) {
+  return (
+    <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
+      <div
+        className={`mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${
+          isDragActive
+            ? "bg-primary/10 border-primary scale-110"
+            : "bg-background border-border"
+        }`}
+        aria-hidden="true"
+      >
+        <ImageIcon
+          className={`size-5 transition-all duration-200 ${
+            isDragActive ? "text-primary scale-110" : "opacity-60"
+          }`}
+        />
+      </div>
+      <p
+        className={`mb-1.5 -mt-1 text-sm font-medium transition-colors duration-200 ${
+          isDragActive ? "text-primary" : ""
+        }`}
+      >
+        {isDragActive ? "Drop your image here" : "Drop your image here"}
+      </p>
+      <p className="text-muted-foreground text-xs">
+        SVG, PNG, or JPG (max. {maxSizeMB}MB)
+      </p>
+      {!isDragActive && (
+        <Button
+          variant="outline"
+          className="mt-4 cursor-pointer"
+          onClick={open}
+          type="button"
+        >
+          <UploadIcon className="-ms-1 size-4 opacity-60" aria-hidden="true" />
+          Select image
+        </Button>
+      )}
     </div>
   );
 }
