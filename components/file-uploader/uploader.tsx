@@ -133,38 +133,88 @@ export default function FileUploader() {
   const renderContent = () => {
     if (fileState.uploading) {
       return (
-        <div className="flex items-center gap-2">
-          <Loader2 className="size-4 animate-spin" />
-          <span>Uploading...</span>
+        <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
+          <div className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
+            <Loader2 className="size-5 animate-spin text-primary" />
+          </div>
+          <p className="mb-1.5 text-sm font-medium">Uploading...</p>
+          <p className="text-muted-foreground text-xs">
+            {fileState.progress}% complete
+          </p>
         </div>
       );
     }
+
     if (fileState.error) {
       return (
-        <>
-          <div
-            className="text-destructive flex items-center gap-1 text-xs"
-            role="alert"
-          >
-            <AlertCircleIcon className="size-3 shrink-0" />
-            <span>Error uploading file</span>
+        <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
+          <div className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+            <AlertCircleIcon className="size-5 text-destructive" />
           </div>
-        </>
+          <p className="mb-1.5 text-sm font-medium text-destructive">
+            Upload failed
+          </p>
+          <p className="text-muted-foreground text-xs">Please try again</p>
+        </div>
       );
     }
 
     if (fileState.objectUrl) {
-      return <div>Uploaded File</div>;
+      return (
+        <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
+          <div className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full bg-green-500/10">
+            <ImageIcon className="size-5 text-green-600" />
+          </div>
+          <p className="mb-1.5 text-sm font-medium">
+            File uploaded successfully
+          </p>
+          <p className="text-muted-foreground text-xs">
+            {fileState.file?.name}
+          </p>
+        </div>
+      );
     }
 
     return (
       <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
         <div
-          className="bg-background mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border"
+          className={`mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${
+            isDragActive
+              ? "bg-primary/10 border-primary scale-110"
+              : "bg-background border-border"
+          }`}
           aria-hidden="true"
         >
-          <ImageIcon className="size-4 opacity-60" />
+          <ImageIcon
+            className={`size-5 transition-all duration-200 ${
+              isDragActive ? "text-primary scale-110" : "opacity-60"
+            }`}
+          />
         </div>
+        <p
+          className={`mb-1.5 -mt-1 text-sm font-medium transition-colors duration-200 ${
+            isDragActive ? "text-primary" : ""
+          }`}
+        >
+          {isDragActive ? "Drop your image here" : "Drop your image here"}
+        </p>
+        <p className="text-muted-foreground text-xs">
+          SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)
+        </p>
+        {!isDragActive && (
+          <Button
+            variant="outline"
+            className="mt-4 cursor-pointer"
+            onClick={open}
+            type="button"
+          >
+            <UploadIcon
+              className="-ms-1 size-4 opacity-60"
+              aria-hidden="true"
+            />
+            Select image
+          </Button>
+        )}
       </div>
     );
   };
@@ -179,57 +229,21 @@ export default function FileUploader() {
   });
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2" {...getRootProps()}>
       <div className="relative">
-        {/* Drop area */}
         <div
-          //   onDragEnter={handleDragEnter}
-          //   onDragLeave={handleDragLeave}
-          //   onDragOver={handleDragOver}
-          //   onDrop={handleDrop}
-          //   data-dragging={isDragging || undefined}
-          className="border-input data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors has-[input:focus]:ring-[3px]"
+          className={`relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed p-4 transition-all duration-200 ${
+            isDragActive
+              ? "border-primary bg-primary/5 scale-[1.02] shadow-lg"
+              : "border-input hover:border-ring/50 hover:bg-accent/30"
+          }`}
         >
           <input
             {...getInputProps()}
             className="sr-only"
             aria-label="Upload image file"
           />
-          {fileState.objectUrl ? (
-            // <div className="absolute inset-0 flex items-center justify-center p-4">
-            //   <img
-            //     src={fileState.objectUrl}
-            //     alt={fileState.file?.name || "Uploaded image"}
-            //     className="mx-auto max-h-full rounded object-contain"
-            //   />
-            // </div>
-            <>{renderContent()}</>
-          ) : (
-            <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
-              <div
-                className="bg-background mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border"
-                aria-hidden="true"
-              >
-                <ImageIcon className="size-4 opacity-60" />
-              </div>
-              <p className="mb-1.5 text-sm font-medium">Drop your image here</p>
-              <p className="text-muted-foreground text-xs">
-                SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)
-              </p>
-              <Button
-                variant="outline"
-                className="mt-4"
-                onClick={open}
-                type="button"
-              >
-                <UploadIcon
-                  className="-ms-1 size-4 opacity-60"
-                  aria-hidden="true"
-                />
-                Select image
-              </Button>
-            </div>
-          )}
+          {renderContent()}
         </div>
 
         {fileState.objectUrl && (
@@ -252,7 +266,7 @@ export default function FileUploader() {
             </Button>
           </div>
         )}
-      </div> 
+      </div>
     </div>
   );
 }
