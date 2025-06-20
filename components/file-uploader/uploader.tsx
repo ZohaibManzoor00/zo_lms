@@ -14,6 +14,7 @@ import {
   UploadIcon,
   XIcon,
 } from "lucide-react";
+import { useConstructUrl } from "@/hooks/use-construct-url";
 
 interface UploaderProps {
   id: string | null;
@@ -33,6 +34,7 @@ interface iAppProps {
 }
 
 export default function FileUploader({ value, onChange }: iAppProps) {
+  const fileUrl = useConstructUrl(value ?? "")
   const [fileState, setFileState] = useState<UploaderProps>({
     id: null,
     file: null,
@@ -41,7 +43,8 @@ export default function FileUploader({ value, onChange }: iAppProps) {
     isDeleting: false,
     error: false,
     fileType: "image",
-    key: value
+    key: value,
+    objectUrl: fileUrl
   });
 
   const uploadFile = async (file: File) => {

@@ -6,6 +6,7 @@ import arcjet, {
   slidingWindow,
   shield,
   sensitiveInfo,
+  detectBot,
 } from "@arcjet/next";
 import { env } from "./env";
 
@@ -16,6 +17,7 @@ export {
   slidingWindow,
   shield,
   sensitiveInfo,
+  detectBot,
 };
 
 export default arcjet({
