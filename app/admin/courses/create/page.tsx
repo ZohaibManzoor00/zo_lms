@@ -39,6 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
+import FileUploader from "@/components/file-uploader/uploader";
 
 export default function CourseCreationPage() {
   const createCourseForm = useForm<CourseSchemaType>({
@@ -173,11 +174,7 @@ export default function CourseCreationPage() {
                   <FormItem className="w-full">
                     <FormLabel>Thumbnail</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Enter course thumbnail"
-                        {...field}
-                        className="min-h-[120px]"
-                      />
+                      <FileUploader />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
