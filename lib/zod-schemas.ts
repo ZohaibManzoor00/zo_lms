@@ -17,7 +17,7 @@ export const courseSchema = z.object({
     .string()
     .min(3, { message: "Description must be at least 3 characters" })
     .max(2000, { message: "Description must be less than 2000 characters" }),
-  fileKey: z.string().min(1, { message: "File key is required" }),
+  fileKey: z.string().min(1, { message: "File is required" }),
   price: z.coerce.number().min(0), // allow free courses
   duration: z.coerce
     .number()

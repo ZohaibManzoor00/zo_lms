@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,6 @@ import {
   UploadIcon,
   XIcon,
 } from "lucide-react";
-import Image from "next/image";
 
 interface UploaderProps {
   id: string | null;
@@ -27,16 +27,21 @@ interface UploaderProps {
   fileType: "image" | "video";
 }
 
-export default function FileUploader() {
+interface iAppProps {
+    value?: string
+    onChange?: (value: string) => void
+}
+
+export default function FileUploader({ value, onChange }: iAppProps) {
   const [fileState, setFileState] = useState<UploaderProps>({
     id: null,
     file: null,
     uploading: false,
     progress: 0,
-    key: undefined,
     isDeleting: false,
     error: false,
     fileType: "image",
+    key: value
   });
 
   const uploadFile = async (file: File) => {
@@ -90,6 +95,7 @@ export default function FileUploader() {
               progress: 100,
               key,
             }));
+            onChange?.(key)
             toast.success("File uploaded successfully");
             resolve();
           } else {
@@ -137,6 +143,58 @@ export default function FileUploader() {
     },
     [fileState.objectUrl]
   );
+
+  const removeFile = async () => {
+    if (fileState.isDeleting || !fileState.objectUrl) return;
+    try {
+      setFileState((prev) => ({
+        ...prev,
+        isDeleting: true,
+      }));
+
+      const response = await fetch("/api/s3/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: fileState.key }),
+      });
+
+      if (!response.ok) {
+        toast.error("Failed to delete file");
+        setFileState((prev) => ({
+          ...prev,
+          isDeleting: false,
+          error: true,
+        }));
+        return;
+      }
+
+      if (fileState.objectUrl && !fileState.objectUrl.startsWith("http")) {
+        URL.revokeObjectURL(fileState.objectUrl);
+      }
+
+      onChange?.("")
+
+      setFileState(() => ({
+        file: null,
+        objectUrl: undefined,
+        id: null,
+        isDeleting: false,
+        error: false,
+        uploading: false,
+        progress: 0,
+        fileType: "image",
+      }));
+
+      toast.success("File deleted successfully");
+    } catch {
+      toast.error("Failed to delete file, please try again.");
+      setFileState((prev) => ({
+        ...prev,
+        isDeleting: false,
+        error: true,
+      }));
+    }
+  };
 
   const maxSizeMB = 5;
 
@@ -186,6 +244,8 @@ export default function FileUploader() {
         <RenderSuccessState
           fileName={fileState.file?.name}
           previewUrl={fileState.objectUrl}
+          isDeleting={fileState.isDeleting}
+          handleRemoveFile={removeFile}
         />
       );
     }
@@ -205,7 +265,8 @@ export default function FileUploader() {
     accept: { "image/*": [] },
     maxFiles: 1,
     multiple: false,
-    maxSize: maxSizeMB * 1024 * 1024, // 5MB
+    maxSize: maxSizeMB * 1024 * 1024,
+    disabled: fileState.uploading || !!fileState.objectUrl,
   });
 
   useEffect(() => {
@@ -233,28 +294,6 @@ export default function FileUploader() {
           />
           {renderContent()}
         </div>
-
-        {fileState.objectUrl && (
-          <div className="absolute top-4 right-4">
-            <Button
-              type="button"
-              className="focus-visible:border-ring focus-visible:ring-ring/50 z-50 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:ring-[3px]"
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.stopPropagation();
-                setFileState((prev) => ({
-                  ...prev,
-                  isDeleting: true,
-                  file: null,
-                  objectUrl: undefined,
-                  id: null,
-                }));
-              }}
-              aria-label="Remove image"
-            >
-              <XIcon className="size-4" aria-hidden="true" />
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -296,9 +335,16 @@ function RenderErrorState() {
 interface RenderSuccessStateProps {
   fileName?: string;
   previewUrl: string;
+  isDeleting: boolean;
+  handleRemoveFile: () => void;
 }
 
-function RenderSuccessState({ fileName, previewUrl }: RenderSuccessStateProps) {
+function RenderSuccessState({
+  fileName,
+  previewUrl,
+  isDeleting,
+  handleRemoveFile,
+}: RenderSuccessStateProps) {
   return (
     <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
       <div className="mb-4 flex size-11 shrink-0 items-center justify-center rounded-full bg-green-500/10">
@@ -316,6 +362,17 @@ function RenderSuccessState({ fileName, previewUrl }: RenderSuccessStateProps) {
           className="object-cover"
         />
       </div>
+      <Button
+        type="button"
+        size="icon"
+        className="absolute top-4 right-4 cursor-pointer rounded-full"
+        onClick={handleRemoveFile}
+        aria-label="Remove image"
+        variant="destructive"
+        disabled={isDeleting}
+      >
+        <XIcon className="size-4" aria-hidden="true" />
+      </Button>
     </div>
   );
 }
