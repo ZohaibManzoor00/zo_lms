@@ -3,6 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import { RecordingSession, AudioEvent } from "./CodeRecorder";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Play, Pause, Square, Edit3, RotateCcw, Lightbulb } from "lucide-react";
 
 export interface CodeEvent {
   timestamp: number;
@@ -19,7 +23,8 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
   const [currentCode, setCurrentCode] = useState(session.initialCode);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [playbackSpeed, _setPlaybackSpeed] = useState(1);
+  const playbackSpeedRef = useRef(playbackSpeed);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isInteractiveMode, setIsInteractiveMode] = useState(false);
   const [originalCode, setOriginalCode] = useState(session.finalCode);
@@ -31,24 +36,28 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
   const playbackTimerRef = useRef<NodeJS.Timeout | null>(null);
   const currentEventIndexRef = useRef(0);
 
+  const setPlaybackSpeed = (speed: number) => {
+    playbackSpeedRef.current = speed;
+    _setPlaybackSpeed(speed);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+  };
+
   // Create audio URL from blob or use provided URL
   useEffect(() => {
     if (session.audioUrl) {
-      // Use the provided audio URL (from Tigris)
       setAudioUrl(session.audioUrl);
     } else if (session.audioBlob) {
-      // Handle both Blob objects and serialized blob data
       let blob: Blob;
 
       if (session.audioBlob instanceof Blob) {
-        // It's already a Blob object
         blob = session.audioBlob;
       } else if (
         session.audioBlob &&
         typeof session.audioBlob === "object" &&
         "data" in session.audioBlob
       ) {
-        // It's serialized blob data - reconstruct the Blob
         const { data, type } = session.audioBlob as any;
 
         if (!data || !Array.isArray(data)) {
@@ -98,66 +107,62 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
   const startPlayback = () => {
     if (isPlaying) return;
 
-    setIsPlaying(true);
+    let timeToStartFrom = currentTime;
 
-    // Don't reset if we're resuming from a pause
-    if (currentEventIndexRef.current === 0) {
+    // If playback is at or near the end, reset to play from the beginning
+    if (timeToStartFrom >= totalDuration) {
+      timeToStartFrom = 0;
+      setCurrentTime(0);
       currentEventIndexRef.current = 0;
       setCurrentCode(session.initialCode);
-
-      // Reset editor position
       if (editorRef.current) {
         editorRef.current.setPosition({ lineNumber: 1, column: 1 });
       }
     }
 
-    // Start audio if available
+    setIsPlaying(true);
+
     if (audioRef.current && audioUrl) {
+      audioRef.current.playbackRate = playbackSpeedRef.current;
+      audioRef.current.currentTime = timeToStartFrom / 1000;
       audioRef.current
         .play()
-        .then(() => {
-          // Audio playback started successfully
-        })
-        .catch((error) => {
-          console.error("Error playing audio:", error);
-          // Continue playback even if audio fails
-        });
-    } else {
-      // Audio not available - continue with code playback only
+        .catch((error) => console.error("Error playing audio:", error));
     }
 
-    // Start playback timer with higher precision
-    const startTime = Date.now() - currentTime / playbackSpeed;
-    playbackTimerRef.current = setInterval(() => {
-      const elapsed = (Date.now() - startTime) * playbackSpeed;
-      setCurrentTime(elapsed);
+    const startWallTime = Date.now();
+    const startRecordingTime = timeToStartFrom;
 
-      // Process events that should have occurred by now
+    playbackTimerRef.current = setInterval(() => {
+      const elapsedWallTime = Date.now() - startWallTime;
+      const currentRecordingTime =
+        startRecordingTime + elapsedWallTime * playbackSpeedRef.current;
+
+      setCurrentTime(currentRecordingTime);
+
       const sessionStartTime = session.startTime;
       const allEvents = [...session.codeEvents, ...session.audioEvents].sort(
         (a, b) => a.timestamp - b.timestamp
       );
 
-      // Process all events that should have occurred
       while (
         currentEventIndexRef.current < allEvents.length &&
         allEvents[currentEventIndexRef.current].timestamp - sessionStartTime <=
-          elapsed
+          currentRecordingTime
       ) {
         const event = allEvents[currentEventIndexRef.current];
         processEvent(event);
         currentEventIndexRef.current++;
       }
 
-      // Check if playback is complete
-      if (currentEventIndexRef.current >= allEvents.length) {
-        stopPlayback();
+      if (currentRecordingTime >= totalDuration) {
+        stopPlayback(true); // Stop but keep final state
       }
-    }, 8); // Higher frequency for better sync (120fps)
+    }, 15);
   };
 
   // Stop playback
-  const stopPlayback = () => {
+  const stopPlayback = (finished = false) => {
     setIsPlaying(false);
 
     if (playbackTimerRef.current) {
@@ -167,16 +172,21 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
 
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      if (!finished) {
+        audioRef.current.currentTime = 0;
+      }
     }
 
-    setCurrentTime(0);
-    currentEventIndexRef.current = 0;
-    setCurrentCode(session.initialCode);
-
-    // Reset editor position
-    if (editorRef.current) {
-      editorRef.current.setPosition({ lineNumber: 1, column: 1 });
+    if (finished) {
+      setCurrentTime(totalDuration);
+      setCurrentCode(session.finalCode);
+    } else {
+      setCurrentTime(0);
+      currentEventIndexRef.current = 0;
+      setCurrentCode(session.initialCode);
+      if (editorRef.current) {
+        editorRef.current.setPosition({ lineNumber: 1, column: 1 });
+      }
     }
   };
 
@@ -197,14 +207,10 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
   // Toggle interactive mode
   const toggleInteractiveMode = () => {
     if (isInteractiveMode) {
-      // Exit interactive mode - restore original code and resume playback
       setIsInteractiveMode(false);
-      setCurrentCode(userEditedCode); // Keep user's edits for now
-
-      // Resume playback from where we left off
+      setCurrentCode(userEditedCode);
       startPlayback();
     } else {
-      // Enter interactive mode - pause playback and save current state
       setIsInteractiveMode(true);
       setUserEditedCode(currentCode);
       pausePlayback();
@@ -215,70 +221,77 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
   const resumeWithOriginalCode = () => {
     setIsInteractiveMode(false);
     setCurrentCode(originalCode);
-
-    // Resume playback from where we left off
     startPlayback();
   };
 
   // Process individual events
   const processEvent = (event: CodeEvent | AudioEvent) => {
     if ("data" in event) {
-      // Code event
       if (event.type === "keypress" && event.data) {
         setCurrentCode(event.data);
       }
-      // No cursor or selection events anymore
-    } else {
-      // Audio event - these are handled by the audio element
-      // but we can log them for debugging
     }
   };
 
-  // Seek to specific time with optimized processing
+  // Seek to specific time
   const seekTo = (time: number) => {
-    if (isPlaying) {
+    const wasPlaying = isPlaying;
+    if (wasPlaying) {
       pausePlayback();
     }
 
     setCurrentTime(time);
-    currentEventIndexRef.current = 0;
-    setCurrentCode(session.initialCode);
 
-    // Process all events up to the seek time efficiently
+    // Re-process events up to the seek time
+    let tempCode = session.initialCode;
     const sessionStartTime = session.startTime;
     const allEvents = [...session.codeEvents, ...session.audioEvents].sort(
       (a, b) => a.timestamp - b.timestamp
     );
 
-    // Use a more efficient loop for seeking
+    let lastCodeEventIndex = -1;
     for (let i = 0; i < allEvents.length; i++) {
       const event = allEvents[i];
       if (event.timestamp - sessionStartTime <= time) {
-        processEvent(event);
-        currentEventIndexRef.current = i + 1;
+        if ("data" in event && event.type === "keypress" && event.data) {
+          tempCode = event.data;
+        }
+        lastCodeEventIndex = i;
       } else {
         break;
       }
     }
+    currentEventIndexRef.current = lastCodeEventIndex + 1;
+    setCurrentCode(tempCode);
 
-    // Update audio position if available
     if (audioRef.current && audioUrl) {
-      audioRef.current.currentTime = time / 1000; // Convert to seconds
+      audioRef.current.currentTime = time / 1000;
+    }
+
+    if (wasPlaying) {
+      startPlayback();
     }
   };
 
   // Format time for display
   const formatTime = (milliseconds: number) => {
-    const seconds = Math.floor(milliseconds / 1000);
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
     return `${mins.toString().padStart(2, "0")}:${secs
       .toString()
       .padStart(2, "0")}`;
   };
 
+  // Handle playback speed change
+  const handleSpeedChange = (speed: number) => {
+    setPlaybackSpeed(speed);
+  };
+
   // Calculate total duration
   const totalDuration = session.endTime - session.startTime;
+  const progressPercentage =
+    totalDuration > 0 ? (currentTime / totalDuration) * 100 : 0;
 
   // Cleanup on unmount
   useEffect(() => {
@@ -290,126 +303,119 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
   }, []);
 
   return (
-    <div className="space-y-6">
-      {/* Playback Controls */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <div className="flex items-center gap-4 flex-wrap mb-4">
-          <button
-            onClick={isPlaying ? pausePlayback : startPlayback}
-            className="px-6 py-3 rounded-lg font-medium bg-blue-500 text-white hover:bg-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            {isPlaying ? "⏸️ Pause" : "▶️ Play"}
-          </button>
+    <div className="space-y-4">
+      {/* Audio element (hidden) */}
+      {audioUrl && (
+        <audio
+          ref={audioRef}
+          src={audioUrl}
+          onError={(e) => console.error("Audio playback error:", e)}
+        />
+      )}
 
-          <button
-            onClick={stopPlayback}
-            className="px-6 py-3 rounded-lg font-medium bg-gray-500 text-white hover:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl"
-          >
-            ⏹️ Stop
-          </button>
-
-          <button
-            onClick={toggleInteractiveMode}
-            className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-              isInteractiveMode
-                ? "bg-yellow-500 text-white hover:bg-yellow-600 shadow-lg"
-                : "bg-purple-500 text-white hover:bg-purple-600 shadow-lg hover:shadow-xl"
-            }`}
-          >
-            {isInteractiveMode ? "✏️ Keep Edits" : "✏️ Edit Mode"}
-          </button>
-
-          {isInteractiveMode && (
-            <button
-              onClick={resumeWithOriginalCode}
-              className="px-6 py-3 rounded-lg font-medium bg-green-500 text-white hover:bg-green-600 transition-all duration-200 shadow-lg hover:shadow-xl"
-            >
-              ▶️ Resume Original
-            </button>
-          )}
-
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-600">Speed:</label>
-            <select
-              value={playbackSpeed}
-              onChange={(e) => setPlaybackSpeed(Number(e.target.value))}
-              className="px-3 py-2 border rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value={0.5}>0.5x</option>
-              <option value={1}>1x</option>
-              <option value={1.5}>1.5x</option>
-              <option value={2}>2x</option>
-            </select>
-          </div>
-
-          <div className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-2 rounded-lg">
-            {formatTime(currentTime)} / {formatTime(totalDuration)}
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full">
-          <input
-            type="range"
-            min="0"
-            max={totalDuration}
-            value={currentTime}
-            onChange={(e) => seekTo(Number(e.target.value))}
-            className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-            style={{
-              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${
-                (currentTime / totalDuration) * 100
-              }%, #e5e7eb ${
-                (currentTime / totalDuration) * 100
-              }%, #e5e7eb 100%)`,
-            }}
-          />
+      <div className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
+        <Lightbulb className="h-5 w-5 flex-shrink-0 text-primary" />
+        <div>
+          <h4 className="font-semibold text-primary">
+            How to Use This Walkthrough
+          </h4>
+          <p className="text-sm text-muted-foreground">
+            Watch the instructor's code being typed in real-time with
+            synchronized audio narration. You can pause at any time to edit the
+            code and experiment, then resume to see the original solution.
+          </p>
         </div>
       </div>
 
-      {/* Audio Player */}
-      {audioUrl && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="font-medium text-gray-700 mb-4 flex items-center gap-2">
-            <span className="text-green-500">🎵</span>
-            Audio Playback
-          </h3>
-          <audio
-            ref={audioRef}
-            controls
-            className="w-full"
-            src={audioUrl}
-            onError={(e) => console.error("Audio playback error:", e)}
-            onLoadStart={() => console.log("Audio loading started")}
-            onCanPlay={() => console.log("Audio can play")}
-            onPlay={() => console.log("Audio play event")}
-            onPause={() => console.log("Audio pause event")}
-          />
-          <div className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-            <span className="font-medium">Audio file:</span>{" "}
-            {session.audioBlob && "size" in session.audioBlob
-              ? session.audioBlob.size > 1024
-                ? `${(session.audioBlob.size / 1024).toFixed(1)} KB`
-                : `${session.audioBlob.size} bytes`
-              : "Audio available"}
+      <Card className="overflow-hidden">
+        <div className="space-y-4 border-b bg-muted/30 p-4 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                onClick={isPlaying ? pausePlayback : startPlayback}
+                size="sm"
+              >
+                {isPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+                <span className="ml-2">{isPlaying ? "Pause" : "Play"}</span>
+              </Button>
+              <Button
+                onClick={() => stopPlayback()}
+                variant="outline"
+                size="sm"
+              >
+                <Square className="h-4 w-4" />
+                <span className="ml-2">Stop</span>
+              </Button>
+              <Button
+                onClick={toggleInteractiveMode}
+                variant={isInteractiveMode ? "secondary" : "outline"}
+                size="sm"
+              >
+                <Edit3 className="h-4 w-4" />
+                <span className="ml-2">
+                  {isInteractiveMode ? "Exit Edit" : "Edit Mode"}
+                </span>
+              </Button>
+              {isInteractiveMode && (
+                <Button
+                  onClick={resumeWithOriginalCode}
+                  variant="outline"
+                  size="sm"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  <span className="ml-2">Reset</span>
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="speed-select"
+                className="text-sm font-medium text-muted-foreground"
+              >
+                Speed:
+              </label>
+              <select
+                id="speed-select"
+                value={playbackSpeed}
+                onChange={(e) => handleSpeedChange(Number(e.target.value))}
+                className="h-9 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value={0.5}>0.5x</option>
+                <option value={1}>1x</option>
+                <option value={1.5}>1.5x</option>
+                <option value={2}>2x</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-2">
+            <span className="text-sm font-mono text-muted-foreground w-12 text-center">
+              {formatTime(currentTime / playbackSpeed)}
+            </span>
+            <div className="relative w-full">
+              <Progress value={progressPercentage} className="h-2" />
+              <input
+                type="range"
+                min="0"
+                max={totalDuration}
+                value={currentTime}
+                onInput={(e) =>
+                  seekTo(Number((e.target as HTMLInputElement).value))
+                }
+                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+              />
+            </div>
+            <span className="text-sm font-mono text-muted-foreground w-12 text-center">
+              {formatTime(totalDuration / playbackSpeed)}
+            </span>
           </div>
         </div>
-      )}
 
-      {/* Code Editor */}
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div className="bg-gray-100 px-4 py-3 border-b">
-          <h3 className="font-medium text-gray-700 flex items-center gap-2">
-            <span className="text-blue-500">📝</span>
-            Code Playback
-            {isInteractiveMode && (
-              <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">
-                ✏️ Interactive Mode
-              </span>
-            )}
-          </h3>
-        </div>
-        <div className="h-96">
+        <div className="h-96 w-full">
           <Editor
             height="100%"
             defaultLanguage="javascript"
@@ -424,80 +430,31 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
               roundedSelection: false,
               scrollBeyondLastLine: false,
               automaticLayout: true,
-              readOnly: !isInteractiveMode, // Only editable in interactive mode
+              readOnly: !isInteractiveMode,
               wordWrap: "on",
               folding: true,
               showFoldingControls: "always",
+              padding: { top: 16, bottom: 16 },
             }}
           />
         </div>
-      </div>
+      </Card>
 
-      {/* Session Info */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="font-medium text-gray-700 mb-4 flex items-center gap-2">
-          <span className="text-purple-500">📊</span>
-          Session Information
-        </h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <span className="font-medium text-blue-700">Duration:</span>
-            <div className="text-lg font-bold text-blue-600">
-              {formatTime(totalDuration)}
-            </div>
-          </div>
-          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-            <span className="font-medium text-green-700">Code Events:</span>
-            <div className="text-lg font-bold text-green-600">
-              {session.codeEvents.length}
-            </div>
-          </div>
-          <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-            <span className="font-medium text-purple-700">Audio Events:</span>
-            <div className="text-lg font-bold text-purple-600">
-              {session.audioEvents.length}
-            </div>
-          </div>
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <span className="font-medium text-gray-700">Session ID:</span>
-            <div className="text-sm font-mono text-gray-600">{session.id}</div>
-          </div>
-          {session.audioBlob && (
-            <div className="col-span-2 bg-green-50 p-4 rounded-lg border border-green-200">
-              <span className="font-medium text-green-700">Audio:</span>
-              <div className="text-sm text-green-600">
-                ✅ Available (
-                {session.audioBlob && "size" in session.audioBlob
-                  ? session.audioBlob.size > 1024
-                    ? `${(session.audioBlob.size / 1024).toFixed(1)} KB`
-                    : `${session.audioBlob.size} bytes`
-                  : "Serialized data"}
-                )
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                Audio URL: {audioUrl ? "✅ Set" : "❌ Not set"}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Interactive Mode Instructions */}
-        <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg">
-          <div className="flex items-start gap-3">
-            <div className="text-purple-500 text-lg">💡</div>
-            <div>
-              <h4 className="font-medium text-purple-700 mb-1">
-                Interactive Mode
-              </h4>
-              <p className="text-sm text-purple-600">
-                {isInteractiveMode
-                  ? "You're in edit mode! Make changes to the code, then click 'Keep Edits' to continue with your changes or 'Resume Original' to restore the recorded code."
-                  : "Click 'Edit Mode' to pause playback and make changes to the code. You can then choose to keep your edits or resume with the original recording."}
-              </p>
-            </div>
+      {isInteractiveMode && (
+        <div className="flex items-center gap-3 rounded-lg border border-secondary/20 bg-secondary/5 p-4">
+          <Edit3 className="h-5 w-5 flex-shrink-0 text-secondary-foreground" />
+          <div>
+            <h4 className="font-semibold text-secondary-foreground">
+              You are in Interactive Mode
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              Feel free to edit the code. Click "Exit Edit" to continue the
+              walkthrough with your changes, or "Reset" to revert to the
+              original.
+            </p>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
