@@ -2,7 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
-import { RecordingSession, CodeEvent, AudioEvent } from "./CodeRecorder";
+import { RecordingSession, AudioEvent } from "./CodeRecorder";
+
+export interface CodeEvent {
+  timestamp: number;
+  type: "keypress" | "delete" | "paste";
+  data?: string;
+  position?: number;
+}
 
 interface CodePlaybackProps {
   session: RecordingSession;
@@ -24,17 +31,17 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
   const playbackTimerRef = useRef<NodeJS.Timeout | null>(null);
   const currentEventIndexRef = useRef(0);
 
-  // Create audio URL from blob
+  // Create audio URL from blob or use provided URL
   useEffect(() => {
-    if (session.audioBlob) {
-      console.log("Processing audioBlob:", session.audioBlob);
-
+    if (session.audioUrl) {
+      // Use the provided audio URL (from Tigris)
+      setAudioUrl(session.audioUrl);
+    } else if (session.audioBlob) {
       // Handle both Blob objects and serialized blob data
       let blob: Blob;
 
       if (session.audioBlob instanceof Blob) {
         // It's already a Blob object
-        console.log("AudioBlob is already a Blob");
         blob = session.audioBlob;
       } else if (
         session.audioBlob &&
@@ -42,9 +49,7 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
         "data" in session.audioBlob
       ) {
         // It's serialized blob data - reconstruct the Blob
-        console.log("Reconstructing Blob from serialized data");
         const { data, type } = session.audioBlob as any;
-        console.log("Blob data length:", data?.length, "type:", type);
 
         if (!data || !Array.isArray(data)) {
           console.error("Invalid blob data format");
@@ -53,7 +58,6 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
 
         const uint8Array = new Uint8Array(data);
         blob = new Blob([uint8Array], { type: type || "audio/webm" });
-        console.log("Reconstructed blob size:", blob.size, "type:", blob.type);
       } else {
         console.warn("Invalid audioBlob format:", session.audioBlob);
         return;
@@ -61,7 +65,6 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
 
       try {
         const url = URL.createObjectURL(blob);
-        console.log("Created audio URL:", url);
         setAudioUrl(url);
 
         return () => {
@@ -71,9 +74,9 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
         console.error("Error creating audio URL:", error);
       }
     } else {
-      console.log("No audioBlob found in session");
+      setAudioUrl(null);
     }
-  }, [session.audioBlob]);
+  }, [session.audioBlob, session.audioUrl]);
 
   // Handle editor mount
   const handleEditorDidMount = (editor: any, monaco: Monaco) => {
@@ -110,25 +113,17 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
 
     // Start audio if available
     if (audioRef.current && audioUrl) {
-      console.log("Starting audio playback, URL:", audioUrl);
-      console.log("Audio element:", audioRef.current);
-
       audioRef.current
         .play()
         .then(() => {
-          console.log("Audio playback started successfully");
+          // Audio playback started successfully
         })
         .catch((error) => {
           console.error("Error playing audio:", error);
           // Continue playback even if audio fails
         });
     } else {
-      console.log(
-        "Audio not available - audioRef:",
-        !!audioRef.current,
-        "audioUrl:",
-        !!audioUrl
-      );
+      // Audio not available - continue with code playback only
     }
 
     // Start playback timer with higher precision
@@ -231,29 +226,11 @@ export default function CodePlayback({ session }: CodePlaybackProps) {
       // Code event
       if (event.type === "keypress" && event.data) {
         setCurrentCode(event.data);
-      } else if (event.type === "cursor" && event.cursor && editorRef.current) {
-        // Move cursor to position
-        editorRef.current.setPosition({
-          lineNumber: event.cursor.lineNumber,
-          column: event.cursor.column,
-        });
-      } else if (
-        event.type === "selection" &&
-        event.selection &&
-        editorRef.current
-      ) {
-        // Set selection
-        editorRef.current.setSelection({
-          startLineNumber: event.selection.startLineNumber,
-          startColumn: event.selection.startColumn,
-          endLineNumber: event.selection.endLineNumber,
-          endColumn: event.selection.endColumn,
-        });
       }
+      // No cursor or selection events anymore
     } else {
       // Audio event - these are handled by the audio element
       // but we can log them for debugging
-      console.log("Audio event:", event.type, "at", event.timestamp);
     }
   };
 

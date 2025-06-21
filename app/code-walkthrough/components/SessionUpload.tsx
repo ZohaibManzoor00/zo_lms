@@ -21,7 +21,7 @@ export default function SessionUpload({
     courseId: "",
     chapterId: "",
     lessonId: "",
-    instructorId: "instructor-1", // Default instructor ID
+    instructorId: "zdNe4AAaPGkV4L3HxLsfPBJpQH6pCPuj", // Default instructor ID
   });
 
   const handleUpload = async () => {
@@ -39,57 +39,88 @@ export default function SessionUpload({
     setUploadStatus("Uploading session...");
 
     try {
-      console.log("Uploading session:", session);
-      console.log("Session audioBlob:", session.audioBlob);
-      console.log("AudioBlob type:", typeof session.audioBlob);
-      console.log(
-        "AudioBlob instanceof Blob:",
-        session.audioBlob instanceof Blob
-      );
+      let audioFileKey: string | null = null;
+      let audioContentType: string | null = null;
+      let audioSize: number | null = null;
 
-      // Prepare session data with serialized audioBlob
-      const sessionData = { ...session };
-
+      // Upload audio to Tigris if available
       if (session.audioBlob && session.audioBlob instanceof Blob) {
-        console.log("Processing audioBlob for upload...");
-        // Convert Blob to serializable format
-        const arrayBuffer = await session.audioBlob.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        sessionData.audioBlob = {
-          data: Array.from(uint8Array), // Convert to regular array for JSON serialization
-          type: session.audioBlob.type,
-          size: session.audioBlob.size,
-        };
-        console.log("Serialized audioBlob:", sessionData.audioBlob);
-      } else {
-        console.warn("No valid audioBlob found for upload");
-        sessionData.audioBlob = null;
+        try {
+          setUploadStatus("Uploading audio to cloud storage...");
+
+          // Get presigned URL for audio upload
+          const presignedResponse = await fetch("/api/s3/upload-audio", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              filename: `walkthrough-audio-${Date.now()}.webm`,
+              contentType: session.audioBlob.type,
+              size: session.audioBlob.size,
+            }),
+          });
+
+          if (!presignedResponse.ok) {
+            throw new Error("Failed to get presigned URL for audio upload");
+          }
+
+          const { presignedUrl, key } = await presignedResponse.json();
+
+          // Upload audio blob directly to Tigris
+          const uploadResponse = await fetch(presignedUrl, {
+            method: "PUT",
+            body: session.audioBlob,
+            headers: {
+              "Content-Type": session.audioBlob.type,
+            },
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error("Failed to upload audio to cloud storage");
+          }
+
+          audioFileKey = key;
+          audioContentType = session.audioBlob.type;
+          audioSize = session.audioBlob.size;
+        } catch (error) {
+          console.error("Error uploading audio:", error);
+          setUploadStatus(
+            "Warning: Audio upload failed, continuing without audio..."
+          );
+          // Continue without audio if upload fails
+        }
       }
 
-      const sessionMetadata: SessionMetadata = {
-        id: session.id,
+      setUploadStatus("Saving walkthrough to database...");
+
+      // Prepare metadata for database (without the blob)
+      const walkthroughMetadata = {
         title: metadata.title,
         description: metadata.description,
         courseId: metadata.courseId,
         chapterId: metadata.chapterId,
         lessonId: metadata.lessonId,
         instructorId: metadata.instructorId,
-        duration: session.endTime - session.startTime,
-        codeEvents: session.codeEvents.length,
-        audioEvents: session.audioEvents.length,
-        audioSize: session.audioBlob?.size || 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        audioFileKey,
+        audioContentType,
+        audioSize,
       };
 
-      const response = await fetch("/api/sessions", {
+      // Create session data without the blob
+      const sessionData = {
+        ...session,
+        audioBlob: undefined, // Don't send the blob to the API
+      };
+
+      const response = await fetch("/api/code-walkthroughs", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          metadata: sessionMetadata,
           session: sessionData,
+          metadata: walkthroughMetadata,
         }),
       });
 
@@ -99,9 +130,9 @@ export default function SessionUpload({
 
       const result = await response.json();
       setUploadStatus(
-        `✅ Session uploaded successfully! ID: ${result.sessionId}`
+        `✅ Session uploaded successfully! ID: ${result.walkthroughId}`
       );
-      onUploadComplete?.(result.sessionId);
+      onUploadComplete?.(result.walkthroughId);
     } catch (error) {
       console.error("Upload error:", error);
       setUploadStatus("❌ Failed to upload session. Please try again.");

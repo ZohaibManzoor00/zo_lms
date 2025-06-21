@@ -1,9 +1,24 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import CodePlayback from "../../code-walkthrough/components/CodePlayback";
-import { RecordingSession } from "../../code-walkthrough/components/CodeRecorder";
-import { SessionMetadata } from "@/app/api/sessions/route";
+import { RecordingSession } from "@/app/code-walkthrough/components/CodeRecorder";
+import CodePlayback from "@/app/code-walkthrough/components/CodePlayback";
+
+interface WalkthroughMetadata {
+  id: string;
+  title: string;
+  description: string;
+  courseId: string;
+  chapterId: string;
+  lessonId: string;
+  instructorId: string;
+  duration: number;
+  codeEvents: number;
+  audioEvents: number;
+  audioSize: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface TestLessonPageProps {
   params: Promise<{
@@ -14,7 +29,7 @@ interface TestLessonPageProps {
 export default function TestLessonPage({ params }: TestLessonPageProps) {
   const { sessionId } = use(params);
   const [session, setSession] = useState<RecordingSession | null>(null);
-  const [metadata, setMetadata] = useState<SessionMetadata | null>(null);
+  const [metadata, setMetadata] = useState<WalkthroughMetadata | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,24 +37,29 @@ export default function TestLessonPage({ params }: TestLessonPageProps) {
     const fetchSession = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/sessions/${sessionId}`);
+        const response = await fetch(`/api/code-walkthroughs/${sessionId}`);
 
         if (!response.ok) {
           throw new Error("Session not found");
         }
 
         const data = await response.json();
-        setSession(data.session);
-
-        // Get metadata from sessions list
-        const sessionsResponse = await fetch("/api/sessions");
-        if (sessionsResponse.ok) {
-          const sessionsData = await sessionsResponse.json();
-          const sessionMetadata = sessionsData.sessions.find(
-            (s: SessionMetadata) => s.id === sessionId
-          );
-          setMetadata(sessionMetadata);
-        }
+        setSession(data.walkthrough.session);
+        setMetadata({
+          id: data.walkthrough.id,
+          title: data.walkthrough.title,
+          description: data.walkthrough.description,
+          courseId: data.walkthrough.courseId,
+          chapterId: data.walkthrough.chapterId,
+          lessonId: data.walkthrough.lessonId,
+          instructorId: data.walkthrough.instructorId,
+          duration: data.walkthrough.duration,
+          codeEvents: data.walkthrough.codeEventCount,
+          audioEvents: data.walkthrough.audioEventCount,
+          audioSize: data.walkthrough.audioSize || 0,
+          createdAt: data.walkthrough.createdAt,
+          updatedAt: data.walkthrough.updatedAt,
+        });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load session");
       } finally {

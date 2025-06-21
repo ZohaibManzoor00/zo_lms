@@ -12,19 +12,9 @@ declare global {
 
 export interface CodeEvent {
   timestamp: number;
-  type: "keypress" | "delete" | "paste" | "cursor" | "selection";
+  type: "keypress" | "delete" | "paste";
   data?: string;
   position?: number;
-  selection?: {
-    startLineNumber: number;
-    startColumn: number;
-    endLineNumber: number;
-    endColumn: number;
-  };
-  cursor?: {
-    lineNumber: number;
-    column: number;
-  };
 }
 
 export interface AudioEvent {
@@ -41,6 +31,7 @@ export interface RecordingSession {
   initialCode: string;
   finalCode: string;
   audioBlob?: Blob;
+  audioUrl?: string; // URL to audio file in Tigris
 }
 
 interface CodeRecorderProps {
@@ -73,73 +64,17 @@ export default function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
 
   // Capture cursor position changes with throttling
   const handleCursorPositionChanged = useCallback(() => {
-    if (!isRecording || !editorRef.current) return;
-
-    const position = editorRef.current.getPosition();
-    const newEvent: CodeEvent = {
-      timestamp: Date.now(),
-      type: "cursor",
-      cursor: {
-        lineNumber: position.lineNumber,
-        column: position.column,
-      },
-    };
-
-    setCodeEvents((prev) => {
-      // Only add cursor event if it's significantly different from the last one
-      const lastEvent = prev[prev.length - 1];
-      if (lastEvent && lastEvent.type === "cursor" && lastEvent.cursor) {
-        const lastPos = lastEvent.cursor;
-        const newPos = newEvent.cursor!;
-        // Only record if cursor moved more than 1 character or to a different line
-        if (
-          Math.abs(newPos.column - lastPos.column) <= 1 &&
-          newPos.lineNumber === lastPos.lineNumber
-        ) {
-          return prev;
-        }
-      }
-      return [...prev, newEvent];
-    });
-  }, [isRecording]);
+    // Disabled cursor tracking to reduce events
+    // Only track essential code changes, not cursor movements
+    return;
+  }, []);
 
   // Capture selection changes with throttling
   const handleSelectionChanged = useCallback(() => {
-    if (!isRecording || !editorRef.current) return;
-
-    const selection = editorRef.current.getSelection();
-    if (!selection) return;
-
-    const newEvent: CodeEvent = {
-      timestamp: Date.now(),
-      type: "selection",
-      selection: {
-        startLineNumber: selection.startLineNumber,
-        startColumn: selection.startColumn,
-        endLineNumber: selection.endLineNumber,
-        endColumn: selection.endColumn,
-      },
-    };
-
-    setCodeEvents((prev) => {
-      // Only add selection event if it's different from the last one
-      const lastEvent = prev[prev.length - 1];
-      if (lastEvent && lastEvent.type === "selection" && lastEvent.selection) {
-        const lastSel = lastEvent.selection;
-        const newSel = newEvent.selection!;
-        // Only record if selection actually changed
-        if (
-          lastSel.startLineNumber === newSel.startLineNumber &&
-          lastSel.startColumn === newSel.startColumn &&
-          lastSel.endLineNumber === newSel.endLineNumber &&
-          lastSel.endColumn === newSel.endColumn
-        ) {
-          return prev;
-        }
-      }
-      return [...prev, newEvent];
-    });
-  }, [isRecording]);
+    // Disabled selection tracking to reduce events
+    // Only track essential code changes, not selections
+    return;
+  }, []);
 
   // Handle code changes with more granular tracking
   const handleEditorChange = (value: string | undefined) => {
@@ -177,8 +112,25 @@ export default function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
 
       streamRef.current = stream;
 
+      // Check available MIME types
+      const mimeTypes = MediaRecorder.isTypeSupported;
+
+      // Choose the best available MIME type
+      let mimeType = "audio/webm;codecs=opus";
+      if (!mimeTypes("audio/webm;codecs=opus")) {
+        if (mimeTypes("audio/webm")) {
+          mimeType = "audio/webm";
+        } else if (mimeTypes("audio/mp4")) {
+          mimeType = "audio/mp4";
+        } else if (mimeTypes("audio/ogg;codecs=opus")) {
+          mimeType = "audio/ogg;codecs=opus";
+        } else {
+          mimeType = ""; // Let MediaRecorder choose
+        }
+      }
+
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "audio/webm;codecs=opus",
+        mimeType: mimeType || undefined,
       });
 
       mediaRecorderRef.current = mediaRecorder;
@@ -190,19 +142,15 @@ export default function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
       };
 
       mediaRecorder.onstop = () => {
-        console.log("MediaRecorder onstop triggered");
-        console.log("chunksRef.current:", chunksRef.current);
-        console.log("chunks length:", chunksRef.current.length);
+        if (chunksRef.current.length === 0) {
+          return;
+        }
 
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-        console.log("Created blob:", blob);
-        console.log("Blob size:", blob.size);
-        console.log("Blob type:", blob.type);
-
+        const blob = new Blob(chunksRef.current, {
+          type: mimeType || "audio/webm",
+        });
         setAudioBlob(blob);
         audioBlobRef.current = blob;
-
-        console.log("Audio blob set in state and ref");
 
         // Trigger session creation after blob is ready
         if (window.createSessionAfterAudio) {
@@ -210,7 +158,12 @@ export default function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
         }
       };
 
-      mediaRecorder.start();
+      mediaRecorder.onerror = (event) => {
+        console.error("MediaRecorder error:", event);
+      };
+
+      // Start recording with 1-second timeslice to get data more frequently
+      mediaRecorder.start(1000);
       setIsAudioRecording(true);
 
       // Use the session start time as reference for audio events
@@ -264,15 +217,6 @@ export default function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
       const createSession = () => {
         const finalAudioBlob = audioBlobRef.current || audioBlob;
 
-        console.log("Creating session...");
-        console.log("audioBlobRef.current:", audioBlobRef.current);
-        console.log("audioBlob state:", audioBlob);
-        console.log("finalAudioBlob:", finalAudioBlob);
-        console.log(
-          "finalAudioBlob instanceof Blob:",
-          finalAudioBlob instanceof Blob
-        );
-
         const session: RecordingSession = {
           id: `session-${Date.now()}`,
           startTime: sessionStartTime,
@@ -282,9 +226,9 @@ export default function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
           initialCode: "// Start coding here...\n",
           finalCode: code,
           audioBlob: finalAudioBlob || undefined,
+          audioUrl: undefined, // Assuming no URL for now
         };
 
-        console.log("Created session:", session);
         onSessionComplete?.(session);
       };
 
@@ -298,9 +242,6 @@ export default function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
         // Wait for audio blob to be created (increased timeout)
         setTimeout(() => {
           if (!audioBlobRef.current && !audioBlob) {
-            console.log(
-              "Audio blob not ready after timeout, creating session anyway"
-            );
             createSession();
           }
         }, 1000);
@@ -328,23 +269,12 @@ export default function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
 
   // Set up editor event listeners
   useEffect(() => {
-    if (!editorRef.current || !isRecording) return;
-
-    const editor = editorRef.current;
-
-    // Add event listeners for cursor and selection changes
-    const cursorDisposable = editor.onDidChangeCursorPosition(
-      handleCursorPositionChanged
-    );
-    const selectionDisposable = editor.onDidChangeCursorSelection(
-      handleSelectionChanged
-    );
-
+    // Removed cursor and selection event listeners to reduce events
+    // Only tracking essential code changes now
     return () => {
-      cursorDisposable.dispose();
-      selectionDisposable.dispose();
+      // No cleanup needed since we removed the listeners
     };
-  }, [isRecording, handleCursorPositionChanged, handleSelectionChanged]);
+  }, []);
 
   // Format time for display
   const formatTime = (seconds: number) => {
@@ -500,12 +430,6 @@ export default function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
                         {"data" in event ? "Code" : "Audio"}: {event.type}
                       </span>
                     </div>
-                    {event.cursor && (
-                      <div className="text-xs opacity-75 mt-1">
-                        Cursor: Line {event.cursor.lineNumber}, Column{" "}
-                        {event.cursor.column}
-                      </div>
-                    )}
                   </div>
                 ))}
             </div>

@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import CodeRecorder, { RecordingSession } from "./components/CodeRecorder";
+import { RecordingSession } from "./components/CodeRecorder";
+import CodeRecorder from "./components/CodeRecorder";
 import CodePlayback from "./components/CodePlayback";
+import SessionUpload from "./components/SessionUpload";
 import DemoGuide from "./components/DemoGuide";
 import AudioTest from "./components/AudioTest";
-import SessionUpload from "./components/SessionUpload";
 
 export default function CodeWalkthroughPage() {
   const [sessions, setSessions] = useState<RecordingSession[]>([]);
