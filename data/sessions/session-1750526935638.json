@@ -1,0 +1,2264 @@
+{
+  "id": "session-1750526935638",
+  "startTime": 1750526912233,
+  "endTime": 1750526935639,
+  "codeEvents": [
+    {
+      "timestamp": 1750526913418,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 24
+      }
+    },
+    {
+      "timestamp": 1750526913418,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 24,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913591,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 22
+      }
+    },
+    {
+      "timestamp": 1750526913592,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 22,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913603,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 18
+      }
+    },
+    {
+      "timestamp": 1750526913604,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 18,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913611,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 16
+      }
+    },
+    {
+      "timestamp": 1750526913611,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 16,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913617,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 14
+      }
+    },
+    {
+      "timestamp": 1750526913617,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 14,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913624,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 12
+      }
+    },
+    {
+      "timestamp": 1750526913624,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 12,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913637,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 9
+      }
+    },
+    {
+      "timestamp": 1750526913637,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 9,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913645,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 6
+      }
+    },
+    {
+      "timestamp": 1750526913645,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 6,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913651,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 5
+      }
+    },
+    {
+      "timestamp": 1750526913651,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 5,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913660,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 4
+      }
+    },
+    {
+      "timestamp": 1750526913660,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 4,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913666,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 3
+      }
+    },
+    {
+      "timestamp": 1750526913666,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913673,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 2
+      }
+    },
+    {
+      "timestamp": 1750526913673,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 2,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526913686,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 1
+      }
+    },
+    {
+      "timestamp": 1750526913686,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 1,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526914568,
+      "type": "keypress",
+      "data": "c\n"
+    },
+    {
+      "timestamp": 1750526914568,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 2
+      }
+    },
+    {
+      "timestamp": 1750526914568,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 2,
+        "endLineNumber": 1,
+        "endColumn": 2
+      }
+    },
+    {
+      "timestamp": 1750526914620,
+      "type": "keypress",
+      "data": "co\n"
+    },
+    {
+      "timestamp": 1750526914620,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 3
+      }
+    },
+    {
+      "timestamp": 1750526914620,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 3,
+        "endLineNumber": 1,
+        "endColumn": 3
+      }
+    },
+    {
+      "timestamp": 1750526914767,
+      "type": "keypress",
+      "data": "con\n"
+    },
+    {
+      "timestamp": 1750526914767,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 4
+      }
+    },
+    {
+      "timestamp": 1750526914767,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 4,
+        "endLineNumber": 1,
+        "endColumn": 4
+      }
+    },
+    {
+      "timestamp": 1750526914879,
+      "type": "keypress",
+      "data": "cons\n"
+    },
+    {
+      "timestamp": 1750526914879,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 5
+      }
+    },
+    {
+      "timestamp": 1750526914879,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 5,
+        "endLineNumber": 1,
+        "endColumn": 5
+      }
+    },
+    {
+      "timestamp": 1750526914931,
+      "type": "keypress",
+      "data": "conso\n"
+    },
+    {
+      "timestamp": 1750526914931,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 6
+      }
+    },
+    {
+      "timestamp": 1750526914931,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 6,
+        "endLineNumber": 1,
+        "endColumn": 6
+      }
+    },
+    {
+      "timestamp": 1750526915077,
+      "type": "keypress",
+      "data": "consol\n"
+    },
+    {
+      "timestamp": 1750526915077,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 7
+      }
+    },
+    {
+      "timestamp": 1750526915077,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 7,
+        "endLineNumber": 1,
+        "endColumn": 7
+      }
+    },
+    {
+      "timestamp": 1750526915180,
+      "type": "keypress",
+      "data": "console\n"
+    },
+    {
+      "timestamp": 1750526915180,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 8
+      }
+    },
+    {
+      "timestamp": 1750526915181,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 8,
+        "endLineNumber": 1,
+        "endColumn": 8
+      }
+    },
+    {
+      "timestamp": 1750526915266,
+      "type": "keypress",
+      "data": "console.\n"
+    },
+    {
+      "timestamp": 1750526915266,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 9
+      }
+    },
+    {
+      "timestamp": 1750526915266,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 9,
+        "endLineNumber": 1,
+        "endColumn": 9
+      }
+    },
+    {
+      "timestamp": 1750526915437,
+      "type": "keypress",
+      "data": "console.l\n"
+    },
+    {
+      "timestamp": 1750526915437,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 10
+      }
+    },
+    {
+      "timestamp": 1750526915437,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 10,
+        "endLineNumber": 1,
+        "endColumn": 10
+      }
+    },
+    {
+      "timestamp": 1750526915583,
+      "type": "keypress",
+      "data": "console.lo\n"
+    },
+    {
+      "timestamp": 1750526915583,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 11
+      }
+    },
+    {
+      "timestamp": 1750526915583,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 11,
+        "endLineNumber": 1,
+        "endColumn": 11
+      }
+    },
+    {
+      "timestamp": 1750526915640,
+      "type": "keypress",
+      "data": "console.log\n"
+    },
+    {
+      "timestamp": 1750526915640,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 12
+      }
+    },
+    {
+      "timestamp": 1750526915640,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 12,
+        "endLineNumber": 1,
+        "endColumn": 12
+      }
+    },
+    {
+      "timestamp": 1750526915860,
+      "type": "keypress",
+      "data": "console.log()\n"
+    },
+    {
+      "timestamp": 1750526915860,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 13
+      }
+    },
+    {
+      "timestamp": 1750526915860,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 13,
+        "endLineNumber": 1,
+        "endColumn": 13
+      }
+    },
+    {
+      "timestamp": 1750526916014,
+      "type": "keypress",
+      "data": "console.log('')\n"
+    },
+    {
+      "timestamp": 1750526916014,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 14
+      }
+    },
+    {
+      "timestamp": 1750526916014,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 14,
+        "endLineNumber": 1,
+        "endColumn": 14
+      }
+    },
+    {
+      "timestamp": 1750526916194,
+      "type": "keypress",
+      "data": "console.log('h')\n"
+    },
+    {
+      "timestamp": 1750526916194,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 15
+      }
+    },
+    {
+      "timestamp": 1750526916194,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 15,
+        "endLineNumber": 1,
+        "endColumn": 15
+      }
+    },
+    {
+      "timestamp": 1750526916283,
+      "type": "keypress",
+      "data": "console.log('he')\n"
+    },
+    {
+      "timestamp": 1750526916283,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 16
+      }
+    },
+    {
+      "timestamp": 1750526916283,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 16,
+        "endLineNumber": 1,
+        "endColumn": 16
+      }
+    },
+    {
+      "timestamp": 1750526916366,
+      "type": "keypress",
+      "data": "console.log('hel')\n"
+    },
+    {
+      "timestamp": 1750526916366,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 17
+      }
+    },
+    {
+      "timestamp": 1750526916366,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 17,
+        "endLineNumber": 1,
+        "endColumn": 17
+      }
+    },
+    {
+      "timestamp": 1750526916499,
+      "type": "keypress",
+      "data": "console.log('hell')\n"
+    },
+    {
+      "timestamp": 1750526916499,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 18
+      }
+    },
+    {
+      "timestamp": 1750526916499,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 18,
+        "endLineNumber": 1,
+        "endColumn": 18
+      }
+    },
+    {
+      "timestamp": 1750526916626,
+      "type": "keypress",
+      "data": "console.log('hello')\n"
+    },
+    {
+      "timestamp": 1750526916626,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 19
+      }
+    },
+    {
+      "timestamp": 1750526916626,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 19,
+        "endLineNumber": 1,
+        "endColumn": 19
+      }
+    },
+    {
+      "timestamp": 1750526916727,
+      "type": "keypress",
+      "data": "console.log('hello ')\n"
+    },
+    {
+      "timestamp": 1750526916727,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 20
+      }
+    },
+    {
+      "timestamp": 1750526916727,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 20,
+        "endLineNumber": 1,
+        "endColumn": 20
+      }
+    },
+    {
+      "timestamp": 1750526916911,
+      "type": "keypress",
+      "data": "console.log('hello w')\n"
+    },
+    {
+      "timestamp": 1750526916911,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 21
+      }
+    },
+    {
+      "timestamp": 1750526916911,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 21,
+        "endLineNumber": 1,
+        "endColumn": 21
+      }
+    },
+    {
+      "timestamp": 1750526916973,
+      "type": "keypress",
+      "data": "console.log('hello wo')\n"
+    },
+    {
+      "timestamp": 1750526916973,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 22
+      }
+    },
+    {
+      "timestamp": 1750526916973,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 22,
+        "endLineNumber": 1,
+        "endColumn": 22
+      }
+    },
+    {
+      "timestamp": 1750526917096,
+      "type": "keypress",
+      "data": "console.log('hello wor')\n"
+    },
+    {
+      "timestamp": 1750526917096,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 23
+      }
+    },
+    {
+      "timestamp": 1750526917096,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 23,
+        "endLineNumber": 1,
+        "endColumn": 23
+      }
+    },
+    {
+      "timestamp": 1750526917241,
+      "type": "keypress",
+      "data": "console.log('hello word')\n"
+    },
+    {
+      "timestamp": 1750526917241,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 24
+      }
+    },
+    {
+      "timestamp": 1750526917241,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 24,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526917917,
+      "type": "keypress",
+      "data": "console.log('hello wor')\n"
+    },
+    {
+      "timestamp": 1750526917917,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 23
+      }
+    },
+    {
+      "timestamp": 1750526917917,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 23,
+        "endLineNumber": 1,
+        "endColumn": 23
+      }
+    },
+    {
+      "timestamp": 1750526918140,
+      "type": "keypress",
+      "data": "console.log('hello worl')\n"
+    },
+    {
+      "timestamp": 1750526918140,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 24
+      }
+    },
+    {
+      "timestamp": 1750526918140,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 24,
+        "endLineNumber": 1,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526918209,
+      "type": "keypress",
+      "data": "console.log('hello world')\n"
+    },
+    {
+      "timestamp": 1750526918210,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 25
+      }
+    },
+    {
+      "timestamp": 1750526918210,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 25,
+        "endLineNumber": 1,
+        "endColumn": 25
+      }
+    },
+    {
+      "timestamp": 1750526918543,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 1,
+        "column": 27
+      }
+    },
+    {
+      "timestamp": 1750526918544,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 1,
+        "startColumn": 27,
+        "endLineNumber": 1,
+        "endColumn": 27
+      }
+    },
+    {
+      "timestamp": 1750526918827,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\n"
+    },
+    {
+      "timestamp": 1750526918827,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 2,
+        "column": 1
+      }
+    },
+    {
+      "timestamp": 1750526918827,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 2,
+        "startColumn": 1,
+        "endLineNumber": 2,
+        "endColumn": 1
+      }
+    },
+    {
+      "timestamp": 1750526918966,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\n\n"
+    },
+    {
+      "timestamp": 1750526918966,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 1
+      }
+    },
+    {
+      "timestamp": 1750526918966,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 1,
+        "endLineNumber": 3,
+        "endColumn": 1
+      }
+    },
+    {
+      "timestamp": 1750526920508,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nc\n"
+    },
+    {
+      "timestamp": 1750526920508,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 2
+      }
+    },
+    {
+      "timestamp": 1750526920508,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 2,
+        "endLineNumber": 3,
+        "endColumn": 2
+      }
+    },
+    {
+      "timestamp": 1750526920596,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nco\n"
+    },
+    {
+      "timestamp": 1750526920596,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 3
+      }
+    },
+    {
+      "timestamp": 1750526920596,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 3,
+        "endLineNumber": 3,
+        "endColumn": 3
+      }
+    },
+    {
+      "timestamp": 1750526920723,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\ncon\n"
+    },
+    {
+      "timestamp": 1750526920723,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 4
+      }
+    },
+    {
+      "timestamp": 1750526920723,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 4,
+        "endLineNumber": 3,
+        "endColumn": 4
+      }
+    },
+    {
+      "timestamp": 1750526920798,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\ncons\n"
+    },
+    {
+      "timestamp": 1750526920798,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 5
+      }
+    },
+    {
+      "timestamp": 1750526920798,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 5,
+        "endLineNumber": 3,
+        "endColumn": 5
+      }
+    },
+    {
+      "timestamp": 1750526920993,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst\n"
+    },
+    {
+      "timestamp": 1750526920993,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 6
+      }
+    },
+    {
+      "timestamp": 1750526920993,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 6,
+        "endLineNumber": 3,
+        "endColumn": 6
+      }
+    },
+    {
+      "timestamp": 1750526921095,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst \n"
+    },
+    {
+      "timestamp": 1750526921095,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 7
+      }
+    },
+    {
+      "timestamp": 1750526921095,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 7,
+        "endLineNumber": 3,
+        "endColumn": 7
+      }
+    },
+    {
+      "timestamp": 1750526922085,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst t\n"
+    },
+    {
+      "timestamp": 1750526922085,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 8
+      }
+    },
+    {
+      "timestamp": 1750526922085,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 8,
+        "endLineNumber": 3,
+        "endColumn": 8
+      }
+    },
+    {
+      "timestamp": 1750526922238,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst tw\n"
+    },
+    {
+      "timestamp": 1750526922238,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 9
+      }
+    },
+    {
+      "timestamp": 1750526922238,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 9,
+        "endLineNumber": 3,
+        "endColumn": 9
+      }
+    },
+    {
+      "timestamp": 1750526922401,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst two\n"
+    },
+    {
+      "timestamp": 1750526922401,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 10
+      }
+    },
+    {
+      "timestamp": 1750526922401,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 10,
+        "endLineNumber": 3,
+        "endColumn": 10
+      }
+    },
+    {
+      "timestamp": 1750526922491,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst two \n"
+    },
+    {
+      "timestamp": 1750526922491,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 11
+      }
+    },
+    {
+      "timestamp": 1750526922491,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 11,
+        "endLineNumber": 3,
+        "endColumn": 11
+      }
+    },
+    {
+      "timestamp": 1750526922855,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst two\n"
+    },
+    {
+      "timestamp": 1750526922855,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 10
+      }
+    },
+    {
+      "timestamp": 1750526922855,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 10,
+        "endLineNumber": 3,
+        "endColumn": 10
+      }
+    },
+    {
+      "timestamp": 1750526923000,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoS\n"
+    },
+    {
+      "timestamp": 1750526923000,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 11
+      }
+    },
+    {
+      "timestamp": 1750526923001,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 11,
+        "endLineNumber": 3,
+        "endColumn": 11
+      }
+    },
+    {
+      "timestamp": 1750526923108,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSu\n"
+    },
+    {
+      "timestamp": 1750526923108,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 12
+      }
+    },
+    {
+      "timestamp": 1750526923108,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 12,
+        "endLineNumber": 3,
+        "endColumn": 12
+      }
+    },
+    {
+      "timestamp": 1750526923298,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum\n"
+    },
+    {
+      "timestamp": 1750526923298,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 13
+      }
+    },
+    {
+      "timestamp": 1750526923298,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 13,
+        "endLineNumber": 3,
+        "endColumn": 13
+      }
+    },
+    {
+      "timestamp": 1750526923344,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum \n"
+    },
+    {
+      "timestamp": 1750526923344,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 14
+      }
+    },
+    {
+      "timestamp": 1750526923344,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 14,
+        "endLineNumber": 3,
+        "endColumn": 14
+      }
+    },
+    {
+      "timestamp": 1750526923512,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum =\n"
+    },
+    {
+      "timestamp": 1750526923512,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 15
+      }
+    },
+    {
+      "timestamp": 1750526923512,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 15,
+        "endLineNumber": 3,
+        "endColumn": 15
+      }
+    },
+    {
+      "timestamp": 1750526923588,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = \n"
+    },
+    {
+      "timestamp": 1750526923588,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 16
+      }
+    },
+    {
+      "timestamp": 1750526923588,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 16,
+        "endLineNumber": 3,
+        "endColumn": 16
+      }
+    },
+    {
+      "timestamp": 1750526923757,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = ()\n"
+    },
+    {
+      "timestamp": 1750526923757,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 17
+      }
+    },
+    {
+      "timestamp": 1750526923757,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 17,
+        "endLineNumber": 3,
+        "endColumn": 17
+      }
+    },
+    {
+      "timestamp": 1750526924099,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (a)\n"
+    },
+    {
+      "timestamp": 1750526924099,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 18
+      }
+    },
+    {
+      "timestamp": 1750526924099,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 18,
+        "endLineNumber": 3,
+        "endColumn": 18
+      }
+    },
+    {
+      "timestamp": 1750526924200,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (ar)\n"
+    },
+    {
+      "timestamp": 1750526924200,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 19
+      }
+    },
+    {
+      "timestamp": 1750526924200,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 19,
+        "endLineNumber": 3,
+        "endColumn": 19
+      }
+    },
+    {
+      "timestamp": 1750526924317,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr)\n"
+    },
+    {
+      "timestamp": 1750526924317,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 20
+      }
+    },
+    {
+      "timestamp": 1750526924317,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 20,
+        "endLineNumber": 3,
+        "endColumn": 20
+      }
+    },
+    {
+      "timestamp": 1750526924457,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr,)\n"
+    },
+    {
+      "timestamp": 1750526924457,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 21
+      }
+    },
+    {
+      "timestamp": 1750526924458,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 21,
+        "endLineNumber": 3,
+        "endColumn": 21
+      }
+    },
+    {
+      "timestamp": 1750526924521,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, )\n"
+    },
+    {
+      "timestamp": 1750526924521,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 22
+      }
+    },
+    {
+      "timestamp": 1750526924521,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 22,
+        "endLineNumber": 3,
+        "endColumn": 22
+      }
+    },
+    {
+      "timestamp": 1750526925409,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t)\n"
+    },
+    {
+      "timestamp": 1750526925409,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 23
+      }
+    },
+    {
+      "timestamp": 1750526925409,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 23,
+        "endLineNumber": 3,
+        "endColumn": 23
+      }
+    },
+    {
+      "timestamp": 1750526925637,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 24
+      }
+    },
+    {
+      "timestamp": 1750526925638,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 24,
+        "endLineNumber": 3,
+        "endColumn": 24
+      }
+    },
+    {
+      "timestamp": 1750526925814,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) \n"
+    },
+    {
+      "timestamp": 1750526925815,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 25
+      }
+    },
+    {
+      "timestamp": 1750526925815,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 25,
+        "endLineNumber": 3,
+        "endColumn": 25
+      }
+    },
+    {
+      "timestamp": 1750526925952,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) =\n"
+    },
+    {
+      "timestamp": 1750526925952,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 26
+      }
+    },
+    {
+      "timestamp": 1750526925952,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 26,
+        "endLineNumber": 3,
+        "endColumn": 26
+      }
+    },
+    {
+      "timestamp": 1750526926235,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) =>\n"
+    },
+    {
+      "timestamp": 1750526926235,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 27
+      }
+    },
+    {
+      "timestamp": 1750526926236,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 27,
+        "endLineNumber": 3,
+        "endColumn": 27
+      }
+    },
+    {
+      "timestamp": 1750526926295,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => \n"
+    },
+    {
+      "timestamp": 1750526926295,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 28
+      }
+    },
+    {
+      "timestamp": 1750526926295,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 28,
+        "endLineNumber": 3,
+        "endColumn": 28
+      }
+    },
+    {
+      "timestamp": 1750526926608,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {}\n"
+    },
+    {
+      "timestamp": 1750526926608,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 3,
+        "column": 29
+      }
+    },
+    {
+      "timestamp": 1750526926608,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 3,
+        "startColumn": 29,
+        "endLineNumber": 3,
+        "endColumn": 29
+      }
+    },
+    {
+      "timestamp": 1750526926876,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    \n}\n"
+    },
+    {
+      "timestamp": 1750526926876,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 5
+      }
+    },
+    {
+      "timestamp": 1750526926876,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 5,
+        "endLineNumber": 4,
+        "endColumn": 5
+      }
+    },
+    {
+      "timestamp": 1750526927650,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    .\n}\n"
+    },
+    {
+      "timestamp": 1750526927650,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 6
+      }
+    },
+    {
+      "timestamp": 1750526927650,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 6,
+        "endLineNumber": 4,
+        "endColumn": 6
+      }
+    },
+    {
+      "timestamp": 1750526927792,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    ..\n}\n"
+    },
+    {
+      "timestamp": 1750526927792,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 7
+      }
+    },
+    {
+      "timestamp": 1750526927792,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 7,
+        "endLineNumber": 4,
+        "endColumn": 7
+      }
+    },
+    {
+      "timestamp": 1750526927879,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    .. \n}\n"
+    },
+    {
+      "timestamp": 1750526927879,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 8
+      }
+    },
+    {
+      "timestamp": 1750526927879,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 8,
+        "endLineNumber": 4,
+        "endColumn": 8
+      }
+    },
+    {
+      "timestamp": 1750526928171,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    ..\n}\n"
+    },
+    {
+      "timestamp": 1750526928171,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 7
+      }
+    },
+    {
+      "timestamp": 1750526928171,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 7,
+        "endLineNumber": 4,
+        "endColumn": 7
+      }
+    },
+    {
+      "timestamp": 1750526928304,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    .\n}\n"
+    },
+    {
+      "timestamp": 1750526928304,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 6
+      }
+    },
+    {
+      "timestamp": 1750526928304,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 6,
+        "endLineNumber": 4,
+        "endColumn": 6
+      }
+    },
+    {
+      "timestamp": 1750526928408,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    \n}\n"
+    },
+    {
+      "timestamp": 1750526928408,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 5
+      }
+    },
+    {
+      "timestamp": 1750526928408,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 5,
+        "endLineNumber": 4,
+        "endColumn": 5
+      }
+    },
+    {
+      "timestamp": 1750526928632,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    /\n}\n"
+    },
+    {
+      "timestamp": 1750526928632,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 6
+      }
+    },
+    {
+      "timestamp": 1750526928632,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 6,
+        "endLineNumber": 4,
+        "endColumn": 6
+      }
+    },
+    {
+      "timestamp": 1750526928770,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    //\n}\n"
+    },
+    {
+      "timestamp": 1750526928770,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 7
+      }
+    },
+    {
+      "timestamp": 1750526928770,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 7,
+        "endLineNumber": 4,
+        "endColumn": 7
+      }
+    },
+    {
+      "timestamp": 1750526928817,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // \n}\n"
+    },
+    {
+      "timestamp": 1750526928817,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 8
+      }
+    },
+    {
+      "timestamp": 1750526928817,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 8,
+        "endLineNumber": 4,
+        "endColumn": 8
+      }
+    },
+    {
+      "timestamp": 1750526929252,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // w\n}\n"
+    },
+    {
+      "timestamp": 1750526929252,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 9
+      }
+    },
+    {
+      "timestamp": 1750526929252,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 9,
+        "endLineNumber": 4,
+        "endColumn": 9
+      }
+    },
+    {
+      "timestamp": 1750526929464,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // wr\n}\n"
+    },
+    {
+      "timestamp": 1750526929464,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 10
+      }
+    },
+    {
+      "timestamp": 1750526929464,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 10,
+        "endLineNumber": 4,
+        "endColumn": 10
+      }
+    },
+    {
+      "timestamp": 1750526929642,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // wri\n}\n"
+    },
+    {
+      "timestamp": 1750526929642,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 11
+      }
+    },
+    {
+      "timestamp": 1750526929642,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 11,
+        "endLineNumber": 4,
+        "endColumn": 11
+      }
+    },
+    {
+      "timestamp": 1750526929778,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // writ\n}\n"
+    },
+    {
+      "timestamp": 1750526929778,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 12
+      }
+    },
+    {
+      "timestamp": 1750526929778,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 12,
+        "endLineNumber": 4,
+        "endColumn": 12
+      }
+    },
+    {
+      "timestamp": 1750526929857,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write\n}\n"
+    },
+    {
+      "timestamp": 1750526929857,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 13
+      }
+    },
+    {
+      "timestamp": 1750526929858,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 13,
+        "endLineNumber": 4,
+        "endColumn": 13
+      }
+    },
+    {
+      "timestamp": 1750526929901,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write \n}\n"
+    },
+    {
+      "timestamp": 1750526929901,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 14
+      }
+    },
+    {
+      "timestamp": 1750526929901,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 14,
+        "endLineNumber": 4,
+        "endColumn": 14
+      }
+    },
+    {
+      "timestamp": 1750526930121,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write y\n}\n"
+    },
+    {
+      "timestamp": 1750526930121,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 15
+      }
+    },
+    {
+      "timestamp": 1750526930121,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 15,
+        "endLineNumber": 4,
+        "endColumn": 15
+      }
+    },
+    {
+      "timestamp": 1750526930302,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write yu\n}\n"
+    },
+    {
+      "timestamp": 1750526930302,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 16
+      }
+    },
+    {
+      "timestamp": 1750526930302,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 16,
+        "endLineNumber": 4,
+        "endColumn": 16
+      }
+    },
+    {
+      "timestamp": 1750526930378,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write yur\n}\n"
+    },
+    {
+      "timestamp": 1750526930378,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 17
+      }
+    },
+    {
+      "timestamp": 1750526930378,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 17,
+        "endLineNumber": 4,
+        "endColumn": 17
+      }
+    },
+    {
+      "timestamp": 1750526930671,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write yu\n}\n"
+    },
+    {
+      "timestamp": 1750526930671,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 16
+      }
+    },
+    {
+      "timestamp": 1750526930671,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 16,
+        "endLineNumber": 4,
+        "endColumn": 16
+      }
+    },
+    {
+      "timestamp": 1750526930780,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write y\n}\n"
+    },
+    {
+      "timestamp": 1750526930780,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 15
+      }
+    },
+    {
+      "timestamp": 1750526930780,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 15,
+        "endLineNumber": 4,
+        "endColumn": 15
+      }
+    },
+    {
+      "timestamp": 1750526930942,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write yo\n}\n"
+    },
+    {
+      "timestamp": 1750526930942,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 16
+      }
+    },
+    {
+      "timestamp": 1750526930942,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 16,
+        "endLineNumber": 4,
+        "endColumn": 16
+      }
+    },
+    {
+      "timestamp": 1750526931009,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write you\n}\n"
+    },
+    {
+      "timestamp": 1750526931009,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 17
+      }
+    },
+    {
+      "timestamp": 1750526931010,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 17,
+        "endLineNumber": 4,
+        "endColumn": 17
+      }
+    },
+    {
+      "timestamp": 1750526931107,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write your\n}\n"
+    },
+    {
+      "timestamp": 1750526931107,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 18
+      }
+    },
+    {
+      "timestamp": 1750526931107,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 18,
+        "endLineNumber": 4,
+        "endColumn": 18
+      }
+    },
+    {
+      "timestamp": 1750526931179,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write your \n}\n"
+    },
+    {
+      "timestamp": 1750526931179,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 19
+      }
+    },
+    {
+      "timestamp": 1750526931179,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 19,
+        "endLineNumber": 4,
+        "endColumn": 19
+      }
+    },
+    {
+      "timestamp": 1750526931352,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write your c\n}\n"
+    },
+    {
+      "timestamp": 1750526931352,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 20
+      }
+    },
+    {
+      "timestamp": 1750526931352,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 20,
+        "endLineNumber": 4,
+        "endColumn": 20
+      }
+    },
+    {
+      "timestamp": 1750526931428,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write your co\n}\n"
+    },
+    {
+      "timestamp": 1750526931428,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 21
+      }
+    },
+    {
+      "timestamp": 1750526931428,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 21,
+        "endLineNumber": 4,
+        "endColumn": 21
+      }
+    },
+    {
+      "timestamp": 1750526931504,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write your cod\n}\n"
+    },
+    {
+      "timestamp": 1750526931504,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 22
+      }
+    },
+    {
+      "timestamp": 1750526931504,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 22,
+        "endLineNumber": 4,
+        "endColumn": 22
+      }
+    },
+    {
+      "timestamp": 1750526931594,
+      "type": "keypress",
+      "data": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write your code\n}\n"
+    },
+    {
+      "timestamp": 1750526931594,
+      "type": "cursor",
+      "cursor": {
+        "lineNumber": 4,
+        "column": 23
+      }
+    },
+    {
+      "timestamp": 1750526931594,
+      "type": "selection",
+      "selection": {
+        "startLineNumber": 4,
+        "startColumn": 23,
+        "endLineNumber": 4,
+        "endColumn": 23
+      }
+    }
+  ],
+  "audioEvents": [
+    {
+      "timestamp": 1750526912528,
+      "type": "start"
+    }
+  ],
+  "initialCode": "// Start coding here...\n",
+  "finalCode": "console.log('hello world')\n\nconst twoSum = (arr, t) => {\n    // write your code\n}\n",
+  "audioBlob": {}
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "session-1750526935638",
+    "title": "Two Sum",
+    "description": "Two Sum walthrough",
+    "courseId": "bc37c9d7-b365-41bb-93df-c50875ce9d4e",
+    "chapterId": "50fe7693-5fb9-4753-9224-b987a3f3ae3e",
+    "lessonId": "09024326-3e0e-4c6d-8bff-acf6230addc0",
+    "instructorId": "instructor-1",
+    "duration": 23406,
+    "codeEvents": 288,
+    "audioEvents": 1,
+    "audioSize": 362411,
+    "createdAt": "2025-06-21T17:29:47.688Z",
+    "updatedAt": "2025-06-21T17:29:47.694Z"
+  },
+  {
+    "id": "session-1750527067477",
+    "title": "two sumff",
+    "description": "dfdsafsd",
+    "courseId": "bc37c9d7-b365-41bb-93df-c50875ce9d4e",
+    "chapterId": "50fe7693-5fb9-4753-9224-b987a3f3ae3e",
+    "lessonId": "09024326-3e0e-4c6d-8bff-acf6230addc0",
+    "instructorId": "instructor-1",
+    "duration": 16655,
+    "codeEvents": 208,
+    "audioEvents": 1,
+    "audioSize": 254219,
+    "createdAt": "2025-06-21T17:31:46.638Z",
+    "updatedAt": "2025-06-21T17:31:46.638Z"
+  },
+  {
+    "id": "session-1750532668740",
+    "title": "osome new event",
+    "description": "sfjasfj",
+    "courseId": "bc37c9d7-b365-41bb-93df-c50875ce9d4e",
+    "chapterId": "50fe7693-5fb9-4753-9224-b987a3f3ae3e",
+    "lessonId": "09024326-3e0e-4c6d-8bff-acf6230addc0",
+    "instructorId": "instructor-1",
+    "duration": 5920,
+    "codeEvents": 148,
+    "audioEvents": 1,
+    "audioSize": 89999,
+    "createdAt": "2025-06-21T19:04:59.500Z",
+    "updatedAt": "2025-06-21T19:04:59.502Z"
+  }
+]

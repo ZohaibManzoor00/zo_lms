@@ -18,6 +18,10 @@ const navItems = [
     href: "/courses",
   },
   {
+    label: "Code Walkthrough",
+    href: "/code-walkthrough",
+  },
+  {
     label: "Dashboard",
     href: "/dashboard",
   },
@@ -56,7 +60,10 @@ export function Navbar() {
                     : session?.user.email.split("@")[0]
                 }
                 email={session.user.email}
-                image={session.user.image ?? `https://avatar.vercel.sh/${session?.user.email}`}
+                image={
+                  session.user.image ??
+                  `https://avatar.vercel.sh/${session?.user.email}`
+                }
               />
             ) : (
               <>
