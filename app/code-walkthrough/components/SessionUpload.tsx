@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { RecordingSession } from "./CodeRecorder";
-import { SessionMetadata } from "@/app/api/sessions/route";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { UploadCloud, CheckCircle, XCircle, Loader } from "lucide-react";
 
 interface SessionUploadProps {
   session: RecordingSession;
@@ -36,24 +41,19 @@ export default function SessionUpload({
     }
 
     setIsUploading(true);
-    setUploadStatus("Uploading session...");
+    setUploadStatus("Starting upload...");
 
     try {
       let audioFileKey: string | null = null;
       let audioContentType: string | null = null;
       let audioSize: number | null = null;
 
-      // Upload audio to Tigris if available
       if (session.audioBlob && session.audioBlob instanceof Blob) {
         try {
-          setUploadStatus("Uploading audio to cloud storage...");
-
-          // Get presigned URL for audio upload
+          setUploadStatus("Getting audio presigned URL...");
           const presignedResponse = await fetch("/api/s3/upload-audio", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               filename: `walkthrough-audio-${Date.now()}.webm`,
               contentType: session.audioBlob.type,
@@ -61,24 +61,20 @@ export default function SessionUpload({
             }),
           });
 
-          if (!presignedResponse.ok) {
-            throw new Error("Failed to get presigned URL for audio upload");
-          }
+          if (!presignedResponse.ok)
+            throw new Error("Failed to get presigned URL");
 
           const { presignedUrl, key } = await presignedResponse.json();
 
-          // Upload audio blob directly to Tigris
+          setUploadStatus("Uploading audio to cloud storage...");
           const uploadResponse = await fetch(presignedUrl, {
             method: "PUT",
             body: session.audioBlob,
-            headers: {
-              "Content-Type": session.audioBlob.type,
-            },
+            headers: { "Content-Type": session.audioBlob.type },
           });
 
-          if (!uploadResponse.ok) {
+          if (!uploadResponse.ok)
             throw new Error("Failed to upload audio to cloud storage");
-          }
 
           audioFileKey = key;
           audioContentType = session.audioBlob.type;
@@ -86,47 +82,30 @@ export default function SessionUpload({
         } catch (error) {
           console.error("Error uploading audio:", error);
           setUploadStatus(
-            "Warning: Audio upload failed, continuing without audio..."
+            "Warning: Audio upload failed. Continuing without audio."
           );
-          // Continue without audio if upload fails
         }
       }
 
       setUploadStatus("Saving walkthrough to database...");
-
-      // Prepare metadata for database (without the blob)
       const walkthroughMetadata = {
-        title: metadata.title,
-        description: metadata.description,
-        courseId: metadata.courseId,
-        chapterId: metadata.chapterId,
-        lessonId: metadata.lessonId,
-        instructorId: metadata.instructorId,
+        ...metadata,
         audioFileKey,
         audioContentType,
         audioSize,
       };
 
-      // Create session data without the blob
-      const sessionData = {
-        ...session,
-        audioBlob: undefined, // Don't send the blob to the API
-      };
-
+      const sessionData = { ...session, audioBlob: undefined };
       const response = await fetch("/api/code-walkthroughs", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           session: sessionData,
           metadata: walkthroughMetadata,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to upload session");
-      }
+      if (!response.ok) throw new Error("Failed to save walkthrough");
 
       const result = await response.json();
       setUploadStatus(
@@ -135,154 +114,148 @@ export default function SessionUpload({
       onUploadComplete?.(result.walkthroughId);
     } catch (error) {
       console.error("Upload error:", error);
-      setUploadStatus("❌ Failed to upload session. Please try again.");
+      const message = error instanceof Error ? error.message : "Unknown error";
+      setUploadStatus(`❌ Failed to upload session: ${message}`);
     } finally {
       setIsUploading(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
-      <h3 className="font-medium text-gray-700 mb-4 flex items-center gap-2">
-        <span className="text-green-500">📤</span>
-        Upload Session to Course
-      </h3>
-
-      <div className="space-y-4">
-        {/* Session Info */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <h4 className="font-medium text-blue-700 mb-2">Session Details</h4>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <UploadCloud className="h-6 w-6" />
+          Upload Session to Course
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="rounded-lg border bg-muted/50 p-4">
+          <h4 className="font-medium text-foreground mb-2">Session Details</h4>
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-blue-600">Duration:</span>
-              <div className="font-medium">
-                {Math.round((session.endTime - session.startTime) / 1000)}s
-              </div>
-            </div>
-            <div>
-              <span className="text-blue-600">Code Events:</span>
-              <div className="font-medium">{session.codeEvents.length}</div>
-            </div>
-            <div>
-              <span className="text-blue-600">Audio Events:</span>
-              <div className="font-medium">{session.audioEvents.length}</div>
-            </div>
-            <div>
-              <span className="text-blue-600">Audio Size:</span>
-              <div className="font-medium">
-                {session.audioBlob
+            {[
+              {
+                label: "Duration",
+                value: `${Math.round(
+                  (session.endTime - session.startTime) / 1000
+                )}s`,
+              },
+              { label: "Code Events", value: session.codeEvents.length },
+              { label: "Audio Events", value: session.audioEvents.length },
+              {
+                label: "Audio Size",
+                value: session.audioBlob
                   ? `${(session.audioBlob.size / 1024).toFixed(1)} KB`
-                  : "No audio"}
+                  : "No audio",
+              },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <span className="text-muted-foreground">{label}:</span>
+                <div className="font-semibold text-foreground">{value}</div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Metadata Form */}
         <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Title *
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="title">Title *</Label>
+            <Input
+              id="title"
               type="text"
               value={metadata.title}
               onChange={(e) =>
                 setMetadata({ ...metadata, title: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="e.g., Introduction to React Hooks"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
               value={metadata.description}
               onChange={(e) =>
                 setMetadata({ ...metadata, description: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              rows={3}
               placeholder="Brief description of what this walkthrough covers..."
+              rows={3}
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Course ID *
-              </label>
-              <input
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="courseId">Course ID *</Label>
+              <Input
+                id="courseId"
                 type="text"
                 value={metadata.courseId}
                 onChange={(e) =>
                   setMetadata({ ...metadata, courseId: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g., react-basics"
               />
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Chapter ID *
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="chapterId">Chapter ID *</Label>
+              <Input
+                id="chapterId"
                 type="text"
                 value={metadata.chapterId}
                 onChange={(e) =>
                   setMetadata({ ...metadata, chapterId: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g., chapter-1"
               />
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Lesson ID *
-              </label>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="lessonId">Lesson ID *</Label>
+              <Input
+                id="lessonId"
                 type="text"
                 value={metadata.lessonId}
                 onChange={(e) =>
                   setMetadata({ ...metadata, lessonId: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g., lesson-1"
               />
             </div>
           </div>
         </div>
 
-        {/* Upload Button */}
         <div className="flex items-center gap-4">
-          <button
-            onClick={handleUpload}
-            disabled={isUploading}
-            className="px-6 py-3 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isUploading ? "📤 Uploading..." : "📤 Upload Session"}
-          </button>
+          <Button onClick={handleUpload} disabled={isUploading}>
+            {isUploading ? (
+              <Loader className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <UploadCloud className="h-4 w-4 mr-2" />
+            )}
+            {isUploading ? "Uploading..." : "Upload Session"}
+          </Button>
 
           {uploadStatus && (
-            <div
-              className={`text-sm ${
-                uploadStatus.includes("✅")
-                  ? "text-green-600"
-                  : uploadStatus.includes("❌")
-                  ? "text-red-600"
-                  : "text-blue-600"
-              }`}
-            >
-              {uploadStatus}
+            <div className="flex items-center gap-2 text-sm">
+              {uploadStatus.startsWith("✅") && (
+                <CheckCircle className="h-4 w-4 text-green-500" />
+              )}
+              {uploadStatus.startsWith("❌") && (
+                <XCircle className="h-4 w-4 text-destructive" />
+              )}
+              {isUploading && <Loader className="h-4 w-4 animate-spin" />}
+              <span
+                className={
+                  uploadStatus.startsWith("❌")
+                    ? "text-destructive"
+                    : "text-muted-foreground"
+                }
+              >
+                {uploadStatus}
+              </span>
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
