@@ -29,12 +29,12 @@ interface UploaderProps {
 }
 
 interface iAppProps {
-    value?: string
-    onChange?: (value: string) => void
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 export default function FileUploader({ value, onChange }: iAppProps) {
-  const fileUrl = useConstructUrl(value ?? "")
+  const fileUrl = useConstructUrl(value ?? "");
   const [fileState, setFileState] = useState<UploaderProps>({
     id: null,
     file: null,
@@ -44,7 +44,7 @@ export default function FileUploader({ value, onChange }: iAppProps) {
     error: false,
     fileType: "image",
     key: value,
-    objectUrl: fileUrl
+    objectUrl: value && value.trim() !== "" ? fileUrl : undefined,
   });
 
   const uploadFile = async (file: File) => {
@@ -98,7 +98,7 @@ export default function FileUploader({ value, onChange }: iAppProps) {
               progress: 100,
               key,
             }));
-            onChange?.(key)
+            onChange?.(key);
             toast.success("File uploaded successfully");
             resolve();
           } else {
@@ -175,7 +175,7 @@ export default function FileUploader({ value, onChange }: iAppProps) {
         URL.revokeObjectURL(fileState.objectUrl);
       }
 
-      onChange?.("")
+      onChange?.("");
 
       setFileState(() => ({
         file: null,
