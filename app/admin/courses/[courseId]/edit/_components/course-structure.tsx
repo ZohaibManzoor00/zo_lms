@@ -40,6 +40,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { reorderChapters, reorderLessons } from "../actions";
+import { NewChapterModal } from "./new-chapter-modal";
+import { NewLessonModal } from "./new-lesson-modal";
 
 interface Props {
   data: AdminCourseSingularType;
@@ -283,6 +285,7 @@ export function CourseStructure({ data }: Props) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between border-b border-border">
           <CardTitle>Chapters</CardTitle>
+          <NewChapterModal courseId={data.id} />
         </CardHeader>
 
         <CardContent className="space-y-8">
@@ -365,9 +368,7 @@ export function CourseStructure({ data }: Props) {
                             ))}
                           </SortableContext>
                           <div className="p-2">
-                            <Button variant="outline" className="w-full">
-                              Create Lesson
-                            </Button>
+                            <NewLessonModal courseId={data.id} chapterId={item.id} />
                           </div>
                         </div>
                       </CollapsibleContent>

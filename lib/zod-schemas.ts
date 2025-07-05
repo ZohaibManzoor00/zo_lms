@@ -6,7 +6,19 @@ export const courseLevelSchema = [
   "Advanced",
 ] as const;
 export const courseStatusSchema = ["Draft", "Published", "Archived"] as const;
-export const courseCategorySchema = ["Development", "Business", "Finance", "IT & Software", "Personal Development", "Marketing", "Design", "Life Skills", "Health & Fitness", "Music", "Other"] as const;
+export const courseCategorySchema = [
+  "Development",
+  "Business",
+  "Finance",
+  "IT & Software",
+  "Personal Development",
+  "Marketing",
+  "Design",
+  "Life Skills",
+  "Health & Fitness",
+  "Music",
+  "Other",
+] as const;
 
 export const courseSchema = z.object({
   title: z
@@ -41,4 +53,29 @@ export const courseSchema = z.object({
   }),
 });
 
+export const chapterSchema = z.object({
+  title: z.string().min(3, { message: "Title must be at least 3 characters" }),
+  courseId: z
+    .string()
+    .uuid({ message: "Invalid course ID" })
+    .min(1, { message: "Course is required" }),
+});
+
+export const lessonSchema = z.object({
+  title: z.string().min(3, { message: "Title must be at least 3 characters" }),
+  chapterId: z
+    .string()
+    .uuid({ message: "Invalid chapter ID" })
+    .min(1, { message: "Chapter is required" }),
+  courseId: z
+    .string()
+    .uuid({ message: "Invalid course ID" })
+    .min(1, { message: "Course is required" }),
+  description: z.string().min(3, { message: "Description must be at least 3 characters" }).optional(),
+  videoKey: z.string().optional(),
+  thumbnailKey: z.string().optional(),
+});
+
 export type CourseSchemaType = z.infer<typeof courseSchema>;
+export type ChapterSchemaType = z.infer<typeof chapterSchema>;
+export type LessonSchemaType = z.infer<typeof lessonSchema>;
