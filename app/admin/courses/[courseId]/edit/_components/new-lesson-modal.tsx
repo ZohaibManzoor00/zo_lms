@@ -37,6 +37,7 @@ export function NewLessonModal({ courseId, chapterId }: Props) {
   const [isPending, startTransition] = useTransition();
 
   const handleOpenChange = (open: boolean) => {
+    if (!open) createLessonForm.reset();
     setIsOpen(open);
   };
 

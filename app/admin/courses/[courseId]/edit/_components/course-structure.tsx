@@ -42,6 +42,8 @@ import { Button } from "@/components/ui/button";
 import { reorderChapters, reorderLessons } from "../actions";
 import { NewChapterModal } from "./new-chapter-modal";
 import { NewLessonModal } from "./new-lesson-modal";
+import { DeleteLesson } from "./delete-lesson";
+import { DeleteChapter } from "./delete-chapter";
 
 interface Props {
   data: AdminCourseSingularType;
@@ -325,9 +327,7 @@ export function CourseStructure({ data }: Props) {
                           </p>
                         </div>
 
-                        <Button size="icon" variant="ghost">
-                          <Trash2Icon className="size-4" />
-                        </Button>
+                        <DeleteChapter chapterId={item.id} courseId={data.id} />
                       </div>
                       <CollapsibleContent>
                         <div className="p-1">
@@ -359,9 +359,7 @@ export function CourseStructure({ data }: Props) {
                                       </Link>
                                     </div>
 
-                                    <Button size="icon" variant="outline">
-                                      <Trash2Icon className="size-4" />
-                                    </Button>
+                                   <DeleteLesson lessonId={lesson.id} chapterId={item.id} courseId={data.id} />
                                   </div>
                                 )}
                               </SortableItem>

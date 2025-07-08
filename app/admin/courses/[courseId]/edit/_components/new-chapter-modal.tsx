@@ -36,6 +36,7 @@ export function NewChapterModal({ courseId }: Props) {
   const [isPending, startTransition] = useTransition();
 
   const handleOpenChange = (open: boolean) => {
+    if (!open) createChapterForm.reset();
     setIsOpen(open);
   };
 
