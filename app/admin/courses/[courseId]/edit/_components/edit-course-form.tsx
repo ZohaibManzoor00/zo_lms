@@ -35,7 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
-import FileUploader from "@/components/file-uploader/uploader";
+import { Uploader } from "@/components/file-uploader/uploader";
 import { editCourse } from "../actions";
 import { AdminCourseSingularType } from "@/app/data/admin/admin-get-course";
 
@@ -81,6 +81,7 @@ export function EditCourseForm({ data }: Props) {
       }
     });
   };
+
   return (
     <div>
       <Form {...createCourseForm}>
@@ -173,7 +174,11 @@ export function EditCourseForm({ data }: Props) {
               <FormItem className="w-full">
                 <FormLabel>Thumbnail</FormLabel>
                 <FormControl>
-                  <FileUploader onChange={field.onChange} value={field.value} />
+                  <Uploader
+                    onChange={field.onChange}
+                    value={field.value}
+                    fileTypeAccepted="image"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

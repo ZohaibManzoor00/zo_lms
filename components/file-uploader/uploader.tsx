@@ -12,9 +12,11 @@ import {
   ImageIcon,
   Loader2,
   UploadIcon,
+  VideoIcon,
   XIcon,
 } from "lucide-react";
 import { useConstructUrl } from "@/hooks/use-construct-url";
+import { cn } from "@/lib/utils";
 
 interface UploaderProps {
   id: string | null;
@@ -31,9 +33,14 @@ interface UploaderProps {
 interface iAppProps {
   value?: string;
   onChange?: (value: string) => void;
+  fileTypeAccepted: "image" | "video";
 }
 
-export default function FileUploader({ value, onChange }: iAppProps) {
+export function Uploader({
+  value,
+  onChange,
+  fileTypeAccepted,
+}: iAppProps) {
   const fileUrl = useConstructUrl(value ?? "");
   const [fileState, setFileState] = useState<UploaderProps>({
     id: null,
@@ -42,87 +49,90 @@ export default function FileUploader({ value, onChange }: iAppProps) {
     progress: 0,
     isDeleting: false,
     error: false,
-    fileType: "image",
+    fileType: fileTypeAccepted,
     key: value,
-    objectUrl: value && value.trim() !== "" ? fileUrl : undefined,
+    objectUrl: value ? fileUrl : undefined,
   });
 
-  const uploadFile = async (file: File) => {
-    setFileState((prev) => ({
-      ...prev,
-      uploading: true,
-      progress: 0,
-    }));
-
-    try {
-      const presignedResponse = await fetch("/api/s3/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type,
-          size: file.size,
-          isImage: true,
-        }),
-      });
-
-      if (!presignedResponse.ok) {
-        toast.error("Failed to generate presigned URL");
-        setFileState((prev) => ({
-          ...prev,
-          uploading: false,
-          progress: 0,
-          error: true,
-        }));
-        return;
-      }
-
-      const { presignedUrl, key } = await presignedResponse.json();
-
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            const percentageCompleted = (event.loaded / event.total) * 100;
-            setFileState((prev) => ({
-              ...prev,
-              progress: Math.round(percentageCompleted),
-            }));
-          }
-        };
-        xhr.onload = () => {
-          if (xhr.status === 200 || xhr.status === 204) {
-            setFileState((prev) => ({
-              ...prev,
-              uploading: false,
-              progress: 100,
-              key,
-            }));
-            onChange?.(key);
-            toast.success("File uploaded successfully");
-            resolve();
-          } else {
-            reject(new Error("Failed to upload file"));
-          }
-        };
-        xhr.onerror = () => {
-          reject(new Error("Failed to upload file"));
-        };
-        xhr.open("PUT", presignedUrl);
-        xhr.setRequestHeader("Content-Type", file.type);
-        xhr.send(file);
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to upload file");
+  const uploadFile = useCallback(
+    async (file: File) => {
       setFileState((prev) => ({
         ...prev,
+        uploading: true,
         progress: 0,
-        error: true,
-        uploading: false,
       }));
-    }
-  };
+
+      try {
+        const presignedResponse = await fetch("/api/s3/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            filename: file.name,
+            contentType: file.type,
+            size: file.size,
+            isImage: fileTypeAccepted === "image",
+          }),
+        });
+
+        if (!presignedResponse.ok) {
+          toast.error("Failed to generate presigned URL");
+          setFileState((prev) => ({
+            ...prev,
+            uploading: false,
+            progress: 0,
+            error: true,
+          }));
+          return;
+        }
+
+        const { presignedUrl, key } = await presignedResponse.json();
+
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percentageCompleted = (event.loaded / event.total) * 100;
+              setFileState((prev) => ({
+                ...prev,
+                progress: Math.round(percentageCompleted),
+              }));
+            }
+          };
+          xhr.onload = () => {
+            if (xhr.status === 200 || xhr.status === 204) {
+              setFileState((prev) => ({
+                ...prev,
+                uploading: false,
+                progress: 100,
+                key,
+              }));
+              onChange?.(key);
+              toast.success("File uploaded successfully");
+              resolve();
+            } else {
+              reject(new Error("Failed to upload file"));
+            }
+          };
+          xhr.onerror = () => {
+            reject(new Error("Failed to upload file"));
+          };
+          xhr.open("PUT", presignedUrl);
+          xhr.setRequestHeader("Content-Type", file.type);
+          xhr.send(file);
+        });
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to upload file");
+        setFileState((prev) => ({
+          ...prev,
+          progress: 0,
+          error: true,
+          uploading: false,
+        }));
+      }
+    },
+    [fileTypeAccepted, onChange]
+  );
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -139,12 +149,12 @@ export default function FileUploader({ value, onChange }: iAppProps) {
           uploading: false,
           progress: 0,
           objectUrl: URL.createObjectURL(file),
-          fileType: "image",
+          fileType: fileTypeAccepted,
         });
         uploadFile(file);
       }
     },
-    [fileState.objectUrl]
+    [fileState.objectUrl, fileTypeAccepted, uploadFile]
   );
 
   const removeFile = async () => {
@@ -185,7 +195,7 @@ export default function FileUploader({ value, onChange }: iAppProps) {
         error: false,
         uploading: false,
         progress: 0,
-        fileType: "image",
+        fileType: fileTypeAccepted,
       }));
 
       toast.success("File deleted successfully");
@@ -199,7 +209,8 @@ export default function FileUploader({ value, onChange }: iAppProps) {
     }
   };
 
-  const maxSizeMB = 5;
+  const maxSizeImageMB = 5;
+  const maxSizeVideoMB = 500;
 
   const onDropRejected = useCallback(
     (rejectedFiles: any[]) => {
@@ -210,7 +221,7 @@ export default function FileUploader({ value, onChange }: iAppProps) {
 
         switch (error.code) {
           case "file-too-large":
-            toast.error(`File is too large. Maximum size is ${maxSizeMB}MB.`);
+            toast.error(`File is too large. Maximum size is ${fileTypeAccepted === 'image' ? maxSizeImageMB : maxSizeVideoMB}MB.`);
             break;
           case "file-invalid-type":
             toast.error(
@@ -225,7 +236,7 @@ export default function FileUploader({ value, onChange }: iAppProps) {
         }
       }
     },
-    [maxSizeMB]
+    [fileTypeAccepted]
   );
 
   const renderContent = () => {
@@ -249,6 +260,7 @@ export default function FileUploader({ value, onChange }: iAppProps) {
           previewUrl={fileState.objectUrl}
           isDeleting={fileState.isDeleting}
           handleRemoveFile={removeFile}
+          fileType={fileTypeAccepted}
         />
       );
     }
@@ -256,8 +268,10 @@ export default function FileUploader({ value, onChange }: iAppProps) {
     return (
       <RenderDefaultState
         isDragActive={isDragActive}
-        maxSizeMB={maxSizeMB}
+        maxSizeImageMB={maxSizeImageMB}
+        maxSizeVideoMB={maxSizeVideoMB}
         open={open}
+        fileType={fileTypeAccepted}
       />
     );
   };
@@ -265,10 +279,11 @@ export default function FileUploader({ value, onChange }: iAppProps) {
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
     onDrop,
     onDropRejected,
-    accept: { "image/*": [] },
+    accept:
+      fileTypeAccepted === "image" ? { "image/*": [] } : { "video/*": [] },
     maxFiles: 1,
     multiple: false,
-    maxSize: maxSizeMB * 1024 * 1024,
+    maxSize: fileTypeAccepted === 'image' ? maxSizeImageMB * 1024 * 1024 : maxSizeVideoMB * 1024 * 1024,
     disabled: fileState.uploading || !!fileState.objectUrl,
   });
 
@@ -340,6 +355,7 @@ interface RenderSuccessStateProps {
   previewUrl: string;
   isDeleting: boolean;
   handleRemoveFile: () => void;
+  fileType: "image" | "video";
 }
 
 function RenderSuccessState({
@@ -347,23 +363,39 @@ function RenderSuccessState({
   previewUrl,
   isDeleting,
   handleRemoveFile,
+  fileType,
 }: RenderSuccessStateProps) {
   return (
     <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
       <div className="mb-4 flex size-11 shrink-0 items-center justify-center rounded-full bg-green-500/10">
-        <ImageIcon className="size-5 text-green-600" />
+        {fileType === "image" ? (
+          <ImageIcon className="size-5 text-green-600" />
+        ) : (
+          <VideoIcon className="size-5 text-green-600" />
+        )}
       </div>
       <p className="mb-1.5 -mt-2 text-sm font-medium">
         File uploaded successfully
       </p>
       <p className="mb-4 text-muted-foreground text-xs">{fileName}</p>
-      <div className="relative h-32 w-full max-w-48 overflow-hidden rounded-lg border">
-        <Image
-          src={previewUrl}
-          alt="Uploaded image"
-          fill
-          className="object-cover"
-        />
+      <div className={cn(
+        "relative group flex items-center justify-center overflow-hidden rounded-lg border",
+        fileType === "image" ? "aspect-square w-full" : "aspect-video w-4/5 h-full"
+      )}>
+        {fileType === "image" ? (
+          <Image
+            src={previewUrl}
+            alt="Uploaded image"
+            fill
+            className="object-contain p-2"
+          />
+        ) : (
+          <video
+            src={previewUrl}
+            className="h-full w-full rounded-md"
+            controls
+          />
+        )}
       </div>
       <Button
         type="button"
@@ -382,14 +414,18 @@ function RenderSuccessState({
 
 interface RenderDefaultStateProps {
   isDragActive: boolean;
-  maxSizeMB: number;
+  maxSizeImageMB: number;
+  maxSizeVideoMB: number;
   open: () => void;
+  fileType: "image" | "video";
 }
 
 function RenderDefaultState({
   isDragActive,
-  maxSizeMB,
+  maxSizeImageMB,
+  maxSizeVideoMB,
   open,
+  fileType,
 }: RenderDefaultStateProps) {
   return (
     <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
@@ -401,21 +437,31 @@ function RenderDefaultState({
         }`}
         aria-hidden="true"
       >
-        <ImageIcon
+        {fileType === "image" ? (
+          <ImageIcon
           className={`size-5 transition-all duration-200 ${
-            isDragActive ? "text-primary scale-110" : "opacity-60"
-          }`}
-        />
+                isDragActive ? "text-primary scale-110" : "opacity-60"
+            }`}
+          />
+        ) : (
+          <VideoIcon
+            className={`size-5 transition-all duration-200 ${
+              isDragActive ? "text-primary scale-110" : "opacity-60"
+            }`}
+          />
+        )}
       </div>
       <p
         className={`mb-1.5 -mt-1 text-sm font-medium transition-colors duration-200 ${
           isDragActive ? "text-primary" : ""
         }`}
       >
-        {isDragActive ? "Drop your image here" : "Drop your image here"}
+        Drop your {fileType} here
       </p>
       <p className="text-muted-foreground text-xs">
-        SVG, PNG, or JPG (max. {maxSizeMB}MB)
+        {fileType === "image"
+          ? `SVG, PNG, or JPG (max. ${maxSizeImageMB}MB)`
+          : `MP4, MOV, or WEBM (max. ${maxSizeVideoMB}MB)`}
       </p>
       {!isDragActive && (
         <Button
@@ -425,7 +471,7 @@ function RenderDefaultState({
           type="button"
         >
           <UploadIcon className="-ms-1 size-4 opacity-60" aria-hidden="true" />
-          Select image
+          {fileType === "image" ? "Select image" : "Select video"}
         </Button>
       )}
     </div>

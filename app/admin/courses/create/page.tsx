@@ -39,7 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
-import FileUploader from "@/components/file-uploader/uploader";
+import { Uploader } from "@/components/file-uploader/uploader";
 import { tryCatch } from "@/hooks/try-catch";
 import { useTransition } from "react";
 import { createCourse } from "./actions";
@@ -195,9 +195,10 @@ export default function CourseCreationPage() {
                   <FormItem className="w-full">
                     <FormLabel>Thumbnail</FormLabel>
                     <FormControl>
-                      <FileUploader
+                      <Uploader
                         onChange={field.onChange}
                         value={field.value}
+                        fileTypeAccepted="image"
                       />
                     </FormControl>
                     <FormMessage />
