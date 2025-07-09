@@ -4,7 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { adminGetCourses } from "@/app/data/admin/admin-get-courses";
 import {
   AdminCourseCard,
-  AdminCourseSkeleton,
+  AdminCourseCardSkeleton,
 } from "./_components/admin-course";
 import { EmptyCourseState } from "@/components/general/empty-course-state";
 
@@ -52,7 +52,7 @@ function AdminCourseSkeletonLayout() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 gap-7">
       {Array.from({ length: 4 }).map((_, idx) => (
-        <AdminCourseSkeleton key={idx} />
+        <AdminCourseCardSkeleton key={idx} />
       ))}
     </div>
   );

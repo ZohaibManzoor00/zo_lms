@@ -108,7 +108,7 @@ export function AdminCourseCard({ data }: Props) {
   );
 }
 
-export function AdminCourseSkeleton() {
+export function AdminCourseCardSkeleton() {
   return (
     <Card className="group relative py-0 gap-0">
       <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
