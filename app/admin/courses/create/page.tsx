@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import slugify from "slugify";
+import { tryCatch } from "@/hooks/try-catch";
+import { useTransition } from "react";
+import { createCourse } from "./actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useConfetti } from "@/hooks/use-confetti";
 import {
   courseCategorySchema,
   courseLevelSchema,
@@ -10,7 +17,6 @@ import {
   courseStatusSchema,
 } from "@/lib/zod-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import slugify from "slugify";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ArrowLeft, Loader2, PlusIcon, SparklesIcon } from "lucide-react";
@@ -40,15 +46,11 @@ import {
 } from "@/components/ui/select";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
 import { Uploader } from "@/components/file-uploader/uploader";
-import { tryCatch } from "@/hooks/try-catch";
-import { useTransition } from "react";
-import { createCourse } from "./actions";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export default function CourseCreationPage() {
   const [isCreatingCourse, startTransition] = useTransition();
   const router = useRouter();
+  const { triggerConfetti } = useConfetti();
   const createCourseForm = useForm<CourseSchemaType>({
     resolver: zodResolver(courseSchema),
     defaultValues: {
@@ -75,6 +77,7 @@ export default function CourseCreationPage() {
 
       if (result.status === "success") {
         toast.success(result.message);
+        triggerConfetti();
         createCourseForm.reset();
         router.push("/admin/courses");
       } else if (result.status === "error") {
