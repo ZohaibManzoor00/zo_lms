@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { getCourse } from "@/app/data/course/get-course";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -8,7 +9,6 @@ import {
   IconCategory,
   IconChartBar,
   IconChevronRight,
-  IconClick,
   IconClock,
   IconPlayerPlay,
 } from "@tabler/icons-react";
@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/collapsible";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { checkIfCourseBought } from "@/app/data/user/user-is-enrolled";
+import { EnrollmentButton } from "./_components/enrollment-button";
 
 interface Params {
   params: Promise<{ slug: string }>;
@@ -35,6 +36,8 @@ export default async function SlugPage({ params }: Params) {
       (total, chapter) => total + chapter.lesson.length,
       0
     ) ?? 0;
+
+  const isEnrolled = await checkIfCourseBought(course.id);
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mt-5">
@@ -260,8 +263,15 @@ export default async function SlugPage({ params }: Params) {
                 </ul>
               </div>
 
-              <Button className="w-full">Enroll Now!</Button>
-              <p className="text-sm text-muted-foreground mt-4">30-day money-back guarantee</p>
+              {isEnrolled ? (
+                <Link href={`/dashboard`}>Watch Course</Link>
+              ) : (
+                <EnrollmentButton courseId={course.id} />
+              )}
+
+              <p className="text-sm text-muted-foreground mt-4">
+                30-day money-back guarantee
+              </p>
             </CardContent>
           </Card>
         </div>

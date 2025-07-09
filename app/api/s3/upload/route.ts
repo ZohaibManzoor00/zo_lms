@@ -6,12 +6,10 @@ import { s3 } from "@/lib/s3-client";
 import { env } from "@/lib/env";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
-import arcjet, { detectBot, fixedWindow } from "@/lib/arcjet";
+import arcjet, { fixedWindow } from "@/lib/arcjet";
 import { requireAdmin } from "@/app/data/admin/require-admin";
 
-const aj = arcjet
-  .withRule(detectBot({ mode: "LIVE", allow: [] }))
-  .withRule(fixedWindow({ mode: "LIVE", window: "1m", max: 5 }));
+const aj = arcjet.withRule(fixedWindow({ mode: "LIVE", window: "1m", max: 5 }));
 
 export const fileUploadSchema = z.object({
   filename: z.string().min(1, { message: "Filename is required" }),
