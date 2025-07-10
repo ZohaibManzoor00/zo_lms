@@ -8,10 +8,10 @@ interface Props {
   lesson: CourseSidebarDataType["course"]["chapter"][number]["lesson"][number];
   slug: string;
   isActive?: boolean;
+  isCompleted?: boolean;
 }
 
-export function LessonItem({ lesson, slug, isActive }: Props) {
-  const isCompleted = false;
+export function LessonItem({ lesson, slug, isActive, isCompleted }: Props) {
 
   return (
     <Link

@@ -18,9 +18,23 @@ export const getLessonContent = async (lessonId: string) => {
       thumbnailKey: true,
       videoKey: true,
       position: true,
+      lessonProgress: {
+        where: {
+          userId: user.id,
+        },
+        select: {
+          completed: true,
+          lessonId: true,
+        },
+      },
       chapter: {
         select: {
           courseId: true,
+          course: {
+            select: {
+              slug: true,
+            },
+          },
         },
       },
     },
@@ -40,7 +54,8 @@ export const getLessonContent = async (lessonId: string) => {
     },
   });
 
-  if (!enrollmentStatus || enrollmentStatus.status !== "Active") return notFound();
+  if (!enrollmentStatus || enrollmentStatus.status !== "Active")
+    return notFound();
 
   return lesson;
 };

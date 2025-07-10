@@ -8,6 +8,7 @@ import { lessonSchema, LessonSchemaType } from "@/lib/zod-schemas";
 import { AdminLessonType } from "@/app/data/admin/admin-get-lesson";
 import { updateLesson } from "../actions";
 import { tryCatch } from "@/hooks/try-catch";
+import { toast } from "sonner";
 
 import { ArrowLeftIcon } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -29,7 +30,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
 import { Uploader } from "@/components/file-uploader/uploader";
-import { toast } from "sonner";
 
 interface Props {
   lesson: AdminLessonType;
@@ -85,12 +85,23 @@ export function LessonForm({ lesson, chapterId, courseId }: Props) {
           <CardTitle className="flex items-center justify-between">
             <p>Lesson Configuration</p>
             <div className="flex items-center gap-2">
+              <Link
+                href={`/dashboard/${lesson.chapter.course.slug}/${lesson.id}`}
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+                Preview User View
+              </Link>
               {createLessonForm.formState.isDirty ? (
                 <Button type="submit" disabled={pending}>
                   {pending ? "Saving..." : "Save Changes"}
                 </Button>
               ) : (
-                <Button type="button" disabled={true} variant="outline">
+                <Button
+                  type="button"
+                  disabled={true}
+                  variant="outline"
+                  size="sm"
+                >
                   No changes detected
                 </Button>
               )}
@@ -176,11 +187,16 @@ export function LessonForm({ lesson, chapterId, courseId }: Props) {
                 )}
               />
               {createLessonForm.formState.isDirty ? (
-                <Button type="submit" disabled={pending}>
+                <Button type="submit" disabled={pending} size="sm">
                   {pending ? "Saving..." : "Save Changes"}
                 </Button>
               ) : (
-                <Button type="button" disabled={true} variant="outline">
+                <Button
+                  type="button"
+                  disabled={true}
+                  variant="outline"
+                  size="sm"
+                >
                   No changes detected
                 </Button>
               )}

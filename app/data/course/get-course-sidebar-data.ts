@@ -34,6 +34,15 @@ export const getCourseSidebarData = async (slug: string) => {
               title: true,
               position: true,
               description: true,
+              lessonProgress: {
+                where: {
+                  userId: user.id,
+                },
+                select: {
+                  completed: true,
+                  lessonId: true,
+                },
+              },
             },
           },
         },
@@ -52,9 +61,12 @@ export const getCourseSidebarData = async (slug: string) => {
     },
   });
 
-  if (!enrollmentStatus || enrollmentStatus.status !== "Active") return notFound();
+  if (!enrollmentStatus || enrollmentStatus.status !== "Active")
+    return notFound();
 
   return { course };
 };
 
-export type CourseSidebarDataType = Awaited<ReturnType<typeof getCourseSidebarData>>;
+export type CourseSidebarDataType = Awaited<
+  ReturnType<typeof getCourseSidebarData>
+>;
