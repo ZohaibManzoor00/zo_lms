@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import { getAllCourses } from "@/app/data/course/get-all-courses";
 import { PublicCourseCard, PublicCourseCardSkeleton } from "../_components/public-course-card";
-import { Suspense } from "react";
 
-export default function CoursesPage() {
+export const dynamic = "force-dynamic";
+
+export default function PublicCoursesPage() {
   return (
     <div className="mt-5">
       <div className="flex flex-col space-y-2 mb-10">
