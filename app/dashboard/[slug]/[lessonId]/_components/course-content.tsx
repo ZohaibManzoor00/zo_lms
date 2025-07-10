@@ -85,8 +85,6 @@ export function CourseContent({ data }: Props) {
     });
   };
 
-  console.log(data.lessonProgress, "LESSON PROGRESS");
-
   return (
     <div className="flex flex-col h-full bg-background pl-6">
       <VideoPlayer
@@ -98,12 +96,12 @@ export function CourseContent({ data }: Props) {
         {data.lessonProgress.length > 0 && data.lessonProgress[0].completed ? (
           <Button variant="outline" onClick={onSubmit} disabled={pending}>
             <XCircle className="size-4 text-red-500" />
-            Mark as incomplete
+            Mark Incomplete
           </Button>
         ) : (
           <Button variant="outline" onClick={onSubmit} disabled={pending}>
             <CheckCircle className="size-4 text-green-500" />
-            Mark as complete
+            Mark Complete
           </Button>
         )}
       </div>

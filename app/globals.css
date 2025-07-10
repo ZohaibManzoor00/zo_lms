@@ -113,6 +113,11 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+html, body {
+  overscroll-behavior: none;
+}
+
+
 @layer base {
   button:not([disabled]),
   [role="button"]:not([disabled]) {
