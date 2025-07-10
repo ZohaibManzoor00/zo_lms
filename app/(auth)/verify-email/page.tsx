@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { Suspense, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,10 +18,17 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { authClient } from "@/lib/auth-client";
 import { Loader2 } from "lucide-react";
 
-export default function VerifyRequest() {
+export default function VerifyRequestRoute() {
+  return (
+    <Suspense>
+      <VerifyRequest />
+    </Suspense>
+  );
+}
+
+function VerifyRequest() {
   const [otp, setOtp] = useState("");
   const [emailPending, startEmailTransition] = useTransition();
   const searchParams = useSearchParams();

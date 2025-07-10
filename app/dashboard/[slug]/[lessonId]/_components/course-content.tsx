@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { tryCatch } from "@/hooks/try-catch";
 import { markLessonComplete } from "../actions";
 

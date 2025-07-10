@@ -8,23 +8,18 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import {
   AlignCenter,
-  AlignCenterIcon,
   AlignLeftIcon,
   AlignRight,
   Bold,
-  Heading1,
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
   Italic,
-  List,
   ListIcon,
   ListOrdered,
-  ListOrderedIcon,
   Redo,
   Undo,
   Strikethrough,
-  Underline,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";

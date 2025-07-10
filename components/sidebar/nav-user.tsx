@@ -4,7 +4,6 @@ import {
   IconDashboard,
   IconDotsVertical,
   IconLogout,
-  IconNotification,
 } from "@tabler/icons-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

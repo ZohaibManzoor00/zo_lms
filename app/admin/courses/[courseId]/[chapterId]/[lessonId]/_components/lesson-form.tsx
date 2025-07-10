@@ -9,6 +9,7 @@ import { AdminLessonType } from "@/app/data/admin/admin-get-lesson";
 import { updateLesson } from "../actions";
 import { tryCatch } from "@/hooks/try-catch";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { ArrowLeftIcon } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -39,6 +40,7 @@ interface Props {
 
 export function LessonForm({ lesson, chapterId, courseId }: Props) {
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
   const createLessonForm = useForm<LessonSchemaType>({
     resolver: zodResolver(lessonSchema),
@@ -65,6 +67,7 @@ export function LessonForm({ lesson, chapterId, courseId }: Props) {
 
       if (result.status === "success") {
         toast.success(result.message);
+        router.back()
       } else if (result.status === "error") {
         toast.error(result.message);
       }
@@ -92,7 +95,7 @@ export function LessonForm({ lesson, chapterId, courseId }: Props) {
                 Preview User View
               </Link>
               {createLessonForm.formState.isDirty ? (
-                <Button type="submit" disabled={pending}>
+                <Button type="submit" disabled={pending} size="sm">
                   {pending ? "Saving..." : "Save Changes"}
                 </Button>
               ) : (

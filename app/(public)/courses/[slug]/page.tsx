@@ -1,9 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getCourse } from "@/app/data/course/get-course";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useConstructUrl } from "@/hooks/use-construct-url";
+
 import {
   IconBook,
   IconCategory,
@@ -23,6 +22,7 @@ import { CheckIcon } from "lucide-react";
 import { checkIfCourseBought } from "@/app/data/user/user-is-enrolled";
 import { EnrollmentButton } from "./_components/enrollment-button";
 import { buttonVariants } from "@/components/ui/button";
+import { ThumbnailImageClient } from "./_components/thumbnail-image-client";
 
 interface Params {
   params: Promise<{ slug: string }>;
@@ -31,7 +31,6 @@ interface Params {
 export default async function SlugPage({ params }: Params) {
   const { slug } = await params;
   const course = await getCourse(slug);
-  const thumbnail = useConstructUrl(course.fileKey);
   const totalLessons =
     course.chapter.reduce(
       (total, chapter) => total + chapter.lesson.length,
@@ -44,14 +43,11 @@ export default async function SlugPage({ params }: Params) {
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mt-5">
       <div className="order-1 lg:col-span-2">
         <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-lg">
-          <Image
-            src={thumbnail}
-            alt={course.title}
-            fill
-            className="object-cover"
-            priority
+          <ThumbnailImageClient
+            thumbnail={course.fileKey}
+            title={course.title}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"/>
         </div>
 
         <div className="mt-8 space-y-6">

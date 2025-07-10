@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { FileRejection, useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 import Image from "next/image";
@@ -213,7 +213,7 @@ export function Uploader({
   const maxSizeVideoMB = 500;
 
   const onDropRejected = useCallback(
-    (rejectedFiles: any[]) => {
+    (rejectedFiles: FileRejection[]) => {
       const rejection = rejectedFiles[0];
 
       if (rejection.errors) {

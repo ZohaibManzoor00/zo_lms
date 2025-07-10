@@ -11,7 +11,7 @@ import { requireAdmin } from "@/app/data/admin/require-admin";
 
 const aj = arcjet.withRule(fixedWindow({ mode: "LIVE", window: "1m", max: 5 }));
 
-export const fileUploadSchema = z.object({
+const fileUploadSchema = z.object({
   filename: z.string().min(1, { message: "Filename is required" }),
   contentType: z.string().min(1, { message: "Content type is required" }),
   size: z.number().min(1, { message: "Size is required" }),

@@ -1,9 +1,7 @@
-import { Suspense } from "react";
 import { getEnrolledCourses } from "@/app/data/user/get-enrolled-courses";
 import { getAllCourses } from "@/app/data/course/get-all-courses";
 import { EmptyCourseState } from "@/components/general/empty-course-state";
 import { PublicCourseCard } from "../(public)/_components/public-course-card";
-import Link from "next/link";
 import { CourseProgressCard } from "./_components/course-progress-card";
 
 export default async function DashboardPage() {
@@ -43,7 +41,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <section className="mt-10">
+      <section className="mt-10 mb-28">
         <div className="flex flex-col gap-2 mb-5">
           <h1 className="text-3xl font-bold">Available Courses</h1>
           <p className="text-muted-foreground">

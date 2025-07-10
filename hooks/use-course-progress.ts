@@ -1,10 +1,21 @@
 "use client";
 
 import { useMemo } from "react";
-import { CourseSidebarDataType } from "@/app/data/course/get-course-sidebar-data";
+
+export type CourseProgressData = {
+  chapter: {
+    lesson: {
+      id: string;
+      lessonProgress: {
+        lessonId: string;
+        completed: boolean;
+      }[];
+    }[];
+  }[];
+};
 
 interface Props {
-  courseData: CourseSidebarDataType["course"];
+  courseData: CourseProgressData;
 }
 
 interface CourseProgressResult {
@@ -40,6 +51,5 @@ export const useCourseProgress = ({
       completedLessons,
       progressPercentage,
     };
-
   }, [courseData]);
 };

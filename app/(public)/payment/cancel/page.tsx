@@ -15,7 +15,7 @@ export default function EnrollmentCanceledPage() {
           <div className="text-center mt-3 w-full">
             <h2 className="text-xl font-semibold">Payment Cancelled</h2>
             <p className="text-sm mt-2 text-muted-foreground tracking-tight text-balance">
-              Your payment was cancelled, you won't be charged. Please try
+              Your payment was cancelled, you won&apos;t be charged. Please try
               again.
             </p>
 

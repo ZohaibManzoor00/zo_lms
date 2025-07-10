@@ -3,7 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import { useCourseProgress } from "@/hooks/use-course-progress";
+import {
+  useCourseProgress,
+  CourseProgressData,
+} from "@/hooks/use-course-progress";
 import { EnrolledCourseType } from "@/app/data/user/get-enrolled-courses";
 
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +21,8 @@ interface Props {
 
 export function CourseProgressCard({ data }: Props) {
   const thumbnailUrl = useConstructUrl(data.course.fileKey);
-  const { totalLessons, completedLessons, progressPercentage } = useCourseProgress({ courseData: data.course as any });
+  const { totalLessons, completedLessons, progressPercentage } =
+    useCourseProgress({ courseData: data.course as CourseProgressData });
 
   return (
     <Card className="group relative py-0 gap-0">
@@ -43,19 +47,18 @@ export function CourseProgressCard({ data }: Props) {
           {data.course.smallDescription}
         </p>
 
-       <div className="space-y-4 mt-3">
-        <div className="flex justify-between mb-1 text-sm">
+        <div className="space-y-4 mt-3">
+          <div className="flex justify-between mb-1 text-sm">
             <p>Progress: </p>
             <p className="font-medium">{progressPercentage}%</p>
-        </div>
+          </div>
 
-        <Progress value={progressPercentage} className="h-1.5" />
+          <Progress value={progressPercentage} className="h-1.5" />
 
-        <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {completedLessons} of {totalLessons} lessons completed
-        </p>
-
-       </div>
+          </p>
+        </div>
 
         <Link
           href={`/dashboard/${data.course.slug}`}
@@ -86,18 +89,18 @@ export function PublicCourseCardSkeleton() {
         </div>
 
         <div className="mt-4 flex items-center gap-x-5">
-            <div className="flex items-center gap-x-2">
-                <Skeleton className="size-6 rounded-md"/>
-                <Skeleton className="h-4 w-8"/>
-            </div>
+          <div className="flex items-center gap-x-2">
+            <Skeleton className="size-6 rounded-md" />
+            <Skeleton className="h-4 w-8" />
+          </div>
 
-            <div className="flex items-center gap-x-2">
-                <Skeleton className="size-6 rounded-md"/>
-                <Skeleton className="h-4 w-8"/>
-            </div>
+          <div className="flex items-center gap-x-2">
+            <Skeleton className="size-6 rounded-md" />
+            <Skeleton className="h-4 w-8" />
+          </div>
         </div>
 
-        <Skeleton className="w-full mt-4 h-10 rounded-md"/>
+        <Skeleton className="w-full mt-4 h-10 rounded-md" />
       </CardContent>
     </Card>
   );

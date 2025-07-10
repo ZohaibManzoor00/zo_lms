@@ -34,8 +34,6 @@ import {
   ChevronRight,
   ChevronDown,
   GripVertical,
-  Trash2Icon,
-  LucideScissorsLineDashed,
   FileTextIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
