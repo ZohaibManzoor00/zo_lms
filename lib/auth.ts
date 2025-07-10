@@ -21,6 +21,7 @@ export const auth = betterAuth({
   plugins: [
     emailOTP({
       async sendVerificationOTP({ email, otp }) {
+        console.log(email, "OTP", otp); // !update to custom domain
         await resend.emails.send({
           from: "Zo LMS <onboarding@resend.dev>",
           to: [email],
