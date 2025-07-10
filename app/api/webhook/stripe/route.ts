@@ -15,11 +15,14 @@ export const POST = async (req: Request) => {
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, env.STRIPE_WEBHOOK_SECRET);
-  } catch {
+  } catch (error) {
+    console.log(error, "ERROR");
     return new Response("Webhook error", { status: 400 });
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
+
+  console.log(session, "SESSION");
 
   if (event.type === "checkout.session.completed") {
     const courseId = session.metadata?.courseId;
@@ -31,6 +34,9 @@ export const POST = async (req: Request) => {
 
     if (!user) throw new Error("User not found");
 
+    console.log(user, "USER");
+
+
     await prisma.enrollment.update({
         where: { id: session.metadata?.enrollmentId as string }, 
         data: {
@@ -40,6 +46,8 @@ export const POST = async (req: Request) => {
             status: "Active"
         }
     })
+
+    console.log("ENROLLMENT UPDATED");
   }
 
   return new Response("Webhook received", { status: 200 });

@@ -66,10 +66,14 @@ export const enrollInCourse = async (
 
       stripeCustomerId = stripeCustomer.id;
 
+      console.log(stripeCustomerId, "STRIPE CUSTOMER ID");
+
       await prisma.user.update({
         where: { id: user.id },
         data: { stripeCustomerId },
       });
+
+      console.log(stripeCustomerId, "STRIPE CUSTOMER ID ADDED TO DB");
     }
 
     const result = await prisma.$transaction(async (tx) => {

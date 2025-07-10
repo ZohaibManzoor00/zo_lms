@@ -48,6 +48,7 @@ model Session {
 
   @@unique([token])
   @@map("session")
+  @@index([userId])
 }
 
 model Account {
@@ -107,6 +108,8 @@ model Course {
 
   chapter    Chapter[]
   enrollment Enrollment[]
+
+  @@index([status])
 }
 
 enum CourseLevel {
@@ -134,6 +137,8 @@ model Chapter {
   courseId String
 
   lesson Lesson[]
+
+  @@index([courseId, position])
 }
 
 model Lesson {
@@ -152,6 +157,8 @@ model Lesson {
   chapterId String
 
   lessonProgress LessonProgress[]
+
+  @@index([chapterId, position])
 }
 
 model Enrollment {
@@ -194,4 +201,7 @@ model LessonProgress {
   lessonId String
 
   @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+  @@index([completed])
 }
