@@ -11,7 +11,6 @@ import { tryCatch } from "@/hooks/try-catch";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-import { ArrowLeftIcon } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -31,6 +30,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
 import { Uploader } from "@/components/file-uploader/uploader";
+import { BackButton } from "@/components/ui/back-button";
 
 interface Props {
   lesson: AdminLessonType;
@@ -67,7 +67,7 @@ export function LessonForm({ lesson, chapterId, courseId }: Props) {
 
       if (result.status === "success") {
         toast.success(result.message);
-        router.back()
+        router.back();
       } else if (result.status === "error") {
         toast.error(result.message);
       }
@@ -76,12 +76,9 @@ export function LessonForm({ lesson, chapterId, courseId }: Props) {
 
   return (
     <div>
-      <Link
-        href={`/admin/courses/${courseId}/edit`}
-        className={buttonVariants({ variant: "outline", className: "mb-6" })}
-      >
-        <ArrowLeftIcon className="size-4" />
-      </Link>
+      <div className="mb-6">
+        <BackButton href={`/admin/courses/${courseId}/edit`} />
+      </div>
 
       <Card>
         <CardHeader>

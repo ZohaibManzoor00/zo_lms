@@ -19,7 +19,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ArrowLeft, Loader2, PlusIcon, SparklesIcon } from "lucide-react";
+import { ArrowLeft, Loader2, SparklesIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -352,7 +352,7 @@ export default function CourseCreationPage() {
                   </>
                 ) : (
                   <>
-                    Create Course <PlusIcon size={16} />
+                    Create Course
                   </>
                 )}
               </Button>
