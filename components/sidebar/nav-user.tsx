@@ -1,5 +1,8 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
+import { useSignOut } from "@/hooks/use-signout";
 import {
   IconDashboard,
   IconDotsVertical,
@@ -22,17 +25,29 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
-import Link from "next/link";
 import { HomeIcon, Tv2 } from "lucide-react";
-import { useSignOut } from "@/hooks/use-signout";
+
+const userRoutes = [
+  { href: "/", icon: HomeIcon, label: "Home" },
+  { href: "/dashboard", icon: IconDashboard, label: "Dashboard" },
+  { href: "/courses", icon: Tv2, label: "Courses" },
+];
+
+const adminRoutes = [
+  { href: "/", icon: HomeIcon, label: "Home" },
+  { href: "/admin", icon: IconDashboard, label: "Admin Dashboard" },
+  { href: "/admin/courses", icon: Tv2, label: "Admin Courses" },
+];
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { data: session, isPending } = authClient.useSession();
   const { handleSignOut } = useSignOut();
 
-  if (isPending) return null;
+  if (isPending) return <div className="h-12" />;
+  const isAdmin = session?.user.role === "admin";
+
+  const navRoutes = isAdmin ? adminRoutes : userRoutes;
 
   return (
     <SidebarMenu>
@@ -106,27 +121,20 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/">
-                  <HomeIcon />
-                  Homepage
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/admin">
-                  <IconDashboard />
-                  Dashboard
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/admin/courses">
-                  <Tv2 />
-                  Courses
-                </Link>
-              </DropdownMenuItem>
+              {navRoutes.map(({ href, label, icon: Icon }) => (
+                <DropdownMenuItem asChild key={href} className="cursor-pointer">
+                  <Link href={href}>
+                    <Icon />
+                    {label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut}>
+            <DropdownMenuItem
+              onClick={handleSignOut}
+              className="cursor-pointer"
+            >
               <IconLogout />
               Log out
             </DropdownMenuItem>

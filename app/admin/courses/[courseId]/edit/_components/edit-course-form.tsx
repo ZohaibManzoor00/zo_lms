@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { tryCatch } from "@/hooks/try-catch";
 import { toast } from "sonner";
 
-import { Loader2, PlusIcon, SparklesIcon } from "lucide-react";
+import { Loader2, SparklesIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -328,7 +328,7 @@ export function EditCourseForm({ data }: Props) {
               </>
             ) : (
               <>
-                Update Course <PlusIcon size={16} />
+                Update Course
               </>
             )}
           </Button>

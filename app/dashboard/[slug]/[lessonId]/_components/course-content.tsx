@@ -3,14 +3,16 @@
 import { useTransition } from "react";
 import { tryCatch } from "@/hooks/try-catch";
 import { markLessonComplete } from "../actions";
-
-import { LessonContentType } from "@/app/data/course/get-lesson-content";
-import { RenderDescription } from "@/components/rich-text-editor/render-description";
-import { Button } from "@/components/ui/button";
-import { useConstructUrl } from "@/hooks/use-construct-url";
-import { BookIcon, CheckCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import { LessonContentType } from "@/app/data/course/get-lesson-content";
+
+import { RenderDescription } from "@/components/rich-text-editor/render-description";
+import { useConstructUrl } from "@/hooks/use-construct-url";
+import { BookIcon } from "lucide-react";
 import { useConfetti } from "@/hooks/use-confetti";
+import { HeartButton } from "@/components/ui/heart-button";
+import { Button } from "@/components/ui/button";
+// import { CompleteLessonButton } from "@/components/ui/complete-lesson-button";
 
 interface Props {
   data: LessonContentType;
@@ -92,18 +94,23 @@ export function CourseContent({ data }: Props) {
         videoKey={data.videoKey ?? ""}
       />
 
-      <div className="py-4 border-b">
-        {data.lessonProgress.length > 0 && data.lessonProgress[0].completed ? (
-          <Button variant="outline" onClick={onSubmit} disabled={pending}>
-            <XCircle className="size-4 text-red-500" />
-            Mark Incomplete
-          </Button>
-        ) : (
-          <Button variant="outline" onClick={onSubmit} disabled={pending}>
-            <CheckCircle className="size-4 text-green-500" />
-            Mark Complete
-          </Button>
-        )}
+      <div className="flex justify-between items-center border-b py-4">
+        {/* <CompleteLessonButton
+          isCompleted={isCompleted}
+          onToggleComplete={onSubmit}
+          disabled={pending}
+        /> */}
+        <Button onClick={onSubmit} disabled={pending}>
+          Mark as complete
+        </Button>
+
+        <HeartButton
+          initialCount={0}
+          maxClicks={10}
+          onChange={(count) => {
+            console.log(count);
+          }}
+        />
       </div>
 
       <div className="space-y-3 pt-3">

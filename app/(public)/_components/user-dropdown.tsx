@@ -24,10 +24,24 @@ interface UserDropdownProps {
   name: string;
   email: string;
   image: string;
+  isAdmin: boolean
 }
 
-export function UserDropdown({ name, email, image }: UserDropdownProps) {
+const userRoutes = [
+  { href: "/", icon: Home, label: "Home" },
+  { href: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
+  { href: "/courses", icon: BookOpenIcon, label: "Courses" },
+];
+
+const adminRoutes = [
+  { href: "/", icon: Home, label: "Home" },
+  { href: "/admin", icon: LayoutDashboardIcon, label: "Admin Dashboard" },
+  { href: "/admin/courses", icon: BookOpenIcon, label: "Admin Courses" },
+];
+
+export function UserDropdown({ name, email, image, isAdmin }: UserDropdownProps) {
   const { handleSignOut } = useSignOut();
+  const navRoutes = isAdmin ? adminRoutes : userRoutes;
 
   return (
     <DropdownMenu>
@@ -55,32 +69,14 @@ export function UserDropdown({ name, email, image }: UserDropdownProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="/">
-              <Home size={16} className="opacity-60" aria-hidden="true" />
-              <span>Home</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/courses">
-              <BookOpenIcon
-                size={16}
-                className="opacity-60"
-                aria-hidden="true"
-              />
-              <span>Courses</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/dashboard">
-              <LayoutDashboardIcon
-                size={16}
-                className="opacity-60"
-                aria-hidden="true"
-              />
-              <span>Dashboard</span>
-            </Link>
-          </DropdownMenuItem>
+          {navRoutes.map(({ href, label, icon: Icon }) => (
+            <DropdownMenuItem asChild key={href}>
+              <Link href={href}>
+                <Icon size={16} className="opacity-60" aria-hidden="true" />
+                <span>{label}</span>
+              </Link>
+            </DropdownMenuItem>
+          ))}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>

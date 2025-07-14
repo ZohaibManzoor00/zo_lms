@@ -22,12 +22,24 @@ import {
   TimerIcon,
   Trash2,
 } from "lucide-react";
+import { Pill, PillIndicator, PillIndicatorProps } from "@/components/ui/pill";
 
 interface Props {
   data: AdminCourseType;
 }
 
 export function AdminCourseCard({ data }: Props) {
+  const pillIndicatorMap = {
+    Published: "success",
+    Archived: "error",
+    Draft: "warning",
+  };
+  const pillLabelMap = {
+    Published: "Active",
+    Archived: "Archived",
+    Draft: "Draft",
+  };
+
   return (
     <Card className="group relative py-0 gap-0">
       <div className="absolute top-2 right-2 z-10">
@@ -74,13 +86,23 @@ export function AdminCourseCard({ data }: Props) {
       />
 
       <CardContent className="p-4">
-        <Link
-          href={`/admin/courses/${data.id}/edit`}
-          className="font-medium text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors"
-        >
-          {data.title}
-        </Link>
-
+        <div className="flex justify-between items-center">
+          <Link
+            href={`/admin/courses/${data.id}/edit`}
+            className="font-medium text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors"
+          >
+            {data.title}
+          </Link>
+          <Pill>
+            <PillIndicator
+              pulse={data.status === "Published"}
+              variant={
+                pillIndicatorMap[data.status] as PillIndicatorProps["variant"]
+              }
+            />
+            {pillLabelMap[data.status]}
+          </Pill>
+        </div>
         <p className="line-clamp-2 text-sm text-muted-foreground leading-tight mt-2">
           {data.smallDescription}
         </p>
@@ -136,7 +158,6 @@ export function AdminCourseCardSkeleton() {
         </div>
 
         <Skeleton className="w-full h-10 mt-4" />
-
       </CardContent>
     </Card>
   );

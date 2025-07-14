@@ -5,8 +5,8 @@ import { authClient } from "@/lib/auth-client";
 
 import { buttonVariants } from "@/components/ui/button";
 import { AppLogo } from "@/components/ui/app-logo";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { UserDropdown } from "./user-dropdown";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const navItems = [
   {
@@ -25,6 +25,7 @@ const navItems = [
 
 export function Navbar() {
   const { data: session, isPending } = authClient.useSession();
+  const isAdmin = session?.user.role === "admin";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-[backdrop-filter]:bg-background/60">
@@ -45,10 +46,20 @@ export function Navbar() {
                 {item.label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className={buttonVariants({ className: "text-sm font-medium transition-colors hover:text-primary", variant: "outline", size: "sm" })}
+              >
+                Admin
+              </Link>
+            )}
           </div>
           <div className="flex items-center gap-x-2">
             <ThemeToggle />
-            {isPending ? null : session ? (
+            {isPending ? (
+              <div className="w-20 h-10" />
+            ) : session ? (
               <UserDropdown
                 name={
                   session?.user.name && session.user.name.length > 0
@@ -56,7 +67,11 @@ export function Navbar() {
                     : session?.user.email.split("@")[0]
                 }
                 email={session.user.email}
-                image={session.user.image ?? `https://avatar.vercel.sh/${session?.user.email}`}
+                image={
+                  session.user.image ??
+                  `https://avatar.vercel.sh/${session?.user.email}`
+                }
+                isAdmin={session?.user.role === "admin"}
               />
             ) : (
               <>

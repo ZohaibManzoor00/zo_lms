@@ -168,7 +168,7 @@ export default async function SlugPage({ params }: Params) {
 
       {/* Enrollment Form */}
       <div className="order-2 lg:col-span-1">
-        <div className="sticky top-20">
+        <div className="sticky top-22">
           <Card className="py-0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-6">
