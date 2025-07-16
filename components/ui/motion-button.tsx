@@ -6,7 +6,6 @@ import { Button, type ButtonProps } from "@/components/ui/button";
 import { LucideIcon } from "lucide-react";
 
 type MotionButtonProps = ButtonProps & {
-  initialState?: boolean;
   onChange?: (isSaved: boolean) => void;
   className?: string;
   icon?: LucideIcon;
@@ -53,10 +52,9 @@ const createParticleAnimation = (index: number) => {
   };
 };
 
-export const MotionIcon = React.forwardRef<HTMLDivElement, MotionButtonProps>(
+const MotionIcon = React.forwardRef<HTMLDivElement, MotionButtonProps>(
   (props, ref) => {
     const {
-      initialState = false,
       onChange,
       className,
       icon: Icon,
@@ -102,8 +100,21 @@ export const MotionIcon = React.forwardRef<HTMLDivElement, MotionButtonProps>(
     };
 
     function playClickTone(pitch: number = 440) {
-      const ctx = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+      // Type assertion to correctly handle window.webkitAudioContext
+      const AudioContextConstructor =
+        window.AudioContext ||
+        (
+          window as typeof window & {
+            webkitAudioContext: new () => AudioContext;
+          }
+        ).webkitAudioContext;
+
+      if (!AudioContextConstructor) {
+        console.error("AudioContext not supported in this browser.");
+        return;
+      }
+
+      const ctx = new AudioContextConstructor();
       const oscillator = ctx.createOscillator();
       const gain = ctx.createGain();
 
@@ -216,3 +227,7 @@ export const MotionIcon = React.forwardRef<HTMLDivElement, MotionButtonProps>(
     );
   }
 );
+
+MotionIcon.displayName = "MotionIcon";
+
+export { MotionIcon };
