@@ -81,8 +81,20 @@ const HeartButton = React.forwardRef<HTMLDivElement, HeartButtonProps>(
     };
 
     function playClickTone(pitch: number = 440) {
-      const ctx = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+      const AudioContextConstructor =
+        window.AudioContext ||
+        (
+          window as typeof window & {
+            webkitAudioContext: new () => AudioContext;
+          }
+        ).webkitAudioContext;
+
+      if (!AudioContextConstructor) {
+        console.error("AudioContext not supported in this browser.");
+        return;
+      }
+
+      const ctx = new AudioContextConstructor();
       const oscillator = ctx.createOscillator();
       const gain = ctx.createGain();
 
@@ -127,7 +139,11 @@ const HeartButton = React.forwardRef<HTMLDivElement, HeartButtonProps>(
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
             className="relative"
           >
-            <Heart className="opacity-60 text-red-500 fill-background" size={24} aria-hidden="true" />
+            <Heart
+              className="opacity-60 text-red-500 fill-background"
+              size={24}
+              aria-hidden="true"
+            />
 
             <Heart
               className="absolute inset-0 text-red-500 fill-red-500 transition-all duration-300"

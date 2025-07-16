@@ -11,7 +11,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Progress } from "@/components/ui/progress";
-import { ChevronDown, Play } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { LessonItem } from "./lesson-item";
 import { cn } from "@/lib/utils";
 import { IconBook } from "@tabler/icons-react";

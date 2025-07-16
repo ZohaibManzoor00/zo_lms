@@ -5,7 +5,6 @@ import { CourseType } from "@/app/data/course/get-all-courses";
 import { School, TimerIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ForwardButton } from "@/components/ui/forward-button";
 
