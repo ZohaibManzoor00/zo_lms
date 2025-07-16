@@ -205,3 +205,24 @@ model LessonProgress {
   @@index([lessonId])
   @@index([completed])
 }
+
+model CodeWalkthrough {
+  id          String             @id @default(uuid())
+  name        String
+  description String?
+  authorId    String?
+  audioKey    String            
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  steps       WalkthroughStep[]
+}
+
+model WalkthroughStep {
+  id            String      @id @default(uuid())
+  walkthrough   CodeWalkthrough @relation(fields: [walkthroughId], references: [id], onDelete: Cascade)
+  walkthroughId String
+  stepIndex     Int
+  code          String
+  timestamp     Float
+  createdAt     DateTime    @default(now())
+}

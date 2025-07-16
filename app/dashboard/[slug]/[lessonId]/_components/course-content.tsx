@@ -64,7 +64,7 @@ export function CourseContent({ data }: Props) {
 
   const onSubmit = () => {
     startTransition(async () => {
-      setOptimisticIsCompleted(!optimisticIsCompleted); // Optimistic update
+      setOptimisticIsCompleted(!optimisticIsCompleted);
       const currentToastId = toast.loading(
         `Marking lesson as ${
           optimisticIsCompleted ? "incomplete" : "complete"
@@ -80,7 +80,7 @@ export function CourseContent({ data }: Props) {
           "An unexpected error occurred while marking the lesson as complete",
           { id: currentToastId }
         );
-        setOptimisticIsCompleted(initialIsCompleted); // Revert on error
+        setOptimisticIsCompleted(initialIsCompleted);
         return;
       }
 
@@ -93,7 +93,7 @@ export function CourseContent({ data }: Props) {
         );
       } else if (result?.status === "error") {
         toast.error(result.message, { id: currentToastId });
-        setOptimisticIsCompleted(initialIsCompleted); // Revert on error
+        setOptimisticIsCompleted(initialIsCompleted);
       }
     });
   };
@@ -108,7 +108,7 @@ export function CourseContent({ data }: Props) {
       <div className="flex justify-between items-center border-b py-4">
         <div className="flex gap-x-1 items-center">
           <MotionIcon
-            isActive={optimisticIsCompleted} // Use optimistic state
+            isActive={optimisticIsCompleted}
             onChange={onSubmit}
             disabled={pending}
             icon={CircleCheckBig}
