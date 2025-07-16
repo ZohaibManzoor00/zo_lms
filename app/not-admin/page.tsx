@@ -1,4 +1,3 @@
-import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,8 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, ShieldX } from "lucide-react";
-import Link from "next/link";
+import { ShieldX } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
 
 export default function NotAdminPage() {
   return (
@@ -23,10 +22,7 @@ export default function NotAdminPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Link href="/" className={buttonVariants({ className: "w-full" })}>
-            <ArrowLeft className="size-4" />
-            Back to home
-          </Link>
+          <BackButton className="w-full" icon={true} label="Back to home" />
         </CardContent>
       </Card>
     </div>

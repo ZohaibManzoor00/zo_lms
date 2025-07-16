@@ -1,43 +1,32 @@
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ArrowLeftIcon } from "lucide-react";
 
 type BackButtonProps = {
-  iconSize?: number;
-  iconStrokeWidth?: number;
   href?: string;
   className?: string;
-  children?: React.ReactNode;
+  label?: string;
+  icon?: boolean;
 };
 
 const BackButton = ({
   className,
-  children = "Back",
-  iconSize = 16,
-  iconStrokeWidth = 2,
+  label = "Back",
+  icon = true,
   href = "/",
 }: BackButtonProps) => {
   return (
-    <Button
-      asChild
-      variant="outline"
-      className={cn("group relative overflow-hidden", className)}
-    >
-      <Link href={href}>
-        <span className="translate-x-2 transition-transform duration-300 group-hover:opacity-0">
-          {children}
-        </span>
-        <span
-          className="absolute inset-0 z-10 flex items-center justify-center bg-primary-foreground/15 w-2/5 transition-all duration-300 group-hover:w-full"
-          aria-hidden="true"
-        >
-          <ArrowLeft
-            className="opacity-60"
-            size={iconSize}
-            strokeWidth={iconStrokeWidth}
+    <Button className={cn("group", className)} variant="outline">
+      <Link href={href} className="flex items-center gap-x-2">
+        {icon && (
+          <ArrowLeftIcon
+            className="-ms-1 opacity-60 transition-transform group-hover:-translate-x-0.5"
+            size={16}
+            aria-hidden="true"
           />
-        </span>
+        )}
+        {label}
       </Link>
     </Button>
   );

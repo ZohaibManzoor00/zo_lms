@@ -1,7 +1,6 @@
-import { buttonVariants } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/back-button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Ban } from "lucide-react";
-import Link from "next/link";
+import { Ban } from "lucide-react";
 
 export default function EnrollmentCanceledPage() {
   return (
@@ -18,14 +17,9 @@ export default function EnrollmentCanceledPage() {
               Your payment was cancelled, you won&apos;t be charged. Please try
               again.
             </p>
-
-            <Link
-              href="/"
-              className={buttonVariants({ className: "w-full mt-5" })}
-            >
-              <ArrowLeft className="size-4" />
-              Go back to Homepage
-            </Link>
+            <div className="pt-5">
+              <BackButton label="Back to home" className="w-full" />
+            </div>
           </div>
         </CardContent>
       </Card>

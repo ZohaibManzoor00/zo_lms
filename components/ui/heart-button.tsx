@@ -57,6 +57,7 @@ const HeartButton = React.forwardRef<HTMLDivElement, HeartButtonProps>(
     } = props;
 
     const [clickCount, setClickCount] = React.useState(initialCount);
+    const burstSoundRef = React.useRef<HTMLAudioElement>(null);
 
     const fillPercentage = Math.min(100, (clickCount / maxClicks) * 100);
     const isActive = clickCount > 0;
@@ -68,14 +69,47 @@ const HeartButton = React.forwardRef<HTMLDivElement, HeartButtonProps>(
         const newCount = clickCount + 1;
         setClickCount(newCount);
         onChange?.(newCount);
+
+        const pitch = 400 + newCount * 50;
+        playClickTone(pitch);
+
+        if (newCount === maxClicks && burstSoundRef.current) {
+          burstSoundRef.current.currentTime = 0;
+          burstSoundRef.current.play().catch(() => {});
+        }
       }
     };
+
+    function playClickTone(pitch: number = 440) {
+      const ctx = new (window.AudioContext ||
+        (window as any).webkitAudioContext)();
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      oscillator.type = "triangle";
+
+      oscillator.frequency.setValueAtTime(pitch, ctx.currentTime);
+      oscillator.frequency.linearRampToValueAtTime(
+        pitch + 120,
+        ctx.currentTime + 0.15
+      );
+
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+
+      oscillator.start();
+      oscillator.stop(ctx.currentTime + 0.2);
+    }
 
     return (
       <div
         ref={ref}
         className={cn("flex justify-center items-center relative", className)}
       >
+        <audio ref={burstSoundRef} src="/sounds/burst.mp3" preload="auto" />
         <Button
           size="icon"
           variant="ghost"
@@ -93,7 +127,7 @@ const HeartButton = React.forwardRef<HTMLDivElement, HeartButtonProps>(
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
             className="relative"
           >
-            <Heart className="opacity-60" size={24} aria-hidden="true" />
+            <Heart className="opacity-60 text-red-500 fill-background" size={24} aria-hidden="true" />
 
             <Heart
               className="absolute inset-0 text-red-500 fill-red-500 transition-all duration-300"

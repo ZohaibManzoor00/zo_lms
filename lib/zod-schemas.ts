@@ -7,16 +7,10 @@ export const courseLevelSchema = [
 ] as const;
 export const courseStatusSchema = ["Draft", "Published", "Archived"] as const;
 export const courseCategorySchema = [
-  "Development",
-  "Business",
-  "Finance",
-  "IT & Software",
-  "Personal Development",
-  "Marketing",
-  "Design",
-  "Life Skills",
-  "Health & Fitness",
-  "Music",
+  "Data Structures & Algorithms",
+  "Frontend Development",
+  "Backend Development",
+  "Fullstack Development",
   "Other",
 ] as const;
 

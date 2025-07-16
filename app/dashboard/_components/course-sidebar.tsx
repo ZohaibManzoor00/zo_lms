@@ -13,6 +13,9 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { ChevronDown, Play } from "lucide-react";
 import { LessonItem } from "./lesson-item";
+import { cn } from "@/lib/utils";
+import { IconBook } from "@tabler/icons-react";
+
 
 interface Props {
   course: CourseSidebarDataType["course"];
@@ -20,14 +23,16 @@ interface Props {
 
 export function CourseSidebar({ course }: Props) {
   const currentLessonId = usePathname().split("/").pop();
-  const { totalLessons, completedLessons, progressPercentage } = useCourseProgress({ courseData: course });
+  const { totalLessons, completedLessons, progressPercentage } =
+    useCourseProgress({ courseData: course });
+  const isCourseComplete = completedLessons === totalLessons;
 
   return (
     <div className="flex flex-col h-full">
       <div className="pb-4 pr-4 border-b border-border">
         <div className="flex items-center gap-3 mb-3">
           <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <Play className="size-5 text-primary" />
+            <IconBook className="size-5 text-primary" />
           </div>
 
           <div className="flex-1 min-w-0">
@@ -41,14 +46,23 @@ export function CourseSidebar({ course }: Props) {
         </div>
 
         <div className="space-y-2">
-          <div className="flex justify-between text-xs">
+          <div className={cn("flex justify-between text-xs", isCourseComplete && "text-green-600")}>
             <span className="text-muted-foreground">Progress</span>
             <span className="font-medium">
               {completedLessons}/{totalLessons}
             </span>
           </div>
-          <Progress value={progressPercentage} className="h-1.5" />
-          <p className="text-xs text-muted-foreground">
+          <Progress
+            value={progressPercentage}
+            className={cn("h-1.5", isCourseComplete && "bg-green-600")}
+            indicatorClassName={isCourseComplete ? "bg-green-600" : ""}
+          />
+          <p
+            className={cn(
+              "text-xs text-muted-foreground",
+              isCourseComplete && "text-green-500"
+            )}
+          >
             {progressPercentage}% complete
           </p>
         </div>

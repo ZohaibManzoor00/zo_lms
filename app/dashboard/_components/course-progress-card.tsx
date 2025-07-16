@@ -11,9 +11,11 @@ import { EnrolledCourseType } from "@/app/data/user/get-enrolled-courses";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
+import { ForwardButton } from "@/components/ui/forward-button";
+import { cn } from "@/lib/utils";
+import { Award } from "lucide-react";
 
 interface Props {
   data: EnrolledCourseType;
@@ -23,6 +25,7 @@ export function CourseProgressCard({ data }: Props) {
   const thumbnailUrl = useConstructUrl(data.course.fileKey);
   const { totalLessons, completedLessons, progressPercentage } =
     useCourseProgress({ courseData: data.course as CourseProgressData });
+  const isCourseComplete = completedLessons === totalLessons;
 
   return (
     <Card className="group relative py-0 gap-0">
@@ -36,36 +39,59 @@ export function CourseProgressCard({ data }: Props) {
       />
 
       <CardContent className="p-6">
-        <Link
-          href={`/dashboard/${data.course.slug}`}
-          className="font-medium text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors"
-        >
-          {data.course.title}
-        </Link>
+        <div className="flex justify-between items-center">
+          <Link
+            href={`/dashboard/${data.course.slug}`}
+            className="font-medium text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors"
+          >
+            {data.course.title}
+          </Link>
+          {isCourseComplete && <Award className="size-5 text-yellow-400" />}
+        </div>
 
         <p className="text-sm text-muted-foreground line-clamp-2 leading-tight mt-2">
           {data.course.smallDescription}
         </p>
 
-        <div className="space-y-4 mt-3">
-          <div className="flex justify-between mb-1 text-sm">
-            <p>Progress: </p>
+        <div className="space-y-2 mt-3">
+          <div
+            className={cn(
+              "flex justify-between text-sm",
+              isCourseComplete && "text-green-600"
+            )}
+          >
+            <span>Progress</span>
             <p className="font-medium">{progressPercentage}%</p>
           </div>
-
-          <Progress value={progressPercentage} className="h-1.5" />
-
-          <p className="text-xs text-muted-foreground mt-1">
+          <Progress
+            value={progressPercentage}
+            className={cn("h-1.5", isCourseComplete && "bg-green-600")}
+            indicatorClassName={isCourseComplete ? "bg-green-600" : ""}
+          />
+          <p
+            className={cn(
+              "text-xs text-muted-foreground",
+              isCourseComplete && "text-green-500"
+            )}
+          >
             {completedLessons} of {totalLessons} lessons completed
           </p>
         </div>
-
-        <Link
-          href={`/dashboard/${data.course.slug}`}
-          className={buttonVariants({ className: "w-full mt-4" })}
-        >
-          Learn More
-        </Link>
+        {/* <div className="flex justify-between items-center"> */}
+          <div className={cn("mt-4")}>
+            <ForwardButton
+              className="w-full"
+              label="View Course"
+              href={`/dashboard/${data.course.slug}`}
+            />
+          </div>
+          {/* <ForwardButton
+            className="w-full"
+            label="Admin Edit"
+            variant="default"
+            href={`/admin/courses/${data.course.id}/edit`}
+          /> */}
+        {/* </div> */}
       </CardContent>
     </Card>
   );
