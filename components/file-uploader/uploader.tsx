@@ -36,11 +36,7 @@ interface iAppProps {
   fileTypeAccepted: "image" | "video";
 }
 
-export function Uploader({
-  value,
-  onChange,
-  fileTypeAccepted,
-}: iAppProps) {
+export function Uploader({ value, onChange, fileTypeAccepted }: iAppProps) {
   const fileUrl = useConstructUrl(value ?? "");
   const [fileState, setFileState] = useState<UploaderProps>({
     id: null,
@@ -221,7 +217,11 @@ export function Uploader({
 
         switch (error.code) {
           case "file-too-large":
-            toast.error(`File is too large. Maximum size is ${fileTypeAccepted === 'image' ? maxSizeImageMB : maxSizeVideoMB}MB.`);
+            toast.error(
+              `File is too large. Maximum size is ${
+                fileTypeAccepted === "image" ? maxSizeImageMB : maxSizeVideoMB
+              }MB.`
+            );
             break;
           case "file-invalid-type":
             toast.error(
@@ -283,7 +283,10 @@ export function Uploader({
       fileTypeAccepted === "image" ? { "image/*": [] } : { "video/*": [] },
     maxFiles: 1,
     multiple: false,
-    maxSize: fileTypeAccepted === 'image' ? maxSizeImageMB * 1024 * 1024 : maxSizeVideoMB * 1024 * 1024,
+    maxSize:
+      fileTypeAccepted === "image"
+        ? maxSizeImageMB * 1024 * 1024
+        : maxSizeVideoMB * 1024 * 1024,
     disabled: fileState.uploading || !!fileState.objectUrl,
   });
 
@@ -296,9 +299,10 @@ export function Uploader({
   }, [fileState.objectUrl]);
 
   return (
-    <div className="flex flex-col gap-2" {...getRootProps()}>
+    <div className="flex flex-col gap-2">
       <div className="relative">
         <div
+          {...getRootProps()}
           className={`relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed p-4 transition-all duration-200 ${
             isDragActive
               ? "border-primary bg-primary/5 scale-[1.02] shadow-lg"
@@ -378,10 +382,14 @@ function RenderSuccessState({
         File uploaded successfully
       </p>
       <p className="mb-4 text-muted-foreground text-xs">{fileName}</p>
-      <div className={cn(
-        "relative group flex items-center justify-center overflow-hidden rounded-lg border",
-        fileType === "image" ? "aspect-square w-full" : "aspect-video w-4/5 h-full"
-      )}>
+      <div
+        className={cn(
+          "relative group flex items-center justify-center overflow-hidden rounded-lg border",
+          fileType === "image"
+            ? "aspect-square w-full"
+            : "aspect-video w-4/5 h-full"
+        )}
+      >
         {fileType === "image" ? (
           <Image
             src={previewUrl}
@@ -428,7 +436,7 @@ function RenderDefaultState({
   fileType,
 }: RenderDefaultStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
+    <div className="flex flex-col items-center justify-center px-4 py-3 text-center cursor-pointer w-full">
       <div
         className={`mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${
           isDragActive
@@ -439,8 +447,8 @@ function RenderDefaultState({
       >
         {fileType === "image" ? (
           <ImageIcon
-          className={`size-5 transition-all duration-200 ${
-                isDragActive ? "text-primary scale-110" : "opacity-60"
+            className={`size-5 transition-all duration-200 ${
+              isDragActive ? "text-primary scale-110" : "opacity-60"
             }`}
           />
         ) : (

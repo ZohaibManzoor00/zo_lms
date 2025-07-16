@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ForwardButton } from "@/components/ui/forward-button";
 
 interface Props {
   data: CourseType;
@@ -48,13 +49,20 @@ export function PublicCourseCard({ data }: Props) {
             <p className="text-sm text-muted-foreground">{data.category}</p>
           </div>
         </div>
-
-        <Link
+        {/* <Link
           href={`/courses/${data.slug}`}
           className={buttonVariants({ className: "w-full mt-4" })}
         >
-          Learn More
-        </Link>
+          View Course
+        </Link> */}
+        <div className="mt-4">
+          <ForwardButton
+            variant="secondary"
+            label="View Course"
+            href={`/courses/${data.slug}`}
+            className="w-full"
+          />
+        </div>
       </CardContent>
     </Card>
   );
@@ -78,18 +86,18 @@ export function PublicCourseCardSkeleton() {
         </div>
 
         <div className="mt-4 flex items-center gap-x-5">
-            <div className="flex items-center gap-x-2">
-                <Skeleton className="size-6 rounded-md"/>
-                <Skeleton className="h-4 w-8"/>
-            </div>
+          <div className="flex items-center gap-x-2">
+            <Skeleton className="size-6 rounded-md" />
+            <Skeleton className="h-4 w-8" />
+          </div>
 
-            <div className="flex items-center gap-x-2">
-                <Skeleton className="size-6 rounded-md"/>
-                <Skeleton className="h-4 w-8"/>
-            </div>
+          <div className="flex items-center gap-x-2">
+            <Skeleton className="size-6 rounded-md" />
+            <Skeleton className="h-4 w-8" />
+          </div>
         </div>
 
-        <Skeleton className="w-full mt-4 h-10 rounded-md"/>
+        <Skeleton className="w-full mt-4 h-10 rounded-md" />
       </CardContent>
     </Card>
   );

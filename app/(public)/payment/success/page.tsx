@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 
-import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useConfetti } from "@/hooks/use-confetti";
-import { ArrowLeft, CheckIcon } from "lucide-react";
+import { CheckIcon, PartyPopperIcon } from "lucide-react";
+import { ForwardButton } from "@/components/ui/forward-button";
 
 export default function EnrollmentSuccessfulPage() {
   const { triggerConfetti } = useConfetti();
@@ -29,14 +28,9 @@ export default function EnrollmentSuccessfulPage() {
               Congratulations! You have successfully enrolled in the course. You
               can now start learning.
             </p>
-
-            <Link
-              href="/dashboard"
-              className={buttonVariants({ className: "w-full mt-5" })}
-            >
-              <ArrowLeft className="size-4" />
-              Go back to Dashboard
-            </Link>
+            <div className="mt-5">
+              <ForwardButton label="View in dashboard" className="w-full" icon={PartyPopperIcon} />
+            </div>
           </div>
         </CardContent>
       </Card>
