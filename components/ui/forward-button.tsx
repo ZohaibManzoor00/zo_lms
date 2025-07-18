@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Button, ButtonProps, buttonVariants } from "@/components/ui/button";
+import { ButtonProps, buttonVariants } from "@/components/ui/button";
 import { ArrowRightIcon, LucideIcon } from "lucide-react";
 
 type ForwardButtonProps = {
@@ -10,7 +10,6 @@ type ForwardButtonProps = {
   icon?: LucideIcon;
   variant?: ButtonProps["variant"];
   onClick?: () => void;
-  disabled?: boolean;
 };
 
 export const ForwardButton = ({
@@ -20,7 +19,6 @@ export const ForwardButton = ({
   href = "/",
   variant = "secondary",
   onClick,
-  disabled,
 }: ForwardButtonProps) => {
   return (
     <Link

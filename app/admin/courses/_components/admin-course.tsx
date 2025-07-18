@@ -3,7 +3,7 @@ import Link from "next/link";
 import { AdminCourseType } from "@/app/data/admin/admin-get-courses";
 import { useConstructUrl } from "@/hooks/use-construct-url";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  ArrowRight,
   Eye,
   MoreVertical,
   Pencil,

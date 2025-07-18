@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getCourse } from "@/app/data/course/get-course";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -21,7 +20,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CheckIcon } from "lucide-react";
 import { checkIfCourseBought } from "@/app/data/user/user-is-enrolled";
 import { EnrollmentButton } from "./_components/enrollment-button";
-import { buttonVariants } from "@/components/ui/button";
 import { ThumbnailImageClient } from "./_components/thumbnail-image-client";
 import { ForwardButton } from "@/components/ui/forward-button";
 
