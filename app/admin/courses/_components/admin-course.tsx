@@ -51,14 +51,14 @@ export function AdminCourseCard({ data }: Props) {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={`/admin/courses/${data.id}/edit`}>
                 <Pencil className="size-4 text-yellow-600" />
                 Edit Course
               </Link>
             </DropdownMenuItem>
 
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={`/courses/${data.slug}`}>
                 <Eye className="size-4 text-emerald-600" />
                 Preview Course
@@ -67,7 +67,7 @@ export function AdminCourseCard({ data }: Props) {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem asChild className="cursor-pointer">
               <Link href={`/admin/courses/${data.id}/delete`}>
                 <Trash2 className="size-4 text-destructive" />
                 Delete Course

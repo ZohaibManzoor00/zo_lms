@@ -46,7 +46,7 @@ export function UserDropdown({ name, email, image, isAdmin }: UserDropdownProps)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
+        <Button variant="ghost" className="h-auto p-1 hover:bg-transparent">
           <Avatar>
             <AvatarImage src={image} alt="Profile image" />
             <AvatarFallback>{name[0].toUpperCase()}</AvatarFallback>
@@ -70,7 +70,7 @@ export function UserDropdown({ name, email, image, isAdmin }: UserDropdownProps)
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {navRoutes.map(({ href, label, icon: Icon }) => (
-            <DropdownMenuItem asChild key={href}>
+            <DropdownMenuItem asChild key={href} className="cursor-pointer">
               <Link href={href}>
                 <Icon size={16} className="opacity-60" aria-hidden="true" />
                 <span>{label}</span>
@@ -80,7 +80,7 @@ export function UserDropdown({ name, email, image, isAdmin }: UserDropdownProps)
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
-          <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
+          <LogOutIcon size={16} className="opacity-60 cursor-pointer" aria-hidden="true" />
           <span>Logout</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
