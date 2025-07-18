@@ -17,7 +17,7 @@ const createWalkthroughSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   steps: z.array(stepSchema).min(1),
-  audioBuffer: z.instanceof(Buffer),
+  audioBase64: z.string().min(1),
   audioMimeType: z.string().min(1),
   audioFileName: z.string().min(1),
 });
@@ -30,11 +30,12 @@ export async function adminCreateWalkthrough(
     name,
     description,
     steps,
-    audioBuffer,
+    audioBase64,
     audioMimeType,
     audioFileName,
   } = createWalkthroughSchema.parse(input);
 
+  const audioBuffer = Buffer.from(audioBase64, "base64");
   const audioKey = `walkthrough-audio/${uuid()}-${audioFileName}`;
 
   await s3.send(
@@ -64,3 +65,7 @@ export async function adminCreateWalkthrough(
 
   return walkthrough;
 }
+
+export type AdminCreateWalkthroughType = Awaited<
+  ReturnType<typeof adminCreateWalkthrough>
+>;

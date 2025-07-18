@@ -29,7 +29,7 @@ export default function EnrollmentSuccessfulPage() {
               can now start learning.
             </p>
             <div className="mt-5">
-              <ForwardButton label="View in dashboard" className="w-full" icon={PartyPopperIcon} />
+              <ForwardButton label="View in dashboard" href="/dashboard" className="w-full" icon={PartyPopperIcon} />
             </div>
           </div>
         </CardContent>

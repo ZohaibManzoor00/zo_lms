@@ -11,12 +11,12 @@ export default async function CourseLayout({ children, params }: Props) {
   const { course } = await getCourseSidebarData(slug);
 
   return (
-    <div className="flex flex-1">
-      <div className="w-80 border-r border-border shrink-0">
+    <div className="flex">
+      <div className="w-80 border-r border-border shrink-0 overflow-y-auto">
         <CourseSidebar course={course} />
       </div>
 
-      <div className="flex-1 overflow-hidden">{children}</div>
+      <div className="flex-1 overflow-y-auto">{children}</div>
     </div>
   );
 }

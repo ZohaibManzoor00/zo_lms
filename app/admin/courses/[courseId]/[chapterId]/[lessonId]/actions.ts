@@ -27,21 +27,39 @@ export const updateLesson = async ({
     }
 
     await prisma.lesson.update({
-        where: {
-            id: lessonId
-        }, 
-        data: {
-            title: formData.title,
-            description: formData.description,
-            thumbnailKey: formData.thumbnailKey,
-            videoKey: formData.videoKey,
-        }
+      where: {
+        id: lessonId,
+      },
+      data: {
+        title: formData.title,
+        description: formData.description,
+        thumbnailKey: formData.thumbnailKey,
+        videoKey: formData.videoKey,
+      },
     });
 
-    return {
-        status: "success",
-        message: "Lesson updated successfully",
+    // Update LessonWalkthrough join table
+    if (Array.isArray(formData.walkthroughIds)) {
+      // Remove all existing links
+      await prisma.lessonWalkthrough.deleteMany({ where: { lessonId } });
+      // Add new links in order
+      await Promise.all(
+        formData.walkthroughIds.map((walkthroughId, idx) =>
+          prisma.lessonWalkthrough.create({
+            data: {
+              lessonId,
+              walkthroughId,
+              position: idx,
+            },
+          })
+        )
+      );
     }
+
+    return {
+      status: "success",
+      message: "Lesson updated successfully",
+    };
   } catch {
     return {
       status: "error",

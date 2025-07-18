@@ -65,9 +65,13 @@ export const lessonSchema = z.object({
     .string()
     .uuid({ message: "Invalid course ID" })
     .min(1, { message: "Course is required" }),
-  description: z.string().min(3, { message: "Description must be at least 3 characters" }).optional(),
+  description: z
+    .string()
+    .min(3, { message: "Description must be at least 3 characters" })
+    .optional(),
   videoKey: z.string().optional(),
   thumbnailKey: z.string().optional(),
+  walkthroughIds: z.string().array().optional(),
 });
 
 export type CourseSchemaType = z.infer<typeof courseSchema>;

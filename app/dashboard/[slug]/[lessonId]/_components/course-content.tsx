@@ -1,6 +1,7 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
+import dynamic from "next/dynamic";
 import { tryCatch } from "@/hooks/try-catch";
 import { markLessonComplete } from "../actions";
 import { toast } from "sonner";
@@ -9,9 +10,21 @@ import { useOptimistic } from "react";
 
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import { BookIcon, CircleCheckBig } from "lucide-react";
+import { BookIcon, ChevronDown, CircleCheckBig } from "lucide-react";
 import { HeartButton } from "@/components/ui/heart-button";
 import { MotionIcon } from "@/components/ui/motion-button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { buildRecordingSession } from "@/lib/build-recording-session";
+import { cn } from "@/lib/utils";
+
+const CodePlayback = dynamic(
+  () => import("@/components/code-walkthrough/code-playback"),
+  { ssr: false }
+);
 
 interface Props {
   data: LessonContentType;
@@ -104,7 +117,6 @@ export function CourseContent({ data }: Props) {
         thumbnailKey={data.thumbnailKey ?? ""}
         videoKey={data.videoKey ?? ""}
       />
-
       <div className="flex justify-between items-center border-b py-4">
         <div className="flex gap-x-1 items-center">
           <MotionIcon
@@ -122,7 +134,11 @@ export function CourseContent({ data }: Props) {
           }}
         />
       </div>
-      <div className="space-y-3 pt-3">
+
+      <LessonCodeWalkthrough data={data} />
+      <div className="border-b py-4" />
+
+      <div className="space-y-3 pt-6">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           {data.title}
         </h1>
@@ -131,5 +147,61 @@ export function CourseContent({ data }: Props) {
         )}
       </div>
     </div>
+  );
+}
+
+function LessonCodeWalkthrough({ data }: Props) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const getAudioUrl = useConstructUrl;
+
+  return (
+    <>
+      {data.walkthroughs && data.walkthroughs.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
+            Interactive Code Walkthroughs
+          </h2>
+          {data.walkthroughs.map((lw, idx) => (
+            <Collapsible
+              key={lw.id}
+              open={openIndex === idx}
+              onOpenChange={(open) => setOpenIndex(open ? idx : null)}
+              className="dark:bg-accent/40 bg-accent rounded mb-2"
+            >
+              <CollapsibleTrigger
+                className={cn(
+                  "w-full flex items-center rounded justify-between px-4 py-2 text-left font-semibold bg-muted hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+                  // "w-full flex items-center rounded justify-between px-4 py-2 text-left text-primary font-medium border border-primary/20 bg-primary/20 ",
+                  openIndex === idx &&
+                    "bg-primary/10 hover:text-primary hover:bg-primary/20 hover:rounded hover:rounded-b-none rounded dark:bg-accent dark:text-accent-foreground text-primary border-t-accent-foreground rounded-b-none"
+                    // "border border-primary/20 rounded-b-none text-primary font-semibold"
+                )}
+              >
+                <span>{lw.walkthrough.name}</span>
+                <ChevronDown
+                  className={`ml-2 size-5 text-bg-accent-foreground transition-transform duration-200 ${
+                    openIndex === idx ? "rotate-180" : "rotate-0"
+                  }`}
+                  aria-hidden="true"
+                />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="">
+                {lw.walkthrough.description && (
+                  <>
+                    <div className="text-muted-foreground p-4 text-sm">
+                      {lw.walkthrough.description}
+                    </div>
+                  </>
+                )}
+                <CodePlayback
+                  showGuide
+                  session={buildRecordingSession(lw.walkthrough, getAudioUrl)}
+                />
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
+        </div>
+      )}
+    </>
   );
 }

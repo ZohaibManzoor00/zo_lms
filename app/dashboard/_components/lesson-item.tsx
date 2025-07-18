@@ -20,9 +20,7 @@ export function LessonItem({ lesson, slug, isActive, isCompleted }: Props) {
           "w-full p-2.5 h-auto justify-start transition-all",
           isCompleted &&
             "bg-green-200 dark:bg-green-900/30 border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-800 dark:text-green-200",
-          isActive &&
-            !isCompleted &&
-            "bg-primary/10 dark:bg-primary/20 border-primary/50 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary"
+          isActive && "bg-primary/10 dark:bg-primary/20 border-primary/50 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary"
         ),
       })}
       href={`/dashboard/${slug}/${lesson.id}`}
@@ -30,7 +28,7 @@ export function LessonItem({ lesson, slug, isActive, isCompleted }: Props) {
       <div className="flex items-center gap-2.5 w-full min-w-0">
         <div className="shrink-0">
           {isCompleted ? (
-            <div className="rounded-full bg-green-500/10 text-green-500 p-1">
+            <div className={cn("rounded-full bg-green-500/10 text-green-500 p-1", isActive && "bg-primary/20 text-primary")}>
               <CheckIcon className="size-3" />
             </div>
           ) : (
@@ -72,7 +70,7 @@ export function LessonItem({ lesson, slug, isActive, isCompleted }: Props) {
                 isActive ? "text-primary" : "text-green-500 dark:text-green-400"
               )}
             >
-              {isCompleted ? "Completed" : "Viewing"}
+              {isActive ? "Viewing" : "Completed"}
             </p>
           )}
         </div>

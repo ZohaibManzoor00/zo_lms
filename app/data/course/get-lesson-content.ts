@@ -27,6 +27,31 @@ export const getLessonContent = async (lessonId: string) => {
           lessonId: true,
         },
       },
+      walkthroughs: {
+        select: {
+          id: true,
+          position: true,
+          walkthrough: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              audioKey: true,
+              createdAt: true,
+              updatedAt: true,
+              steps: {
+                select: {
+                  code: true, 
+                  timestamp: true, 
+                  stepIndex: true
+                },
+                orderBy: { stepIndex: "asc" }
+              }
+            },
+          },
+        },
+        orderBy: { position: "asc" },
+      },
       chapter: {
         select: {
           courseId: true,
@@ -54,8 +79,9 @@ export const getLessonContent = async (lessonId: string) => {
     },
   });
 
-  if (!enrollmentStatus || enrollmentStatus.status !== "Active")
+  if (!enrollmentStatus || enrollmentStatus.status !== "Active") {
     return notFound();
+  }
 
   return lesson;
 };
