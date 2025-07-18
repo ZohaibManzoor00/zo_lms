@@ -12,7 +12,11 @@ export default function CoursesPage() {
     <>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Your Courses</h1>
-        <ForwardButton href="/admin/courses/create" label="Create Course" variant="default" />
+        <ForwardButton
+          href="/admin/courses/create"
+          label="Create Course"
+          variant="default"
+        />
       </div>
 
       <Suspense fallback={<AdminCourseSkeletonLayout />}>

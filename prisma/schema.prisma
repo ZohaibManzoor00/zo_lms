@@ -9,17 +9,17 @@ datasource db {
 }
 
 model User {
-  id            String       @id
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
-  courses       Course[]
-  enrollments   Enrollment[]
+  id             String           @id
+  name           String
+  email          String
+  emailVerified  Boolean
+  image          String?
+  createdAt      DateTime
+  updatedAt      DateTime
+  sessions       Session[]
+  accounts       Account[]
+  courses        Course[]
+  enrollments    Enrollment[]
   lessonProgress LessonProgress[]
 
   stripeCustomerId String? @unique
@@ -47,8 +47,8 @@ model Session {
   impersonatedBy String?
 
   @@unique([token])
-  @@map("session")
   @@index([userId])
+  @@map("session")
 }
 
 model Account {
@@ -157,6 +157,7 @@ model Lesson {
   chapterId String
 
   lessonProgress LessonProgress[]
+  walkthroughs   LessonWalkthrough[]
 
   @@index([chapterId, position])
 }
@@ -196,7 +197,6 @@ model LessonProgress {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
-
   lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   lessonId String
 
@@ -204,4 +204,39 @@ model LessonProgress {
   @@index([userId])
   @@index([lessonId])
   @@index([completed])
+}
+
+model CodeWalkthrough {
+  id          String              @id @default(uuid())
+  name        String
+  description String?
+  authorId    String?
+  audioKey    String
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  steps       WalkthroughStep[]
+  lessons     LessonWalkthrough[]
+}
+
+model WalkthroughStep {
+  id            String          @id @default(uuid())
+  walkthrough   CodeWalkthrough @relation(fields: [walkthroughId], references: [id], onDelete: Cascade)
+  walkthroughId String
+  stepIndex     Int
+  code          String
+  timestamp     Float
+  createdAt     DateTime        @default(now())
+}
+
+model LessonWalkthrough {
+  id            String          @id @default(uuid())
+  lesson        Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId      String
+  walkthrough   CodeWalkthrough @relation(fields: [walkthroughId], references: [id], onDelete: Cascade)
+  walkthroughId String
+  position      Int
+
+  @@unique([lessonId, walkthroughId])
+  @@index([lessonId])
+  @@index([walkthroughId])
 }

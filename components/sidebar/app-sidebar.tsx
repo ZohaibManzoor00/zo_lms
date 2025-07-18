@@ -14,6 +14,8 @@ import {
   IconSearch,
   IconSettings,
   IconUsers,
+  IconVideo,
+  IconBrandCodesandbox
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -41,6 +43,16 @@ const data = {
       title: "Courses",
       url: "/admin/courses",
       icon: IconListDetails,
+    },
+    {
+      title: "Code Walkthroughs",
+      url: "/admin/code-walkthrough",
+      icon: IconBrandCodesandbox,
+    },
+    {
+      title: "Record Walkthrough",
+      url: "/admin/code-walkthrough/record",
+      icon: IconVideo,
     },
     {
       title: "Analytics",

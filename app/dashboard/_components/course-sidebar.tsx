@@ -16,7 +16,6 @@ import { LessonItem } from "./lesson-item";
 import { cn } from "@/lib/utils";
 import { IconBook } from "@tabler/icons-react";
 
-
 interface Props {
   course: CourseSidebarDataType["course"];
 }
@@ -68,7 +67,7 @@ export function CourseSidebar({ course }: Props) {
         </div>
       </div>
 
-      <div className="py-4 pr-4 space-y-3">
+      <div className="py-4 pr-4 space-y-3 h-[70dvh] overflow-y-auto">
         {course.chapter.map((chapter) => (
           <Collapsible key={chapter.id} defaultOpen={chapter.position === 1}>
             <CollapsibleTrigger asChild>

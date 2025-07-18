@@ -25,6 +25,13 @@ export const adminGetLesson = async (lessonId: string) => {
           },
         },
       },
+      walkthroughs: {
+        select: {
+          walkthroughId: true,
+          position: true,
+        },
+        orderBy: { position: "asc" },
+      },
     },
   });
 
