@@ -10,7 +10,7 @@ import { request } from "@arcjet/next";
 import { redirect } from "next/navigation";
 import Stripe from "stripe";
 
-const aj = arcjet.withRule(fixedWindow({ mode: "LIVE", window: "1m", max: 5 }))
+const aj = arcjet.withRule(fixedWindow({ mode: "LIVE", window: "1m", max: 5 }));
 
 export const enrollInCourse = async (
   courseId: string
@@ -18,8 +18,8 @@ export const enrollInCourse = async (
   const user = await requireUser();
   let checkoutUrl: string;
   try {
-    const req = await request()
-    const decision = await aj.protect(req, { fingerprint: user.id })
+    const req = await request();
+    const decision = await aj.protect(req, { fingerprint: user.id });
     if (decision.isDenied()) {
       return {
         status: "error",
@@ -36,6 +36,7 @@ export const enrollInCourse = async (
         title: true,
         price: true,
         slug: true,
+        stripePriceId: true,
       },
     });
 
@@ -97,6 +98,36 @@ export const enrollInCourse = async (
         };
       }
 
+      if (course.price === 0) {
+        let enrollment;
+        if (existingEnrollment) {
+          enrollment = await tx.enrollment.update({
+            where: {
+              id: existingEnrollment.id,
+            },
+            data: {
+              status: "Active", 
+              amount: 0,
+              updatedAt: new Date(),
+            },
+          });
+        } else {
+          enrollment = await tx.enrollment.create({
+            data: {
+              userId: user.id,
+              courseId: courseId,
+              amount: 0,
+              status: "Active",
+            },
+          });
+        }
+
+        return {
+          enrollmentId: enrollment.id,
+          isFree: true,
+        };
+      }
+
       let enrollment;
       if (existingEnrollment) {
         enrollment = await tx.enrollment.update({
@@ -122,7 +153,7 @@ export const enrollInCourse = async (
 
       const checkoutSession = await stripe.checkout.sessions.create({
         customer: stripeCustomerId,
-        line_items: [{ price: "price_1RizWLQ4Y7NQTfoSxEoBME8m", quantity: 1 }],
+        line_items: [{ price: course.stripePriceId, quantity: 1 }],
         mode: "payment",
         success_url: `${env.BETTER_AUTH_URL}/payment/success`,
         cancel_url: `${env.BETTER_AUTH_URL}/payment/cancel`,
@@ -139,8 +170,14 @@ export const enrollInCourse = async (
       };
     });
 
-    checkoutUrl = result.checkoutUrl as string;
+    if (result.isFree) {
+      return {
+        status: "success",
+        message: "You have been enrolled in this course for free 🎉",
+      };
+    }
 
+    checkoutUrl = result.checkoutUrl as string;
   } catch (error) {
     if (error instanceof Stripe.errors.StripeError) {
       return {

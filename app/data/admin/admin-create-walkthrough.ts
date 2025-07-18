@@ -7,6 +7,7 @@ import { env } from "@/lib/env";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuid } from "uuid";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 const stepSchema = z.object({
   code: z.string(),
@@ -62,6 +63,8 @@ export async function adminCreateWalkthrough(
     },
     select: { id: true, audioKey: true },
   });
+
+  revalidatePath("/admin/code-walkthrough");
 
   return walkthrough;
 }

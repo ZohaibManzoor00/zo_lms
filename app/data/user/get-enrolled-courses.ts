@@ -40,6 +40,9 @@ export const getEnrolledCourses = async () => {
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   return data;

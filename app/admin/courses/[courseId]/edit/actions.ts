@@ -14,6 +14,7 @@ import {
 import arcjet, { fixedWindow } from "@/lib/arcjet";
 import { request } from "@arcjet/next";
 import { revalidatePath } from "next/cache";
+import { stripe } from "@/lib/stripe";
 
 const aj = arcjet.withRule(fixedWindow({ mode: "LIVE", window: "1m", max: 5 }));
 
@@ -49,6 +50,54 @@ export const editCourse = async (
       };
     }
 
+    // Get the current course data to check if price changed
+    const currentCourse = await prisma.course.findUnique({
+      where: {
+        id: courseId,
+        userId: user.user.id,
+      },
+      select: {
+        price: true,
+        stripePriceId: true,
+      },
+    });
+
+    if (!currentCourse) {
+      return {
+        status: "error",
+        message: "Course not found",
+      };
+    }
+
+    let newStripePriceId = currentCourse.stripePriceId;
+    const priceChanged = currentCourse.price !== result.data.price;
+
+    if (priceChanged) {
+      try {
+        const existingPrice = await stripe.prices.retrieve(
+          currentCourse.stripePriceId
+        );
+
+        const newPrice = await stripe.prices.create({
+          product: existingPrice.product as string,
+          unit_amount: result.data.price * 100,
+          currency: "usd",
+        });
+
+        await stripe.prices.update(currentCourse.stripePriceId, {
+          active: false,
+        });
+
+        newStripePriceId = newPrice.id;
+      } catch (stripeError) {
+        console.error("Error updating Stripe price:", stripeError);
+        return {
+          status: "error",
+          message: "Failed to update price in payment system",
+        };
+      }
+    }
+
     await prisma.course.update({
       where: {
         id: courseId,
@@ -56,6 +105,7 @@ export const editCourse = async (
       },
       data: {
         ...result.data,
+        stripePriceId: newStripePriceId,
       },
     });
 
@@ -356,7 +406,9 @@ export const deleteChapter = async ({
     }
 
     const chapters = courseWithChapters.chapter;
-    const chapterToDelete = chapters.find((chapter) => chapter.id === chapterId);
+    const chapterToDelete = chapters.find(
+      (chapter) => chapter.id === chapterId
+    );
 
     if (!chapterToDelete) {
       return {
@@ -365,7 +417,9 @@ export const deleteChapter = async ({
       };
     }
 
-    const remainingChapters = chapters.filter((chapter) => chapter.id !== chapterId);
+    const remainingChapters = chapters.filter(
+      (chapter) => chapter.id !== chapterId
+    );
 
     const updatedPositions = remainingChapters.map((chapter, index) =>
       prisma.chapter.update({

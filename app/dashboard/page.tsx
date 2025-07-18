@@ -41,7 +41,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <section className="mt-10 mb-28">
+      <section className="mt-10">
         <div className="flex flex-col gap-2 mb-5">
           <h1 className="text-3xl font-bold">Available Courses</h1>
           <p className="text-muted-foreground">
@@ -52,7 +52,7 @@ export default async function DashboardPage() {
         {coursesUserHasNotEnrolledIn.length === 0 ? (
           <EmptyCourseState
             title="No available courses"
-            description="All courses are already enrolled"
+            description="You have already enrolled in all available courses, check back later for new courses"
             buttonText="Browse Courses"
             href="/courses"
           />

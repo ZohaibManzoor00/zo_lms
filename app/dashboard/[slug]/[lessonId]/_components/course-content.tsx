@@ -113,10 +113,10 @@ export function CourseContent({ data }: Props) {
 
   return (
     <div className="flex flex-col h-full bg-background pl-6">
-      <VideoPlayer
-        thumbnailKey={data.thumbnailKey ?? ""}
-        videoKey={data.videoKey ?? ""}
-      />
+        <VideoPlayer
+          thumbnailKey={data.thumbnailKey ?? ""}
+          videoKey={data.videoKey ?? ""}
+        />
       <div className="flex justify-between items-center border-b py-4">
         <div className="flex gap-x-1 items-center">
           <MotionIcon
@@ -135,8 +135,9 @@ export function CourseContent({ data }: Props) {
         />
       </div>
 
-      <LessonCodeWalkthrough data={data} />
-      <div className="border-b py-4" />
+      {data.walkthroughs && data.walkthroughs.length > 0 && (
+        <LessonCodeWalkthrough data={data} />
+      )}
 
       <div className="space-y-3 pt-6">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
@@ -158,9 +159,11 @@ function LessonCodeWalkthrough({ data }: Props) {
     <>
       {data.walkthroughs && data.walkthroughs.length > 0 && (
         <div className="mt-6">
-          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
-            Interactive Code Walkthroughs
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
+              Interactive Code Walkthroughs
+            </h2>
+          </div>
           {data.walkthroughs.map((lw, idx) => (
             <Collapsible
               key={lw.id}
@@ -174,7 +177,7 @@ function LessonCodeWalkthrough({ data }: Props) {
                   // "w-full flex items-center rounded justify-between px-4 py-2 text-left text-primary font-medium border border-primary/20 bg-primary/20 ",
                   openIndex === idx &&
                     "bg-primary/10 hover:text-primary hover:bg-primary/20 hover:rounded hover:rounded-b-none rounded dark:bg-accent dark:text-accent-foreground text-primary border-t-accent-foreground rounded-b-none"
-                    // "border border-primary/20 rounded-b-none text-primary font-semibold"
+                  // "border border-primary/20 rounded-b-none text-primary font-semibold"
                 )}
               >
                 <span>{lw.walkthrough.name}</span>
@@ -202,6 +205,8 @@ function LessonCodeWalkthrough({ data }: Props) {
           ))}
         </div>
       )}
+
+      <div className="border-b pb-4 pt-2" />
     </>
   );
 }

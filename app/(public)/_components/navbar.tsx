@@ -28,7 +28,7 @@ export function Navbar() {
   const isAdmin = session?.user.role === "admin";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container flex min-h-16 items-center mx-auto px-4 md:px-6 lg:px-8">
         <Link href="/" className="flex items-center space-x-2 mr-4">
           <AppLogo />
@@ -49,7 +49,12 @@ export function Navbar() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className={buttonVariants({ className: "text-sm font-medium transition-colors hover:text-primary", variant: "outline", size: "sm" })}
+                className={buttonVariants({
+                  className:
+                    "text-sm font-medium transition-colors hover:text-primary",
+                  variant: "outline",
+                  size: "sm",
+                })}
               >
                 Admin
               </Link>

@@ -6,13 +6,16 @@ import { useTransition } from "react";
 import { enrollInCourse } from "../actions";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Props {
   courseId: string;
+  isFree: boolean;
 }
 
-export function EnrollmentButton({ courseId }: Props) {
+export function EnrollmentButton({ courseId, isFree }: Props) {
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
   const onSubmit = () => {
     startTransition(async () => {
@@ -27,6 +30,9 @@ export function EnrollmentButton({ courseId }: Props) {
 
       if (result.status === "success") {
         toast.success(result.message);
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
       } else if (result.status === "error") {
         toast.error(result.message);
       }
@@ -45,7 +51,7 @@ export function EnrollmentButton({ courseId }: Props) {
           <Loader2 className="size-4 animate-spin" /> Enrolling...
         </>
       ) : (
-        "Enroll Now!"
+        isFree ? "Start Learning" : "Enroll Now!"
       )}
     </Button>
   );

@@ -23,6 +23,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Pill, PillIndicator, PillIndicatorProps } from "@/components/ui/pill";
+import { ForwardButton } from "@/components/ui/forward-button";
 
 interface Props {
   data: AdminCourseType;
@@ -119,12 +120,12 @@ export function AdminCourseCard({ data }: Props) {
           </div>
         </div>
 
-        <Link
+        <ForwardButton
           href={`/admin/courses/${data.id}/edit`}
-          className={buttonVariants({ className: "w-full mt-4" })}
-        >
-          Edit Course <ArrowRight className="size-4" />
-        </Link>
+          label="Edit Course"
+          variant="default"
+          className="w-full mt-4"
+        />
       </CardContent>
     </Card>
   );

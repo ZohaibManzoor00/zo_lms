@@ -23,6 +23,7 @@ import { checkIfCourseBought } from "@/app/data/user/user-is-enrolled";
 import { EnrollmentButton } from "./_components/enrollment-button";
 import { buttonVariants } from "@/components/ui/button";
 import { ThumbnailImageClient } from "./_components/thumbnail-image-client";
+import { ForwardButton } from "@/components/ui/forward-button";
 
 interface Params {
   params: Promise<{ slug: string }>;
@@ -47,7 +48,7 @@ export default async function SlugPage({ params }: Params) {
             thumbnail={course.fileKey}
             title={course.title}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"/>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         </div>
 
         <div className="mt-8 space-y-6">
@@ -166,19 +167,24 @@ export default async function SlugPage({ params }: Params) {
         </div>
       </div>
 
-      {/* Enrollment Form */}
       <div className="order-2 lg:col-span-1">
         <div className="sticky top-22">
           <Card className="py-0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <span className="text-lg font-medium">Price:</span>
-                <span className="text-2xl font-bold text-primary">
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  }).format(course.price)}
-                </span>
+                <span className="text-xl font-medium">Price:</span>
+                {course.price === 0 ? (
+                  <span className="text-2xl font-bold text-primary">
+                    Free
+                  </span>
+                ) : (
+                  <span className="text-2xl font-bold text-primary">
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(course.price)}
+                  </span>
+                )}
               </div>
 
               <div className="space-y-3 mb-6 rounded-lg bg-muted p-4">
@@ -238,21 +244,21 @@ export default async function SlugPage({ params }: Params) {
                 <h4>This course includes:</h4>
                 <ul className="space-y-2">
                   <li className="flex items-center gap-2 text-sm">
-                    <div className="rounded-full bg-green-500/10 text-green-500 p-1">
+                    <div className="rounded-full bg-accent text-accent-foreground p-1">
                       <CheckIcon className="size-3" />
                     </div>
                     <span>Full lifetime access</span>
                   </li>
 
                   <li className="flex items-center gap-2 text-sm">
-                    <div className="rounded-full bg-green-500/10 text-green-500 p-1">
+                    <div className="rounded-full bg-accent text-accent-foreground p-1">
                       <CheckIcon className="size-3" />
                     </div>
                     <span>Access on mobile and desktop</span>
                   </li>
 
                   <li className="flex items-center gap-2 text-sm">
-                    <div className="rounded-full bg-green-500/10 text-green-500 p-1">
+                    <div className="rounded-full bg-accent text-accent-foreground p-1">
                       <CheckIcon className="size-3" />
                     </div>
                     <span>Certificate of completion</span>
@@ -261,17 +267,20 @@ export default async function SlugPage({ params }: Params) {
               </div>
 
               {isEnrolled ? (
-                <Link
-                  className={buttonVariants({ className: "w-full" })}
-                  href={`/dashboard`}
-                >
-                  Watch Course
-                </Link>
+                <ForwardButton
+                  href="/dashboard"
+                  label="Watch Course"
+                  variant="default"
+                  className="w-full"
+                />
               ) : (
-                <EnrollmentButton courseId={course.id} />
+                <EnrollmentButton
+                  isFree={course.price === 0}
+                  courseId={course.id}
+                />
               )}
 
-              <p className="text-sm text-muted-foreground mt-4">
+              <p className="text-sm text-center text-muted-foreground mt-4">
                 30-day money-back guarantee
               </p>
             </CardContent>

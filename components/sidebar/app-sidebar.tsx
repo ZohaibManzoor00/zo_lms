@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   IconCamera,
   IconChartBar,
-  IconDashboard,
+  IconLayoutDashboard,
   IconFileAi,
   IconFileDescription,
   IconFolder,
@@ -37,7 +37,7 @@ const data = {
     {
       title: "Dashboard",
       url: "/admin",
-      icon: IconDashboard,
+      icon: IconLayoutDashboard,
     },
     {
       title: "Courses",

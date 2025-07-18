@@ -8,7 +8,12 @@ const aj = arcjet({
   rules: [
     detectBot({
       mode: "LIVE",
-      allow: ["CATEGORY:SEARCH_ENGINE", "CATEGORY:MONITOR", "CATEGORY:PREVIEW", "STRIPE_WEBHOOK"],
+      allow: [
+        "CATEGORY:SEARCH_ENGINE",
+        "CATEGORY:MONITOR",
+        "CATEGORY:PREVIEW",
+        "STRIPE_WEBHOOK",
+      ],
     }),
   ],
 });
@@ -24,13 +29,25 @@ async function authMiddleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/auth|api/webhook|api/s3).*)",
+     /*
+     * Match all request paths except for the ones starting with:
+     * - api/auth (auth routes)
+     * - api/webhook (webhook routes)
+     * - api/s3 (s3 routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     "/((?!api/auth(?:/|$)|api/webhook(?:/|$)|api/s3(?:/|$)|_next/static|_next/image|favicon.ico).*)",
+     */
+  ],
 };
 
 export default createMiddleware(aj, async (request: NextRequest) => {
-	if (request.nextUrl.pathname.startsWith("/admin")) {
-		return authMiddleware(request);
-	}
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    return authMiddleware(request);
+  }
 
-	return NextResponse.next();
+  return NextResponse.next();
 });

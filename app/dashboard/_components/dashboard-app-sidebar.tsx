@@ -4,12 +4,13 @@ import * as React from "react";
 import Link from "next/link";
 import {
   IconCamera,
-  IconDashboard,
+  IconLayoutDashboard,
   IconFileAi,
   IconFileDescription,
   IconHelp,
   IconSearch,
   IconSettings,
+  IconBook,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -31,7 +32,12 @@ const data = {
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: IconDashboard,
+      icon: IconLayoutDashboard,
+    },
+    {
+      title: "Courses",
+      url: "/courses",
+      icon: IconBook,
     },
   ],
   navClouds: [

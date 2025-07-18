@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Button, ButtonProps } from "@/components/ui/button";
+import { Button, ButtonProps, buttonVariants } from "@/components/ui/button";
 import { ArrowRightIcon, LucideIcon } from "lucide-react";
 
 type ForwardButtonProps = {
@@ -8,7 +8,9 @@ type ForwardButtonProps = {
   className?: string;
   label?: string;
   icon?: LucideIcon;
-  variant?: ButtonProps['variant']
+  variant?: ButtonProps["variant"];
+  onClick?: () => void;
+  disabled?: boolean;
 };
 
 export const ForwardButton = ({
@@ -17,18 +19,26 @@ export const ForwardButton = ({
   icon: Icon,
   href = "/",
   variant = "secondary",
+  onClick,
+  disabled,
 }: ForwardButtonProps) => {
   return (
-    <Button className={cn("group", className)} variant={variant}>
-      <Link className="flex items-center gap-x-2" href={href}>
-        {Icon && <Icon className="-ms-1 opacity" size={16} aria-hidden="true" />}
-        {label}
-        <ArrowRightIcon
-          className="-me-1 opacity-60 transition-transform group-hover:translate-x-0.5"
-          size={16}
-          aria-hidden="true"
-        />
-      </Link>
-    </Button>
+    <Link
+      className={cn(
+        "group flex items-center gap-x-2",
+        buttonVariants({ variant }),
+        className
+      )}
+      href={href}
+      onClick={onClick}
+    >
+      {Icon && <Icon className="-ms-1 opacity" size={16} aria-hidden="true" />}
+      {label}
+      <ArrowRightIcon
+        className="-me-1 opacity-60 transition-transform group-hover:translate-x-0.5"
+        size={16}
+        aria-hidden="true"
+      />
+    </Link>
   );
 };
