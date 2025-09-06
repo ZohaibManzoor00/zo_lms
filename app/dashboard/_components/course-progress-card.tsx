@@ -54,38 +54,43 @@ export function CourseProgressCard({ data }: Props) {
         </p>
 
         <div className="space-y-2 mt-3">
-          <div
-            className={cn(
-              "flex justify-between text-sm",
-              isCourseComplete && "text-green-600"
-            )}
-          >
-            <span>Progress</span>
-            <p className="font-medium">{progressPercentage}%</p>
+          <div className="flex justify-between items-center">
+            <div
+              className={cn(
+                "flex justify-between text-sm",
+                isCourseComplete && "text-primary"
+              )}
+            >
+              <span>Progress</span>
+            </div>
+            <div className="flex items-center gap-x-2">
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {completedLessons}/{totalLessons} lessons
+              </p>
+              <p
+                className={cn(
+                  "font-medium",
+                  isCourseComplete && "text-primary"
+                )}
+              >
+                {progressPercentage}%
+              </p>
+            </div>
           </div>
           <Progress
             value={progressPercentage}
-            className={cn("h-1.5", isCourseComplete && "bg-green-600")}
-            indicatorClassName={isCourseComplete ? "bg-green-600" : ""}
+            className={cn("h-1.5", isCourseComplete && "bg-primary")}
+            indicatorClassName={isCourseComplete ? "bg-primary" : ""}
           />
-          <p
-            className={cn(
-              "text-xs text-muted-foreground",
-              isCourseComplete && "text-green-500"
-            )}
-          >
-            {completedLessons} of {totalLessons} lessons completed
-          </p>
         </div>
-        {/* <div className="flex justify-between items-center"> */}
-          <div className={cn("mt-4")}>
-            <ForwardButton
-              className="w-full"
-              label="View Course"
-              href={`/dashboard/${data.course.slug}`}
-            />
-          </div>
-          {/* <ForwardButton
+        <div className={cn("mt-4")}>
+          <ForwardButton
+            className="w-full"
+            label="View Course"
+            href={`/dashboard/${data.course.slug}`}
+          />
+        </div>
+        {/* <ForwardButton
             className="w-full"
             label="Admin Edit"
             variant="default"

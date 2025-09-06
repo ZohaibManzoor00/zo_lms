@@ -5,6 +5,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
+import { customThemes } from "@/lib/custom-themes";
 
 import {
   AnimationStart,
@@ -63,21 +64,7 @@ export function ThemeToggle({
       } else if (theme.endsWith("-dark")) {
         const baseTheme = theme.replace("-dark", "");
         setTheme(baseTheme);
-      } else if (
-        [
-          "ocean",
-          "sunset",
-          "forest",
-          "coffee",
-          "lavender",
-          "rose",
-          "mint",
-          "slate",
-          "crimson",
-          "amber",
-          "teal",
-        ].includes(theme)
-      ) {
+      } else if (customThemes.includes(theme)) {
         setTheme(`${theme}-dark`);
       } else {
         setTheme("dark");

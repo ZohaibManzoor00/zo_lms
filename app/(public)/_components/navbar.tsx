@@ -11,16 +11,24 @@ import { AppLogoFull } from "@/components/ui/app-logo";
 
 const navItems = [
   {
-    label: "Home",
-    href: "/",
+    label: "Dashboard",
+    href: "/dashboard",
   },
   {
     label: "Courses",
     href: "/courses",
   },
   {
-    label: "Dashboard",
-    href: "/dashboard",
+    label: "Projects",
+    href: "/projects",
+  },
+  {
+    label: "Blogs",
+    href: "/blogs",
+  },
+  {
+    label: "About",
+    href: "/about",
   },
 ];
 
