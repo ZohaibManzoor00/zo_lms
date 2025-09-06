@@ -6,10 +6,8 @@ import { useConstructUrl } from "@/hooks/use-construct-url";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -62,7 +60,7 @@ export function WalkthroughAccordionList({
               </div>
             </Button>
           </DialogTrigger>
-          <DialogContent className="flex flex-col gap-0 p-0 sm:max-h-[min(640px,80vh)] sm:max-w-3xl [&>button:last-child]:top-3.5">
+          <DialogContent className="flex flex-col gap-0 p-0 max-w-6xl w-[90vw] max-h-[85vh] h-[85vh] [&>button:last-child]:top-3.5">
             <DialogHeader className="contents space-y-0 text-left">
               <DialogTitle className="border-b px-6 py-4 text-base">
                 {w.name}
@@ -80,11 +78,6 @@ export function WalkthroughAccordionList({
                     />
                   </div>
                 </DialogDescription>
-                <DialogFooter className="px-6 pb-6 sm:justify-start">
-                  <DialogClose asChild>
-                    <Button type="button">Close</Button>
-                  </DialogClose>
-                </DialogFooter>
               </div>
             </DialogHeader>
           </DialogContent>

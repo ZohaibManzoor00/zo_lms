@@ -109,6 +109,9 @@ export const editCourse = async (
       },
     });
 
+    // Revalidate courses page in case course status or other public info changed
+    revalidatePath("/courses");
+
     return {
       status: "success",
       message: "Course updated successfully",

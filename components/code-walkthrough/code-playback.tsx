@@ -1,19 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Play, Pause, Square, Edit3, RotateCcw, Lightbulb } from "lucide-react";
 import type { RecordingSession, AudioEvent, CodeEvent } from "./code-recorder";
 import { CopyButton } from "@/components/ui/copy-button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface AudioBlobData {
   data: number[];
@@ -41,12 +34,10 @@ export default function CodePlayback({
   const [currentCode, setCurrentCode] = useState(session.initialCode);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [playbackSpeed, _setPlaybackSpeed] = useState(1);
-  const playbackSpeedRef = useRef(playbackSpeed);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isInteractiveMode, setIsInteractiveMode] = useState(false);
-  const [originalCode] = useState(session.finalCode);
   const [userEditedCode, setUserEditedCode] = useState(session.finalCode);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   type MonacoEditor = any;
@@ -57,13 +48,17 @@ export default function CodePlayback({
   const playbackTimerRef = useRef<NodeJS.Timeout | null>(null);
   const currentEventIndexRef = useRef(0);
 
-  const setPlaybackSpeed = (speed: number) => {
-    playbackSpeedRef.current = speed;
-    _setPlaybackSpeed(speed);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = speed;
-    }
-  };
+  // Calculate total duration
+  const totalDuration = session.endTime - session.startTime;
+
+  // Memoize sorted events to avoid recomputing on every render
+  const sortedEvents = useRef<(CodeEvent | AudioEvent)[]>([]);
+
+  useEffect(() => {
+    sortedEvents.current = [...session.codeEvents, ...session.audioEvents].sort(
+      (a, b) => a.timestamp - b.timestamp
+    );
+  }, [session.codeEvents, session.audioEvents]);
 
   useEffect(() => {
     if (session.audioUrl) {
@@ -107,16 +102,24 @@ export default function CodePlayback({
     monacoRef.current = monaco;
   };
 
-  const handleEditorChange = (value: string | undefined) => {
-    if (!value) return;
-    if (isInteractiveMode) {
+  const handleEditorChange = useCallback(
+    (value: string | undefined) => {
+      if (!value || !isInteractiveMode) return;
       setCurrentCode(value);
       setUserEditedCode(value);
-    }
-  };
+    },
+    [isInteractiveMode]
+  );
 
-  const startPlayback = () => {
-    if (isPlaying) return;
+  const processEvent = useCallback((event: CodeEvent | AudioEvent) => {
+    if ("data" in event && event.type === "keypress" && event.data) {
+      setCurrentCode(event.data);
+    }
+  }, []);
+
+  const startPlayback = useCallback(() => {
+    if (isPlaying || isTransitioning) return;
+
     let timeToStartFrom = currentTime;
     if (timeToStartFrom >= totalDuration) {
       timeToStartFrom = 0;
@@ -131,41 +134,80 @@ export default function CodePlayback({
         editorRef.current.setPosition({ lineNumber: 1, column: 1 });
       }
     }
+
     setIsPlaying(true);
+
     if (audioRef.current && audioUrl) {
-      audioRef.current.playbackRate = playbackSpeedRef.current;
       audioRef.current.currentTime = timeToStartFrom / 1000;
       audioRef.current
         .play()
         .catch((error) => console.error("Error playing audio:", error));
     }
+
     const startWallTime = Date.now();
     const startRecordingTime = timeToStartFrom;
+
     playbackTimerRef.current = setInterval(() => {
       const elapsedWallTime = Date.now() - startWallTime;
-      const currentRecordingTime =
-        startRecordingTime + elapsedWallTime * playbackSpeedRef.current;
+      const currentRecordingTime = startRecordingTime + elapsedWallTime;
       setCurrentTime(currentRecordingTime);
+
       const sessionStartTime = session.startTime;
-      const allEvents = [...session.codeEvents, ...session.audioEvents].sort(
-        (a, b) => a.timestamp - b.timestamp
-      );
+      const events = sortedEvents.current;
+
       while (
-        currentEventIndexRef.current < allEvents.length &&
-        allEvents[currentEventIndexRef.current].timestamp - sessionStartTime <=
+        currentEventIndexRef.current < events.length &&
+        events[currentEventIndexRef.current].timestamp - sessionStartTime <=
           currentRecordingTime
       ) {
-        const event = allEvents[currentEventIndexRef.current];
+        const event = events[currentEventIndexRef.current];
         processEvent(event);
         currentEventIndexRef.current++;
       }
+
       if (currentRecordingTime >= totalDuration) {
         stopPlayback(true);
       }
-    }, 15);
-  };
+    }, 50); // Increased from 15ms to 50ms for better performance
+  }, [
+    isPlaying,
+    isTransitioning,
+    currentTime,
+    totalDuration,
+    session,
+    audioUrl,
+    processEvent,
+  ]);
 
-  const stopPlayback = (finished = false) => {
+  const stopPlayback = useCallback(
+    (finished = false) => {
+      setIsPlaying(false);
+      if (playbackTimerRef.current) {
+        clearInterval(playbackTimerRef.current);
+        playbackTimerRef.current = null;
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        if (!finished) {
+          audioRef.current.currentTime = 0;
+        }
+      }
+      if (finished) {
+        setCurrentTime(totalDuration);
+        setCurrentCode(session.finalCode);
+      } else {
+        setCurrentTime(0);
+        currentEventIndexRef.current = 0;
+        setCurrentCode(session.initialCode);
+        if (editorRef.current) {
+          editorRef.current.setPosition({ lineNumber: 1, column: 1 });
+        }
+      }
+    },
+    [totalDuration, session.finalCode, session.initialCode]
+  );
+
+  const pausePlayback = useCallback(() => {
     setIsPlaying(false);
     if (playbackTimerRef.current) {
       clearInterval(playbackTimerRef.current);
@@ -173,100 +215,142 @@ export default function CodePlayback({
     }
     if (audioRef.current) {
       audioRef.current.pause();
-      if (!finished) {
-        audioRef.current.currentTime = 0;
-      }
     }
-    if (finished) {
-      setCurrentTime(totalDuration);
-      setCurrentCode(session.finalCode);
-    } else {
-      setCurrentTime(0);
-      currentEventIndexRef.current = 0;
-      setCurrentCode(session.initialCode);
-      if (editorRef.current) {
-        editorRef.current.setPosition({ lineNumber: 1, column: 1 });
-      }
-    }
-  };
+  }, []);
 
-  const pausePlayback = () => {
-    setIsPlaying(false);
-    if (playbackTimerRef.current) {
-      clearInterval(playbackTimerRef.current);
-      playbackTimerRef.current = null;
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-  };
+  const toggleInteractiveMode = useCallback(() => {
+    if (isTransitioning) return;
 
-  const toggleInteractiveMode = () => {
+    setIsTransitioning(true);
+
     if (isInteractiveMode) {
+      // Exiting interactive mode
       setIsInteractiveMode(false);
       setCurrentCode(userEditedCode);
-      startPlayback();
+      setTimeout(() => {
+        setIsTransitioning(false);
+        startPlayback();
+      }, 100);
     } else {
-      setIsInteractiveMode(true);
+      // Entering interactive mode
+      pausePlayback();
       setUserEditedCode(currentCode);
-      pausePlayback();
+      setTimeout(() => {
+        setIsInteractiveMode(true);
+        setIsTransitioning(false);
+      }, 100);
     }
-  };
+  }, [
+    isInteractiveMode,
+    isTransitioning,
+    userEditedCode,
+    currentCode,
+    startPlayback,
+    pausePlayback,
+  ]);
 
-  const resumeWithOriginalCode = () => {
+  const resumeWithOriginalCode = useCallback(() => {
+    if (isTransitioning) return;
+
+    setIsTransitioning(true);
     setIsInteractiveMode(false);
-    setCurrentCode(originalCode);
-    startPlayback();
-  };
-
-  const processEvent = (event: CodeEvent | AudioEvent) => {
-    if ("data" in event) {
-      if (event.type === "keypress" && event.data) {
-        setCurrentCode(event.data);
-      }
-    }
-  };
-
-  const seekTo = (time: number) => {
-    const wasPlaying = isPlaying;
-    if (wasPlaying) {
-      pausePlayback();
-    }
-    setCurrentTime(time);
-    let tempCode = session.initialCode;
-    const sessionStartTime = session.startTime;
-    const allEvents = [...session.codeEvents, ...session.audioEvents].sort(
-      (a, b) => a.timestamp - b.timestamp
-    );
-    let lastCodeEventIndex = -1;
-    for (let i = 0; i < allEvents.length; i++) {
-      const event = allEvents[i];
-      if (event.timestamp - sessionStartTime <= time) {
-        if ("data" in event && event.type === "keypress" && event.data) {
-          tempCode = event.data;
-        }
-        lastCodeEventIndex = i;
-      } else {
-        break;
-      }
-    }
-    currentEventIndexRef.current = lastCodeEventIndex + 1;
-    setCurrentCode(tempCode);
-    if (audioRef.current && audioUrl) {
-      audioRef.current.currentTime = time / 1000;
-    }
-    if (wasPlaying) {
+    setCurrentCode(session.finalCode);
+    setTimeout(() => {
+      setIsTransitioning(false);
       startPlayback();
-    }
-  };
+    }, 100);
+  }, [isTransitioning, session.finalCode, startPlayback]);
 
-  const handleSpeedChange = (speed: number) => {
-    setPlaybackSpeed(speed);
-  };
+  // Immediate seeking function
+  const seekTo = useCallback(
+    (time: number) => {
+      const targetTime = time;
+      const wasPlaying = isPlaying;
 
-  const totalDuration = session.endTime - session.startTime;
-  // const progressPercentage =
-  //   totalDuration > 0 ? (currentTime / totalDuration) * 100 : 0;
+      // Stop current playback timer if running
+      if (playbackTimerRef.current) {
+        clearInterval(playbackTimerRef.current);
+        playbackTimerRef.current = null;
+      }
+
+      setCurrentTime(targetTime);
+      let tempCode = session.initialCode;
+      const sessionStartTime = session.startTime;
+      const events = sortedEvents.current;
+
+      let lastCodeEventIndex = -1;
+      for (let i = 0; i < events.length; i++) {
+        const event = events[i];
+        if (event.timestamp - sessionStartTime <= targetTime) {
+          if ("data" in event && event.type === "keypress" && event.data) {
+            tempCode = event.data;
+          }
+          lastCodeEventIndex = i;
+        } else {
+          break;
+        }
+      }
+
+      currentEventIndexRef.current = lastCodeEventIndex + 1;
+      setCurrentCode(tempCode);
+
+      if (audioRef.current && audioUrl) {
+        audioRef.current.currentTime = targetTime / 1000;
+      }
+
+      // Restart playback from the new position if it was playing
+      if (wasPlaying) {
+        const startWallTime = Date.now();
+        const startRecordingTime = targetTime;
+
+        if (audioRef.current && audioUrl) {
+          audioRef.current
+            .play()
+            .catch((error) => console.error("Error playing audio:", error));
+        }
+
+        playbackTimerRef.current = setInterval(() => {
+          const elapsedWallTime = Date.now() - startWallTime;
+          const currentRecordingTime = startRecordingTime + elapsedWallTime;
+          setCurrentTime(currentRecordingTime);
+
+          const sessionStartTime = session.startTime;
+          const events = sortedEvents.current;
+
+          while (
+            currentEventIndexRef.current < events.length &&
+            events[currentEventIndexRef.current].timestamp - sessionStartTime <=
+              currentRecordingTime
+          ) {
+            const event = events[currentEventIndexRef.current];
+            if ("data" in event && event.type === "keypress" && event.data) {
+              setCurrentCode(event.data);
+            }
+            currentEventIndexRef.current++;
+          }
+
+          if (currentRecordingTime >= totalDuration) {
+            setIsPlaying(false);
+            if (playbackTimerRef.current) {
+              clearInterval(playbackTimerRef.current);
+              playbackTimerRef.current = null;
+            }
+            setCurrentTime(totalDuration);
+            setCurrentCode(session.finalCode);
+          }
+        }, 50);
+      }
+    },
+    [isPlaying, session, audioUrl, totalDuration]
+  );
+
+  const handleScrubberInput = useCallback(
+    (e: React.FormEvent<HTMLInputElement>) => {
+      const time = Number((e.target as HTMLInputElement).value);
+      seekTo(time); // Immediate seeking with no debounce
+    },
+    [seekTo]
+  );
 
   useEffect(() => {
     return () => {
@@ -310,6 +394,7 @@ export default function CodePlayback({
               <Button
                 onClick={isPlaying ? pausePlayback : startPlayback}
                 size="sm"
+                disabled={isTransitioning}
               >
                 {isPlaying ? (
                   <Pause className="size-4" />
@@ -322,6 +407,7 @@ export default function CodePlayback({
                 onClick={() => stopPlayback()}
                 variant="outline"
                 size="sm"
+                disabled={isTransitioning}
               >
                 <Square className="size-4" />
                 <span>Stop</span>
@@ -330,45 +416,29 @@ export default function CodePlayback({
                 onClick={toggleInteractiveMode}
                 variant={isInteractiveMode ? "secondary" : "outline"}
                 size="sm"
+                disabled={isTransitioning}
               >
                 <Edit3 className="size-4" />
-                <span>{isInteractiveMode ? "Exit Edit" : "Edit Mode"}</span>
+                <span>
+                  {isTransitioning
+                    ? "..."
+                    : isInteractiveMode
+                    ? "Exit Edit"
+                    : "Edit Mode"}
+                </span>
               </Button>
               {isInteractiveMode && (
                 <Button
                   onClick={resumeWithOriginalCode}
                   variant="outline"
                   size="sm"
+                  disabled={isTransitioning}
                 >
                   <RotateCcw className="size-4" />
                   <span>Reset</span>
                 </Button>
               )}
               <CopyButton textToCopy={currentCode} size="sm" />
-            </div>
-            <div className="flex items-center gap-2">
-              <Select
-                value={playbackSpeed.toString()}
-                onValueChange={(value) => handleSpeedChange(Number(value))}
-              >
-                <SelectTrigger className="w-20 h-8">
-                  <SelectValue placeholder="1x" />
-                </SelectTrigger>
-                <SelectContent className="w-20 min-w-20">
-                  <SelectItem className="cursor-pointer" value="0.5">
-                    0.5x
-                  </SelectItem>
-                  <SelectItem className="cursor-pointer" value="1">
-                    1x
-                  </SelectItem>
-                  <SelectItem className="cursor-pointer" value="1.5">
-                    1.5x
-                  </SelectItem>
-                  <SelectItem className="cursor-pointer" value="2">
-                    2x
-                  </SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
           <div className="flex items-center gap-3 pt-2">
@@ -382,9 +452,7 @@ export default function CodePlayback({
                   min="0"
                   max={totalDuration}
                   value={currentTime}
-                  onInput={(e) =>
-                    seekTo(Number((e.target as HTMLInputElement).value))
-                  }
+                  onInput={handleScrubberInput}
                   className="w-full cursor-pointer"
                 />
               </div>
@@ -394,9 +462,10 @@ export default function CodePlayback({
             </span>
           </div>
         </div>
-        <div className="h-96 w-full">
+        <div className="h-[calc(100vh-200px)] w-full">
           <Editor
             height="100%"
+            width="100%"
             defaultLanguage="python"
             value={currentCode}
             onMount={handleEditorDidMount}
@@ -414,9 +483,11 @@ export default function CodePlayback({
               folding: true,
               showFoldingControls: "always",
               padding: { top: 16, bottom: 16 },
+              smoothScrolling: true,
+              cursorSmoothCaretAnimation: "on",
             }}
           />
-        </div>
+          </div>
       </Card>
       {isInteractiveMode && showGuide && (
         <div className="p-4 -mt-3">

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import {
   IconCamera,
   IconChartBar,
@@ -15,7 +14,7 @@ import {
   IconSettings,
   IconUsers,
   IconVideo,
-  IconBrandCodesandbox
+  IconBrandCodesandbox,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -30,7 +29,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { AppLogo } from "../ui/app-logo";
+import { AppLogoFull } from "../ui/app-logo";
 
 const data = {
   navMain: [
@@ -147,10 +146,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <Link href="/">
-                <AppLogo />
-                <span className="text-base font-semibold">Zo LMS</span>
-              </Link>
+              <AppLogoFull />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

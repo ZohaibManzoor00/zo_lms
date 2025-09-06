@@ -1,6 +1,7 @@
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "../ui/theme-toggle"
+import { ThemeSelector } from "../ui/theme-selector"
 
 export function SiteHeader() {
   return (
@@ -13,6 +14,7 @@ export function SiteHeader() {
         />
         <h1 className="text-base font-medium">Zo LMS</h1>
         <div className="ml-auto flex items-center gap-2">
+          <ThemeSelector />
           <ThemeToggle />
         </div>
       </div>

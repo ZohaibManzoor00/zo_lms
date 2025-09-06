@@ -5,17 +5,11 @@ import { PublicCourseCard } from "../(public)/_components/public-course-card";
 import { CourseProgressCard } from "./_components/course-progress-card";
 
 export default async function DashboardPage() {
-  const [enrolledCourses, allCourses] = await Promise.all([
-    getEnrolledCourses(),
-    getAllCourses(),
-  ]);
+  const [enrolledCoursesResult, allCoursesResult] = await Promise.allSettled([getEnrolledCourses(), getAllCourses()]);
+  const enrolledCourses = enrolledCoursesResult.status === "fulfilled" ? enrolledCoursesResult.value : [];
+  const allCourses = allCoursesResult.status === "fulfilled" ? allCoursesResult.value : [];
 
-  const coursesUserHasNotEnrolledIn = allCourses.filter(
-    (course) =>
-      !enrolledCourses.some(
-        ({ course: enrolledCourse }) => enrolledCourse.id === course.id
-      )
-  );
+  const coursesUserHasNotEnrolledIn = allCourses.filter((course) => !enrolledCourses.some(({ course: enrolledCourse }) => enrolledCourse.id === course.id));
 
   return (
     <>

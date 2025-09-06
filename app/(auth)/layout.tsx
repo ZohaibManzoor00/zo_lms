@@ -1,6 +1,5 @@
-import Link from "next/link";
-import { AppLogo } from "@/components/ui/app-logo";
 import { BackButton } from "@/components/ui/back-button";
+import { AppLogoFull } from "@/components/ui/app-logo";
 
 export default function AuthLayout({
   children,
@@ -12,13 +11,14 @@ export default function AuthLayout({
       <BackButton className={"absolute top-4 left-4" } />
 
       <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link
+        <AppLogoFull />
+        {/* <Link
           href="/"
           className="flex items-center gap-2 self-center font-medium"
         >
           <AppLogo />
           ZoLMS
-        </Link>
+        </Link> */}
         {children}
 
         <div className="text-balance text-center text-xs text-muted-foreground">

@@ -34,9 +34,6 @@ export function ThemeToggle({
 
     let styleElement = document.getElementById(styleId) as HTMLStyleElement;
 
-    console.log("style ELement", styleElement);
-    console.log("name", name);
-
     if (!styleElement) {
       styleElement = document.createElement("style");
       styleElement.id = styleId;
@@ -44,8 +41,6 @@ export function ThemeToggle({
     }
 
     styleElement.textContent = css;
-
-    console.log("content updated");
   }, []);
 
   const toggleTheme = React.useCallback(() => {
@@ -56,7 +51,37 @@ export function ThemeToggle({
     if (typeof window === "undefined") return;
 
     const switchTheme = () => {
-      setTheme(theme === "light" ? "dark" : "light");
+      if (!theme) {
+        setTheme("dark");
+        return;
+      }
+
+      if (theme === "light") {
+        setTheme("dark");
+      } else if (theme === "dark") {
+        setTheme("light");
+      } else if (theme.endsWith("-dark")) {
+        const baseTheme = theme.replace("-dark", "");
+        setTheme(baseTheme);
+      } else if (
+        [
+          "ocean",
+          "sunset",
+          "forest",
+          "coffee",
+          "lavender",
+          "rose",
+          "mint",
+          "slate",
+          "crimson",
+          "amber",
+          "teal",
+        ].includes(theme)
+      ) {
+        setTheme(`${theme}-dark`);
+      } else {
+        setTheme("dark");
+      }
     };
 
     if (!document.startViewTransition) {
@@ -65,7 +90,7 @@ export function ThemeToggle({
     }
 
     document.startViewTransition(switchTheme);
-  }, [theme, setTheme]);
+  }, [theme, setTheme, variant, start, url, updateStyles]);
 
   return (
     <Button

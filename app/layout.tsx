@@ -34,6 +34,32 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          themes={[
+            "light",
+            "dark",
+            "ocean",
+            "ocean-dark",
+            "sunset",
+            "sunset-dark",
+            "forest",
+            "forest-dark",
+            "coffee",
+            "coffee-dark",
+            "lavender",
+            "lavender-dark",
+            "rose",
+            "rose-dark",
+            "mint",
+            "mint-dark",
+            "slate",
+            "slate-dark",
+            "crimson",
+            "crimson-dark",
+            "amber",
+            "amber-dark",
+            "teal",
+            "teal-dark",
+          ]}
         >
           {children}
           <Toaster closeButton position="top-right" />

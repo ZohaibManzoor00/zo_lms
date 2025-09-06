@@ -32,6 +32,7 @@ export const deleteCourse = async (courseId: string): Promise<ApiResponse> => {
     await prisma.course.delete({ where: { id: courseId } });
 
     revalidatePath("/admin/courses");
+    revalidatePath("/courses");
 
     return {
       status: "success",

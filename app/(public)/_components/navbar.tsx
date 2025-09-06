@@ -4,9 +4,10 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 
 import { buttonVariants } from "@/components/ui/button";
-import { AppLogo } from "@/components/ui/app-logo";
 import { UserDropdown } from "./user-dropdown";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeSelector } from "@/components/ui/theme-selector";
+import { AppLogoFull } from "@/components/ui/app-logo";
 
 const navItems = [
   {
@@ -30,11 +31,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container flex min-h-16 items-center mx-auto px-4 md:px-6 lg:px-8">
-        <Link href="/" className="flex items-center space-x-2 mr-4">
-          <AppLogo />
-          <span className="font-bold">Zo LMS</span>
-        </Link>
-
+        <AppLogoFull />
         <nav className="hidden md:flex md:flex-1 md:items-center md:justify-between pl-6">
           <div className="flex items-center space-x-4">
             {navItems.map((item) => (
@@ -61,7 +58,9 @@ export function Navbar() {
             )}
           </div>
           <div className="flex items-center gap-x-2">
+            <ThemeSelector />
             <ThemeToggle />
+
             {isPending ? (
               <div className="w-20 h-10" />
             ) : session ? (

@@ -7,13 +7,13 @@ import { requireAdmin } from "@/app/data/admin/require-admin";
 import arcjet, { fixedWindow } from "@/lib/arcjet";
 import { request } from "@arcjet/next";
 import { stripe } from "@/lib/stripe";
+import { revalidatePath } from "next/cache";
 
 const aj = arcjet.withRule(fixedWindow({ mode: "LIVE", window: "1m", max: 5 }));
 
-export const createCourse = async (
-  data: CourseSchemaType
-): Promise<ApiResponse> => {
+export const createCourse = async (data: CourseSchemaType): Promise<ApiResponse> => {
   const session = await requireAdmin();
+
   try {
     const req = await request();
     const decision = await aj.protect(req, { fingerprint: session.user.id });
@@ -56,6 +56,8 @@ export const createCourse = async (
         stripePriceId: newStripeProductData.default_price as string,
       },
     });
+
+    revalidatePath("/courses");
 
     return {
       status: "success",
