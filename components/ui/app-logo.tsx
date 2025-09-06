@@ -99,8 +99,7 @@ function LogoSVG({
   );
 }
 
-// Alternate Dynamic SVG Logo Component that adapts to themes (Logo1)
-function Logo1SVG({
+function _Logo1SVG({
   size = 24,
   className = "",
 }: {
@@ -186,7 +185,7 @@ export function AppLogo({ href = "/", size = 24 }: AppLogoProps) {
 
   const triggerSpin = () => {
     setIsSpinning(true);
-    setTimeout(() => setIsSpinning(false), 600); // Match animation duration
+    setTimeout(() => setIsSpinning(false), 600);
   };
 
   return (
@@ -196,7 +195,6 @@ export function AppLogo({ href = "/", size = 24 }: AppLogoProps) {
       onClick={triggerSpin}
       className="inline-block"
     >
-      {/* To test alternate logo, replace <LogoSVG with <Logo1SVG */}
       <LogoSVG
         size={size}
         className={`transition-transform duration-300 ${
@@ -220,7 +218,7 @@ export function AppLogoIcon({ size = 24 }: AppLogoIconProps) {
 
   const triggerSpin = () => {
     setIsSpinning(true);
-    setTimeout(() => setIsSpinning(false), 600); // Match animation duration
+    setTimeout(() => setIsSpinning(false), 600);
   };
 
   return (
@@ -244,7 +242,7 @@ export function AppLogoFull({ href = "/", size = 24 }: AppLogoProps) {
 
   const triggerSpin = () => {
     setIsSpinning(true);
-    setTimeout(() => setIsSpinning(false), 600); // Match animation duration
+    setTimeout(() => setIsSpinning(false), 600); 
   };
 
   return (
@@ -254,7 +252,7 @@ export function AppLogoFull({ href = "/", size = 24 }: AppLogoProps) {
       onClick={triggerSpin}
       className="flex items-center gap-2 hover:opacity-90 transition-opacity"
     >
-      {/* To test alternate logo, replace <LogoSVG with <Logo1SVG */}
+      {/* To test alternate logo, replace with <Logo1SVG */}
       <LogoSVG
         size={size}
         className={`transition-transform duration-300 ${
