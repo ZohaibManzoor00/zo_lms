@@ -45,7 +45,7 @@ export function CourseSidebar({ course }: Props) {
         </div>
 
         <div className="space-y-2">
-          <div className={cn("flex justify-between text-xs", isCourseComplete && "text-green-600")}>
+          <div className={cn("flex justify-between text-xs", isCourseComplete && "text-primary")}>
             <span className="text-muted-foreground">Progress</span>
             <span className="font-medium">
               {completedLessons}/{totalLessons}
@@ -53,13 +53,13 @@ export function CourseSidebar({ course }: Props) {
           </div>
           <Progress
             value={progressPercentage}
-            className={cn("h-1.5", isCourseComplete && "bg-green-600")}
-            indicatorClassName={isCourseComplete ? "bg-green-600" : ""}
+            className={cn("h-1.5", isCourseComplete && "bg-primary")}
+            indicatorClassName={isCourseComplete ? "bg-primary" : ""}
           />
           <p
             className={cn(
               "text-xs text-muted-foreground",
-              isCourseComplete && "text-green-500"
+              isCourseComplete && "text-primary"
             )}
           >
             {progressPercentage}% complete

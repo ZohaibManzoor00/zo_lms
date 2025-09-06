@@ -10,7 +10,7 @@ import { useOptimistic } from "react";
 
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import { BookIcon, ChevronDown, CircleCheckBig } from "lucide-react";
+import { BookIcon, CheckCircle, ChevronDown, CircleCheckBig, XCircle } from "lucide-react";
 import { HeartButton } from "@/components/ui/heart-button";
 import { MotionIcon } from "@/components/ui/motion-button";
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/collapsible";
 import { buildRecordingSession } from "@/lib/build-recording-session";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const CodePlayback = dynamic(
   () => import("@/components/code-walkthrough/code-playback"),
@@ -117,15 +118,28 @@ export function CourseContent({ data }: Props) {
           thumbnailKey={data.thumbnailKey ?? ""}
           videoKey={data.videoKey ?? ""}
         />
-      <div className="flex justify-between items-center border-b py-4">
-        <div className="flex gap-x-1 items-center">
+      <div className="flex justify-between items-center border-b py-0">
+        {/* <div className="flex gap-x-1 items-center">
           <MotionIcon
             isActive={optimisticIsCompleted}
             onChange={onSubmit}
             disabled={pending}
             icon={CircleCheckBig}
           />
-        </div>
+        </div> */}
+        <div className="py-4">
+        {data.lessonProgress.length > 0 && data.lessonProgress[0].completed ? (
+          <Button variant="outline" onClick={onSubmit} disabled={pending}>
+            <XCircle className="size-4 text-red-500" />
+            Mark as incomplete
+          </Button>
+        ) : (
+          <Button variant="outline" onClick={onSubmit} disabled={pending}>
+            <CheckCircle className="size-4 text-primary" />
+            Mark as complete
+          </Button>
+        )}
+      </div>
         <HeartButton
           initialCount={0}
           maxClicks={10}

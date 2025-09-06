@@ -1,13 +1,9 @@
-import { Suspense } from "react";
 import { getAllCourses } from "@/app/data/course/get-all-courses";
-import {
-  PublicCourseCard,
-  PublicCourseCardSkeleton,
-} from "../_components/public-course-card";
+import { PublicCourseCard, PublicCourseCardSkeleton } from "../_components/public-course-card";
 
 export default function PublicCoursesPage() {
   return (
-    <div className="mt-5">
+    <>
       <div className="flex flex-col space-y-2 mb-10">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tighter">
           Explore Courses
@@ -18,10 +14,8 @@ export default function PublicCoursesPage() {
         </p>
       </div>
 
-      <Suspense fallback={<LoadingCoursesSkeletonLayout />}>
-        <RenderCourses />
-      </Suspense>
-    </div>
+      <RenderCourses />
+    </>
   );
 }
 

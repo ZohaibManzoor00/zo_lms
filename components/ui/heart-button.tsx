@@ -62,7 +62,7 @@ const HeartButton = React.forwardRef<HTMLDivElement, HeartButtonProps>(
     const fillPercentage = Math.min(100, (clickCount / maxClicks) * 100);
     const isActive = clickCount > 0;
     const isCompleted = clickCount >= maxClicks;
-    const sizeMultiplier = 1 + clickCount * 0.04;
+    const sizeMultiplier = 1 + clickCount * 0.01;
 
     const handleClick = () => {
       if (clickCount < maxClicks) {
@@ -141,13 +141,13 @@ const HeartButton = React.forwardRef<HTMLDivElement, HeartButtonProps>(
           >
             <Heart
               className="opacity-60 text-red-500 fill-background"
-              size={24}
+              size={12}
               aria-hidden="true"
             />
 
             <Heart
               className="absolute inset-0 text-red-500 fill-red-500 transition-all duration-300"
-              size={24}
+              size={12}
               aria-hidden="true"
               style={{ clipPath: `inset(${100 - fillPercentage}% 0 0 0)` }}
             />

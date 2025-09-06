@@ -2,6 +2,7 @@
 
 import { BookOpenIcon, InfoIcon, LifeBuoyIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 
 import { AppLogoFull } from "@/components/ui/app-logo";
 import { cn } from "@/lib/utils";
@@ -47,6 +48,7 @@ const navigationLinks: NavigationLink[] = [
     submenu: true,
     type: "description",
     icon: "BookOpenIcon",
+    href: "/courses",
     items: [
       {
         href: "/courses",
@@ -64,6 +66,7 @@ const navigationLinks: NavigationLink[] = [
     label: "Projects",
     submenu: true,
     type: "simple",
+    href: "/projects",
     items: [
       {
         href: "/projects/custom-lms",
@@ -79,9 +82,9 @@ const navigationLinks: NavigationLink[] = [
   },
   {
     label: "About",
-    submenu: true,
-    type: "icon",
-    items: [{ href: "/about", label: "About Us", description: "About Us" }],
+    submenu: false,
+    type: "simple",
+    href: "/about",
   },
 ];
 
@@ -90,6 +93,8 @@ const adminLinks: NavigationLink[] = [{ href: "/admin", label: "Admin" }];
 export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const isAdmin = session?.user.role === "admin";
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <header className="border-b">
@@ -133,51 +138,70 @@ export default function Navbar() {
             <PopoverContent align="start" className="w-64 p-1 md:hidden">
               <NavigationMenu className="max-w-none *:w-full">
                 <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
-                  {navigationLinks.map((link, index) => (
-                    <NavigationMenuItem key={index} className="w-full">
-                      {link.submenu ? (
-                        <>
-                          <div className="text-muted-foreground px-2 py-1.5 text-xs font-medium">
+                  {navigationLinks.map((link, index) => {
+                    // Check if this link is active (current page) for mobile menu
+                    const isLinkActive = link.href && pathname === link.href;
+
+                    return (
+                      <NavigationMenuItem key={index} className="w-full">
+                        {link.submenu ? (
+                          <>
+                            <div
+                              className={cn(
+                                "px-2 py-1.5 text-xs font-medium",
+                                isLinkActive
+                                  ? "text-primary"
+                                  : "text-muted-foreground"
+                              )}
+                            >
+                              {link.label}
+                            </div>
+                            <ul>
+                              {link.items?.map((item, itemIndex) => (
+                                <li key={itemIndex}>
+                                  <NavigationMenuLink
+                                    href={item.href}
+                                    className="py-1.5"
+                                  >
+                                    {item.label}
+                                  </NavigationMenuLink>
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        ) : (
+                          <NavigationMenuLink
+                            href={link.href}
+                            className={cn(
+                              "py-1.5",
+                              isLinkActive ? "text-primary bg-accent" : ""
+                            )}
+                          >
                             {link.label}
-                          </div>
-                          <ul>
-                            {link.items?.map((item, itemIndex) => (
-                              <li key={itemIndex}>
-                                <NavigationMenuLink
-                                  href={item.href}
-                                  className="py-1.5"
-                                >
-                                  {item.label}
-                                </NavigationMenuLink>
-                              </li>
-                            ))}
-                          </ul>
-                        </>
-                      ) : (
-                        <NavigationMenuLink href={link.href} className="py-1.5">
-                          {link.label}
-                        </NavigationMenuLink>
-                      )}
-                      {/* Add separator between different types of items */}
-                      {index < navigationLinks.length - 1 &&
-                        // Show separator if:
-                        // 1. One is submenu and one is simple link OR
-                        // 2. Both are submenus but with different types
-                        ((!link.submenu &&
-                          navigationLinks[index + 1].submenu) ||
-                          (link.submenu &&
-                            !navigationLinks[index + 1].submenu) ||
-                          (link.submenu &&
-                            navigationLinks[index + 1].submenu &&
-                            link.type !== navigationLinks[index + 1].type)) && (
-                          <div
-                            role="separator"
-                            aria-orientation="horizontal"
-                            className="bg-border -mx-1 my-1 h-px w-full"
-                          />
+                          </NavigationMenuLink>
                         )}
-                    </NavigationMenuItem>
-                  ))}
+                        {/* Add separator between different types of items */}
+                        {index < navigationLinks.length - 1 &&
+                          // Show separator if:
+                          // 1. One is submenu and one is simple link OR
+                          // 2. Both are submenus but with different types
+                          ((!link.submenu &&
+                            navigationLinks[index + 1].submenu) ||
+                            (link.submenu &&
+                              !navigationLinks[index + 1].submenu) ||
+                            (link.submenu &&
+                              navigationLinks[index + 1].submenu &&
+                              link.type !==
+                                navigationLinks[index + 1].type)) && (
+                            <div
+                              role="separator"
+                              aria-orientation="horizontal"
+                              className="bg-border -mx-1 my-1 h-px w-full"
+                            />
+                          )}
+                      </NavigationMenuItem>
+                    );
+                  })}
                 </NavigationMenuList>
               </NavigationMenu>
             </PopoverContent>
@@ -198,6 +222,9 @@ export default function Navbar() {
                     (adminLink) => adminLink.href === link.href
                   );
 
+                  // Check if this link is active (current page)
+                  const isActive = link.href && pathname === link.href;
+
                   return (
                     <NavigationMenuItem key={index}>
                       {link.submenu ? (
@@ -205,10 +232,25 @@ export default function Navbar() {
                           <NavigationMenuTrigger
                             className={cn(
                               "bg-transparent px-2 py-1.5 font-medium *:[svg]:-me-0.5 *:[svg]:size-3.5",
-                              isAdminLink
+                              isActive
+                                ? "text-primary bg-accent" // Active state: primary text with background
+                                : isAdminLink
                                 ? "text-primary hover:text-primary/80" // Admin links: primary by default
                                 : "text-muted-foreground hover:text-primary" // Regular links: normal behavior
                             )}
+                            onPointerDown={(e) => {
+                              // Check if the menu is already open and this trigger has an href
+                              const trigger = e.currentTarget;
+                              const isExpanded =
+                                trigger.getAttribute("aria-expanded") ===
+                                "true";
+
+                              if (isExpanded && link.href) {
+                                // If menu is already open and we have an href, navigate
+                                e.preventDefault();
+                                router.push(link.href);
+                              }
+                            }}
                           >
                             {link.label}
                           </NavigationMenuTrigger>
@@ -284,7 +326,9 @@ export default function Navbar() {
                           href={link.href}
                           className={cn(
                             "py-1.5 font-medium",
-                            isAdminLink
+                            isActive
+                              ? "text-primary bg-accent" // Active state: primary text with background
+                              : isAdminLink
                               ? "text-primary hover:text-primary/80 bg-accent" // Admin links: primary by default
                               : "text-muted-foreground hover:text-primary" // Regular links: normal behavior
                           )}

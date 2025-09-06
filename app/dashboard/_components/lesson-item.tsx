@@ -18,9 +18,9 @@ export function LessonItem({ lesson, slug, isActive, isCompleted }: Props) {
         variant: isCompleted ? "secondary" : "outline",
         className: cn(
           "w-full p-2.5 h-auto justify-start transition-all",
-          isCompleted &&
-            "bg-green-200 dark:bg-green-900/30 border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-800 dark:text-green-200",
-          isActive && "bg-primary/10 dark:bg-primary/20 border-primary/50 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary"
+          isCompleted && "text-primary",
+          isActive &&
+            "bg-primary/10 dark:bg-primary/20 border-primary/50 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary"
         ),
       })}
       href={`/dashboard/${slug}/${lesson.id}`}
@@ -28,7 +28,12 @@ export function LessonItem({ lesson, slug, isActive, isCompleted }: Props) {
       <div className="flex items-center gap-2.5 w-full min-w-0">
         <div className="shrink-0">
           {isCompleted ? (
-            <div className={cn("rounded-full bg-green-500/10 text-green-500 p-1", isActive && "bg-primary/20 text-primary")}>
+            <div
+              className={cn(
+                "rounded-full bg-primary/10 text-primary p-1",
+                isActive && "bg-primary/20 text-primary"
+              )}
+            >
               <CheckIcon className="size-3" />
             </div>
           ) : (
@@ -50,26 +55,21 @@ export function LessonItem({ lesson, slug, isActive, isCompleted }: Props) {
           )}
         </div>
 
-        <div>
+        <div className="max-w-11/12">
           <p
             className={cn(
               "text-xs font-medium truncate",
               isActive
                 ? "text-primary font-semibold"
-                : isCompleted 
-                ? "text-green-800 dark:text-green-200"
+                : isCompleted
+                ? "text-primary"
                 : "text-foreground"
             )}
           >
             {lesson.position}. {lesson.title}
           </p>
           {(isCompleted || isActive) && (
-            <p
-              className={cn(
-                "text-xs font-medium",
-                isActive ? "text-primary" : "text-green-500 dark:text-green-400"
-              )}
-            >
+            <p className={cn("text-xs font-medium text-primary")}>
               {isActive ? "Viewing" : "Completed"}
             </p>
           )}
