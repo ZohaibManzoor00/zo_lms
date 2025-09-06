@@ -29,7 +29,7 @@ export function ThemeToggle({
 
   const styleId = "theme-transition-styles";
 
-  const updateStyles = React.useCallback((css: string, _name: string | undefined) => {
+  const updateStyles = React.useCallback((css: string) => {
     if (typeof window === "undefined") return;
 
     let styleElement = document.getElementById(styleId) as HTMLStyleElement;
@@ -46,7 +46,7 @@ export function ThemeToggle({
   const toggleTheme = React.useCallback(() => {
     const animation = createAnimation(variant, start, url);
 
-    updateStyles(animation.css, animation.name);
+    updateStyles(animation.css);
 
     if (typeof window === "undefined") return;
 
