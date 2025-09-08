@@ -1,5 +1,5 @@
 import { getAllCourses } from "@/app/data/course/get-all-courses";
-import { PublicCourseCard, PublicCourseCardSkeleton } from "../_components/public-course-card";
+import { PublicCourseCard } from "../_components/public-course-card";
 
 export default function PublicCoursesPage() {
   return (
@@ -31,12 +31,12 @@ async function RenderCourses() {
   );
 }
 
-function LoadingCoursesSkeletonLayout() {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {Array.from({ length: 9 }).map((_, index) => (
-        <PublicCourseCardSkeleton key={index} />
-      ))}
-    </div>
-  );
-}
+// function LoadingCoursesSkeletonLayout() {
+//   return (
+//     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//       {Array.from({ length: 9 }).map((_, index) => (
+//         <PublicCourseCardSkeleton key={index} />
+//       ))}
+//     </div>
+//   );
+// }

@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   themes,
-  customThemes,
   getBaseTheme,
   isDarkVariant,
   isCustomTheme,
+  // type Theme,
 } from "@/lib/custom-themes";
 
 export function ThemeSelector() {
@@ -87,29 +87,47 @@ export function ThemeSelector() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-64"
+        className="w-80 p-2"
         onMouseLeave={handleStopHovering}
       >
-        {themes.map((themeOption) => (
-          <DropdownMenuItem
-            key={themeOption.name}
-            onClick={() => handleThemeSelect(themeOption.name)}
-            onMouseEnter={() => handleThemeHover(themeOption.name)}
-            className="flex items-center justify-between p-3 cursor-pointer"
-          >
-            <div className="flex flex-col">
-              <span className="font-medium">{themeOption.label}</span>
-              <span className="text-sm text-muted-foreground">
-                {themeOption.description}
-              </span>
-            </div>
-            <div suppressHydrationWarning>
-              {baseTheme === themeOption.name && (
-                <Check className="size-4 text-primary" />
-              )}
-            </div>
-          </DropdownMenuItem>
-        ))}
+        <div className="grid grid-cols-2 gap-1">
+          {themes.map((themeOption) => (
+            <DropdownMenuItem
+              key={themeOption.name}
+              onClick={() => handleThemeSelect(themeOption.name)}
+              onMouseEnter={() => handleThemeHover(themeOption.name)}
+              className="flex items-center gap-3 p-3 cursor-pointer hover:bg-accent/50 transition-colors"
+              asChild
+            >
+              <div>
+                <div
+                  className="size-4 rounded-full border border-border shrink-0"
+                  style={{ backgroundColor: themeOption.color }}
+                />
+                <div className="flex flex-col min-w-0 flex-1">
+                  <span
+                    className="font-medium text-sm truncate"
+                    style={{
+                      fontFamily: themeOption.fontFamily
+                        ? `${themeOption.fontFamily}, system-ui, sans-serif`
+                        : undefined,
+                    }}
+                  >
+                    {themeOption.label}
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {themeOption.description}
+                  </span>
+                </div>
+                <div suppressHydrationWarning className="shrink-0">
+                  {baseTheme === themeOption.name && (
+                    <Check className="size-3 text-primary" />
+                  )}
+                </div>
+              </div>
+            </DropdownMenuItem>
+          ))}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

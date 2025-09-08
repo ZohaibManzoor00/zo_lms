@@ -1,40 +1,38 @@
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface Feature {
-  title: string;
-  description: string;
-  icon: string;
-}
+// interface Feature {
+//   title: string;
+//   description: string;
+//   icon: string;
+// }
 
-const features: Feature[] = [
-  {
-    title: "Comprehensive Courses",
-    description: "Access a wide range of courses covering various topics.",
-    icon: "📚",
-  },
-  {
-    title: "Interactive Learning",
-    description:
-      "Engage with interactive content, quizzes and assignments to enhance your learning.",
-    icon: "🎮",
-  },
-  {
-    title: "Progress Tracking",
-    description:
-      "Monitor your progress and achievements with detailed analytics and personalized dashboards.",
-    icon: "📊",
-  },
-  {
-    title: "Community Support",
-    description:
-      "Join a vibrant community of learners and instructors to collaborate and share knowledge",
-    icon: "👥",
-  },
-];
+// const features: Feature[] = [
+//   {
+//     title: "Comprehensive Courses",
+//     description: "Access a wide range of courses covering various topics.",
+//     icon: "📚",
+//   },
+//   {
+//     title: "Interactive Learning",
+//     description:
+//       "Engage with interactive content, quizzes and assignments to enhance your learning.",
+//     icon: "🎮",
+//   },
+//   {
+//     title: "Progress Tracking",
+//     description:
+//       "Monitor your progress and achievements with detailed analytics and personalized dashboards.",
+//     icon: "📊",
+//   },
+//   {
+//     title: "Community Support",
+//     description:
+//       "Join a vibrant community of learners and instructors to collaborate and share knowledge",
+//     icon: "👥",
+//   },
+// ];
 
 const sectionLinks: { title: string; href: string }[] = [
   {

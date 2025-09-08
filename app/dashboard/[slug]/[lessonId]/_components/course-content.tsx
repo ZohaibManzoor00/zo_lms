@@ -10,9 +10,8 @@ import { useOptimistic } from "react";
 
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import { BookIcon, CheckCircle, ChevronDown, CircleCheckBig, XCircle } from "lucide-react";
+import { BookIcon, CheckCircle, ChevronDown, XCircle } from "lucide-react";
 import { HeartButton } from "@/components/ui/heart-button";
-import { MotionIcon } from "@/components/ui/motion-button";
 import {
   Collapsible,
   CollapsibleContent,

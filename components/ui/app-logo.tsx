@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useTheme } from "next-themes";
 
 interface AppLogoProps {
   href?: string;
