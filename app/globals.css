@@ -1362,3 +1362,70 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Rich Text Editor Theme Styling */
+.prose,
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6,
+.prose p,
+.prose li,
+.prose td,
+.prose th {
+  color: var(--foreground) !important;
+}
+
+.prose strong,
+.prose b {
+  color: var(--foreground) !important;
+}
+
+/* List bullets and counters */
+.prose ul > li::marker,
+.prose ol > li::marker {
+  color: var(--primary) !important;
+}
+
+.prose ul > li::before {
+  background-color: var(--primary) !important;
+}
+
+/* Links */
+.prose a {
+  color: var(--primary) !important;
+}
+
+/* Code */
+.prose code {
+  color: var(--primary) !important;
+  background-color: var(--muted) !important;
+}
+
+.prose pre {
+  background-color: var(--muted) !important;
+}
+
+.prose pre code {
+  color: var(--foreground) !important;
+}
+
+/* Blockquotes */
+.prose blockquote {
+  border-left-color: var(--primary) !important;
+  color: var(--foreground) !important;
+}
+
+/* Dark mode adjustments */
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4,
+.dark .prose h5,
+.dark .prose h6,
+.dark .prose strong,
+.dark .prose b {
+  color: var(--primary-foreground) !important;
+}
