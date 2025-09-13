@@ -2,6 +2,19 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Glows: 
+- Read the problem back
+- Made an example
+- Clarified edge case of empty or one input.
+
+Grows: 
+- Energy is a bit low
+- Use examples to clarify 
+- Try to move with some urgency when figuring out what the problem is asking
+- Clarify assumptions: 
+    - Try to understand the problem as quickly as you can
+    - Did not discuss edge cases or validating inputs
+
 First, run the development server:
 
 ```bash

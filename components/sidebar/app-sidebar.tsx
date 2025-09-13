@@ -15,6 +15,7 @@ import {
   IconUsers,
   IconVideo,
   IconBrandCodesandbox,
+  IconBook2,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -42,6 +43,11 @@ const data = {
       title: "Courses",
       url: "/admin/courses",
       icon: IconListDetails,
+    },
+    {
+      title: "Lessons",
+      url: "/admin/lessons",
+      icon: IconBook2,
     },
     {
       title: "Code Walkthroughs",
