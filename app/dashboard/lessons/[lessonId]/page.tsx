@@ -3,15 +3,13 @@ import { redirect } from "next/navigation";
 import { getStandaloneLessonContent } from "@/app/data/lesson/get-standalone-lesson-content";
 
 import { StandaloneLessonContent } from "./_components/standalone-lesson-content";
-import { LessonSkeleton } from "@/app/dashboard/[slug]/[lessonId]/_components/lesson-skeleton";
+import { LessonSkeleton } from "@/app/dashboard/lessons/[lessonId]/_components/lesson-skeleton";
 
 interface Params {
   params: Promise<{ lessonId: string }>;
 }
 
-export default async function DashboardStandaloneLessonPage({
-  params,
-}: Params) {
+export default async function DashboardStandaloneLessonPage({ params }: Params) {
   const { lessonId } = await params;
 
   try {
@@ -23,20 +21,16 @@ export default async function DashboardStandaloneLessonPage({
         <StandaloneLessonContentLoader lessonId={lessonId} />
       </Suspense>
     );
-  } catch (error) {
+  } catch {
     return redirect("/dashboard/lessons");
   }
 }
 
-const StandaloneLessonContentLoader = async ({
-  lessonId,
-}: {
-  lessonId: string;
-}) => {
+const StandaloneLessonContentLoader = async ({ lessonId }: { lessonId: string }) => {
   try {
     const data = await getStandaloneLessonContent(lessonId);
     return <StandaloneLessonContent data={data} />;
-  } catch (error) {
+  } catch {
     return redirect("/dashboard/lessons");
   }
 };

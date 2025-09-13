@@ -119,7 +119,7 @@ export function StandaloneLessonContent({ data }: Props) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-background pl-6">
+    <div className="flex flex-col h-full bg-background">
       {/* Back to lessons navigation */}
       <div className="mb-6">
         <Link href="/dashboard/lessons">

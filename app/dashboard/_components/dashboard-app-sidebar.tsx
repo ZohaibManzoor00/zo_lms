@@ -36,14 +36,14 @@ const data = {
     },
     {
       title: "Courses",
-      url: "/courses",
+      url: "/dashboard/courses",
       icon: IconBook,
     },
     {
       title: "Lessons",
-      url: "/lessons",
+      url: "/dashboard/lessons",
       icon: IconBook2,
-    }
+    },
   ],
   navClouds: [
     {

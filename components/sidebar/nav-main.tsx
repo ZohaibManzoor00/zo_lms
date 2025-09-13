@@ -25,6 +25,22 @@ export function NavMain({
   const pathname = usePathname();
   const isAdminRoute = pathname.startsWith("admin");
 
+  // Find the most specific matching route (longest URL that matches)
+  const getActiveItem = () => {
+    const matchingItems = items.filter(
+      (item) => pathname === item.url || pathname.startsWith(item.url + "/")
+    );
+
+    if (matchingItems.length === 0) return null;
+
+    // Return the item with the longest URL (most specific)
+    return matchingItems.reduce((prev, current) =>
+      current.url.length > prev.url.length ? current : prev
+    );
+  };
+
+  const activeItem = getActiveItem();
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -51,10 +67,17 @@ export function NavMain({
                 <Link
                   href={item.url}
                   className={cn(
-                    pathname === item.url && "bg-accent text-accent-foreground"
+                    activeItem?.url === item.url &&
+                      "bg-accent text-accent-foreground"
                   )}
                 >
-                  {item.icon && <item.icon className={cn(pathname === item.url && "text-primary")}/>}
+                  {item.icon && (
+                    <item.icon
+                      className={cn(
+                        activeItem?.url === item.url && "text-primary"
+                      )}
+                    />
+                  )}
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>

@@ -1,63 +1,11 @@
-import { getEnrolledCourses } from "@/app/data/user/get-enrolled-courses";
-import { getAllCourses } from "@/app/data/course/get-all-courses";
-import { EmptyCourseState } from "@/components/general/empty-course-state";
-import { PublicCourseCard } from "../(public)/_components/public-course-card";
-import { CourseProgressCard } from "./_components/course-progress-card";
+import { requireUser } from "@/app/data/user/require-user";
 
 export default async function DashboardPage() {
-  const [enrolledCoursesResult, allCoursesResult] = await Promise.allSettled([getEnrolledCourses(), getAllCourses()]);
-  const enrolledCourses = enrolledCoursesResult.status === "fulfilled" ? enrolledCoursesResult.value : [];
-  const allCourses = allCoursesResult.status === "fulfilled" ? allCoursesResult.value : [];
-
-  const coursesUserHasNotEnrolledIn = allCourses.filter((course) => !enrolledCourses.some(({ course: enrolledCourse }) => enrolledCourse.id === course.id));
+  const user = await requireUser();
 
   return (
-    <>
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Enrolled Courses</h1>
-        <p className="text-muted-foreground">
-          Here are the courses you have enrolled in
-        </p>
-      </div>
-
-      {enrolledCourses.length === 0 ? (
-        <EmptyCourseState
-          title="No enrolled courses"
-          description="You haven't enrolled in any courses yet"
-          buttonText="Browse Courses"
-          href="/courses"
-        />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {enrolledCourses.map((course) => (
-            <CourseProgressCard key={course.course.id} data={course} />
-          ))}
-        </div>
-      )}
-
-      <section className="mt-10">
-        <div className="flex flex-col gap-2 mb-5">
-          <h1 className="text-3xl font-bold">Available Courses</h1>
-          <p className="text-muted-foreground">
-            Here are the courses you can enroll in
-          </p>
-        </div>
-
-        {coursesUserHasNotEnrolledIn.length === 0 ? (
-          <EmptyCourseState
-            title="No available courses"
-            description="You have already enrolled in all available courses, check back later for new courses"
-            buttonText="Browse Courses"
-            href="/courses"
-          />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {coursesUserHasNotEnrolledIn.map((course) => (
-              <PublicCourseCard key={course.id} data={course} />
-            ))}
-          </div>
-        )}
-      </section>
-    </>
+    <div className="flex flex-col gap-2">
+      <h1 className="text-3xl font-bold">{user.name}&apos;s Dashboard</h1>
+    </div>
   );
 }

@@ -16,7 +16,7 @@ export function PublicCourseCard({ data }: Props) {
   const thumbnailUrl = useConstructUrl(data.fileKey);
 
   return (
-    <Link href={`/dashboard/courses/${data.slug}`} className="group hover:scale-[1.02] transition-all duration-300">
+    <Link href={`/courses/${data.slug}`} className="group hover:scale-[1.02] transition-all duration-300">
       <Card className="group relative py-0 gap-0">
         <Badge className="absolute top-2 right-2 z-10">{data.level}</Badge>
         <Image

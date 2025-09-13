@@ -2,7 +2,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function LessonSkeleton() {
   return (
-    <div className="flex flex-col h-full pl-6">
+    <div className="flex flex-col h-full">
+      <div className="mb-6">
+        <Skeleton className="h-10 w-4/30" />
+      </div>
       <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
         <Skeleton className="h-full w-full" />
       </div>

@@ -21,6 +21,7 @@ model User {
   courses        Course[]
   enrollments    Enrollment[]
   lessonProgress LessonProgress[]
+  codeSnippets   CodeSnippet[]
 
   stripeCustomerId String? @unique
 
@@ -158,6 +159,7 @@ model Lesson {
 
   lessonProgress LessonProgress[]
   walkthroughs   LessonWalkthrough[]
+  codeSnippets   LessonCodeSnippet[]
 
   @@index([chapterId, position])
 }
@@ -239,4 +241,48 @@ model LessonWalkthrough {
   @@unique([lessonId, walkthroughId])
   @@index([lessonId])
   @@index([walkthroughId])
+}
+
+model CodeSnippet {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  code        String
+  language    String? // e.g., "javascript", "python", "typescript"
+  tags        String[] // Array of tags for categorization
+
+  clickCount Int @default(0)
+
+  isPublic   Boolean @default(true)
+  isFeatured Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+
+  lessonSnippets LessonCodeSnippet[]
+
+  @@index([authorId])
+  @@index([language])
+  @@index([isPublic])
+  @@index([isFeatured])
+  @@index([createdAt])
+}
+
+model LessonCodeSnippet {
+  id          String      @id @default(uuid())
+  lesson      Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId    String
+  codeSnippet CodeSnippet @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+  snippetId   String
+  position    Int // Order within the lesson
+  context     String? // Optional context about how this snippet relates to the lesson
+
+  createdAt DateTime @default(now())
+
+  @@unique([lessonId, snippetId])
+  @@index([lessonId])
+  @@index([snippetId])
 }

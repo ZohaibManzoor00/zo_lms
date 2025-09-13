@@ -30,11 +30,7 @@ interface Params {
 export default async function SlugPage({ params }: Params) {
   const { slug } = await params;
   const course = await getCourse(slug);
-  const totalLessons =
-    course.chapter.reduce(
-      (total, chapter) => total + chapter.lesson.length,
-      0
-    ) ?? 0;
+  const totalLessons = course.chapter.reduce((total, chapter) => total + chapter.lesson.length, 0) ?? 0;
 
   const isEnrolled = await checkIfCourseBought(course.id);
 

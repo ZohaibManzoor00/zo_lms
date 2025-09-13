@@ -28,77 +28,78 @@ export function CourseProgressCard({ data }: Props) {
   const isCourseComplete = completedLessons === totalLessons;
 
   return (
-    <Card className="group relative py-0 gap-0">
-      <Badge className="absolute top-2 right-2 z-10">{data.course.level}</Badge>
-      <Image
-        src={thumbnailUrl}
-        alt="Thumbnail for course"
-        width={600}
-        height={400}
-        className="w-full rounded-t-xl aspect-video h-full object-cover"
-      />
+    <Link
+      href={`/dashboard/${data.course.slug}`}
+      className="group hover:scale-[1.02] transition-all duration-300"
+    >
+      <Card className="group relative py-0 gap-0">
+        <Badge className="absolute top-2 right-2 z-10">
+          {data.course.level}
+        </Badge>
+        <Image
+          src={thumbnailUrl}
+          alt="Thumbnail for course"
+          width={600}
+          height={400}
+          className="w-full rounded-t-xl aspect-video h-full object-cover"
+        />
 
-      <CardContent className="p-6">
-        <div className="flex justify-between items-center">
-          <Link
-            href={`/dashboard/${data.course.slug}`}
-            className="font-medium text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors"
-          >
-            {data.course.title}
-          </Link>
-          {isCourseComplete && <Award className="size-5 text-yellow-400" />}
-        </div>
-
-        <p className="text-sm text-muted-foreground line-clamp-2 leading-tight mt-2">
-          {data.course.smallDescription}
-        </p>
-
-        <div className="space-y-2 mt-3">
+        <CardContent className="p-6">
           <div className="flex justify-between items-center">
-            <div
-              className={cn(
-                "flex justify-between text-sm",
-                isCourseComplete && "text-primary"
-              )}
+            <h3
+              className="font-medium group-hover:underline text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors"
             >
-              <span>Progress</span>
-            </div>
-            <div className="flex items-center gap-x-2">
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {completedLessons}/{totalLessons} lessons
-              </p>
-              <p
+              {data.course.title}
+            </h3>
+            {isCourseComplete && <Award className="size-5 text-yellow-400" />}
+          </div>
+
+          <p className="text-sm text-muted-foreground line-clamp-2 leading-tight mt-2">
+            {data.course.smallDescription}
+          </p>
+
+          <div className="space-y-2 mt-3">
+            <div className="flex justify-between items-center">
+              <div
                 className={cn(
-                  "font-medium",
+                  "flex justify-between text-sm",
                   isCourseComplete && "text-primary"
                 )}
               >
-                {progressPercentage}%
-              </p>
+                <span>Progress</span>
+              </div>
+              <div className="flex items-center gap-x-2">
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {completedLessons}/{totalLessons} lessons
+                </p>
+                {progressPercentage > 0 && (
+                <p
+                  className={cn(
+                    "font-medium",
+                    isCourseComplete && "text-primary"
+                  )}
+                  >
+                    {progressPercentage}%
+                  </p>
+                )}
+              </div>
             </div>
+            <Progress
+              value={progressPercentage}
+              className={cn("h-1.5", isCourseComplete && "bg-primary")}
+              indicatorClassName={isCourseComplete ? "bg-primary" : ""}
+            />
           </div>
-          <Progress
-            value={progressPercentage}
-            className={cn("h-1.5", isCourseComplete && "bg-primary")}
-            indicatorClassName={isCourseComplete ? "bg-primary" : ""}
-          />
-        </div>
-        <div className={cn("mt-4")}>
-          <ForwardButton
-            className="w-full"
-            label="View Course"
-            href={`/dashboard/${data.course.slug}`}
-          />
-        </div>
-        {/* <ForwardButton
-            className="w-full"
-            label="Admin Edit"
-            variant="default"
-            href={`/admin/courses/${data.course.id}/edit`}
-          /> */}
-        {/* </div> */}
-      </CardContent>
-    </Card>
+          <div className="mt-4">
+            <ForwardButton
+              className="w-full"
+              useLink={false}
+              label="View Course"
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
 

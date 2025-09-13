@@ -3,20 +3,20 @@ import { redirect } from "next/navigation";
 import { getLessonContent } from "@/app/data/course/get-lesson-content";
 
 import { CourseContent } from "./_components/course-content";
-import { LessonSkeleton } from "./_components/lesson-skeleton";
+import { CourseContentSkeleton } from "./_components/course-lesson-skeleton";
 
 interface Params {
   params: Promise<{ lessonId: string }>;
 }
 
-export default async function LessonContentPage({ params }: Params) {
+export default async function CourseLessonContentPage({ params }: Params) {
   const { lessonId } = await params;
   const lessonContent = await getLessonContent(lessonId);
 
   if (!lessonContent) return redirect("/dashboard");
 
   return (
-    <Suspense fallback={<LessonSkeleton />}>
+    <Suspense fallback={<CourseContentSkeleton />}>
       <LessonContentLoader lessonId={lessonId} />
     </Suspense>
   );

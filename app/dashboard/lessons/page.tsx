@@ -8,9 +8,9 @@ export default async function DashboardLessonsPage() {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Standalone Lessons</h1>
+        <h1 className="text-3xl font-bold">All Lessons</h1>
         <p className="text-muted-foreground">
-          Explore individual lessons across all our courses
+          Explore all lessons across all our courses
         </p>
       </div>
 

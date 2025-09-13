@@ -57,28 +57,28 @@ const navigationLinks: NavigationLink[] = [
     icon: "BookOpenIcon",
     href: "/lessons",
   },
-  {
-    label: "Projects",
-    submenu: true,
-    type: "simple",
-    href: "/projects",
-    items: [
-      {
-        href: "/projects/custom-lms",
-        label: "Custom LMS",
-        description: "Custom LMS made for Marcy",
-      },
-      {
-        href: "/projects/streamr",
-        label: "Streamr",
-        description: "Large scale video transcoding/streaming platform",
-      },
-    ],
-  },
+  // {
+  //   label: "Projects",
+  //   submenu: true,
+  //   type: "simple",
+  //   href: "/projects",
+  //   items: [
+  //     {
+  //       href: "/projects/custom-lms",
+  //       label: "Custom LMS",
+  //       description: "Custom LMS made for Marcy",
+  //     },
+  //     {
+  //       href: "/projects/streamr",
+  //       label: "Streamr",
+  //       description: "Large scale video transcoding/streaming platform",
+  //     },
+  //   ],
+  // },
   {
     label: "Code Snippets",
     submenu: false,
-    type: "Helpful Code Snippets",
+    type: "Helpful Code Snippets I've Used",
     href: "/code-snippets",
   },
   {
@@ -89,8 +89,8 @@ const navigationLinks: NavigationLink[] = [
     items: [
       {
         href: "/about",
-        label: "About",
-        description: "About the project",
+        label: "Me",
+        description: "About me",
       },
       {
         href: "/projects",
