@@ -14,56 +14,53 @@ interface Props {
 
 export function PublicCourseCard({ data }: Props) {
   const thumbnailUrl = useConstructUrl(data.fileKey);
+
   return (
-    <Card className="group relative py-0 gap-0">
-      <Badge className="absolute top-2 right-2 z-10">{data.level}</Badge>
-      <Image
-        src={thumbnailUrl}
-        alt="Thumbnail for course"
-        width={600}
-        height={400}
-        className="w-full rounded-t-xl aspect-video h-full object-cover"
-      />
+    <Link href={`/dashboard/courses/${data.slug}`} className="group hover:scale-[1.02] transition-all duration-300">
+      <Card className="group relative py-0 gap-0">
+        <Badge className="absolute top-2 right-2 z-10">{data.level}</Badge>
+        <Image
+          src={thumbnailUrl}
+          alt="Thumbnail for course"
+          width={600}
+          height={400}
+          className="w-full rounded-t-xl aspect-video h-full object-cover"
+        />
 
-      <CardContent className="p-6">
-        <Link
-          href={`/courses/${data.slug}`}
-          className="font-medium text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors"
-        >
-          {data.title}
-        </Link>
+        <CardContent className="p-6">
+          <h3
+            className="font-medium text-lg group-hover:underline line-clamp-1 hover:underline group-hover:text-primary transition-colors"
+          >
+            {data.title}
+          </h3>
 
-        <p className="text-sm text-muted-foreground line-clamp-2 leading-tight mt-2">
-          {data.smallDescription}
-        </p>
+          <p className="text-sm text-muted-foreground line-clamp-2 leading-tight mt-2">
+            {data.smallDescription}
+          </p>
 
-        <div className="flex items-center gap-x-5 mt-4">
-          <div className="flex items-center gap-x-2">
-            <TimerIcon className="size-6 p-1 rounded-md text-primary bg-primary/10" />
-            <p className="text-sm text-muted-foreground">{data.duration}h</p>
+          <div className="flex items-center gap-x-5 mt-4">
+            <div className="flex items-center gap-x-2">
+              <TimerIcon className="size-6 p-1 rounded-md text-primary bg-primary/10" />
+              <p className="text-sm text-muted-foreground">{data.duration}h</p>
+            </div>
+
+            <div className="flex items-center gap-x-2">
+              <School className="size-6 p-1 rounded-md text-primary bg-primary/10" />
+              <p className="text-sm text-muted-foreground">{data.category}</p>
+            </div>
           </div>
-
-          <div className="flex items-center gap-x-2">
-            <School className="size-6 p-1 rounded-md text-primary bg-primary/10" />
-            <p className="text-sm text-muted-foreground">{data.category}</p>
+          <div className="mt-4">
+            <ForwardButton
+              variant="secondary"
+              label="View Course"
+              useLink={false}
+              // href={`/courses/${data.slug}`}
+              className="w-full"
+            />
           </div>
-        </div>
-        {/* <Link
-          href={`/courses/${data.slug}`}
-          className={buttonVariants({ className: "w-full mt-4" })}
-        >
-          View Course
-        </Link> */}
-        <div className="mt-4">
-          <ForwardButton
-            variant="secondary"
-            label="View Course"
-            href={`/courses/${data.slug}`}
-            className="w-full"
-          />
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
 

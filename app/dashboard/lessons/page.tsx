@@ -2,18 +2,15 @@ import { getAllLessons } from "@/app/data/lesson/get-all-lessons";
 import { PublicLessonCard } from "@/app/(public)/_components/public-lesson-card";
 import { EmptyCourseState } from "@/components/general/empty-course-state";
 
-export default async function PublicLessonsPage() {
+export default async function DashboardLessonsPage() {
   const lessons = await getAllLessons();
 
   return (
     <>
-      <div className="flex flex-col space-y-2 mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tighter">
-          Explore Lessons
-        </h1>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold">Standalone Lessons</h1>
         <p className="text-muted-foreground">
-          Discover a wide range of lessons designed to help you learn new skills
-          and advance your career.
+          Explore individual lessons across all our courses
         </p>
       </div>
 

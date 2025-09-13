@@ -2,68 +2,75 @@ import Image from "next/image";
 import Link from "next/link";
 import { LessonType } from "@/app/data/lesson/get-all-lessons";
 
-import { School, TimerIcon } from "lucide-react";
+import { PlayIcon, School } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ForwardButton } from "@/components/ui/forward-button";
 import { useConstructUrl } from "@/hooks/use-construct-url";
+import { cn } from "@/lib/utils";
 
 interface Props {
   data: LessonType;
 }
 
 export function PublicLessonCard({ data }: Props) {
-  //   const thumbnailUrl = useConstructUrl(data.fileKey);
   const thumbnailUrl = useConstructUrl(data.thumbnailKey || "");
+  const hasVideo = !!data.videoKey;
+  const hasWalkthrough = data.walkthroughs && data.walkthroughs.length > 0;
+
   return (
-    <Card className="group relative py-0 gap-0">
-      {/* <Badge className="absolute top-2 right-2 z-10">{data.level}</Badge> */}
-      <Image
-        src={data.thumbnailKey ? thumbnailUrl : "/placeholder-lesson-thumbnail.jpg"}
-        alt="Thumbnail for lesson"
-        width={600}
-        height={400}
-        className="w-full rounded-t-xl aspect-video h-full object-cover"
-      />
-      <CardContent className="p-6">
-        <Link
-          href={`/dashboard/${data.chapter.course.slug}/${data.id}`}
-          className="font-medium text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors"
-        >
-          {data.title}
-        </Link>
+    <Link href={`/dashboard/lessons/${data.id}`} className="group">
+      <Card className="group relative py-0 gap-0 hover:scale-[1.02] transition-all duration-300">
+        <Image
+          src={
+            data.thumbnailKey
+              ? thumbnailUrl
+              : "/placeholder-lesson-thumbnail.jpg"
+          }
+          alt="Thumbnail for lesson"
+          width={600}
+          height={400}
+          className="w-full rounded-t-xl aspect-video h-full object-cover"
+        />
+        <CardContent className="p-6">
+          <h2 className="font-medium text-primary text-lg line-clamp-2 group-hover:underline transition-all duration-300">
+            {data.title}
+          </h2>
 
-        <p className="text-sm text-muted-foreground line-clamp-2 leading-tight mt-2">
-          {/* {data} */}
-        </p>
-
-        <div className="flex items-center gap-x-5 mt-4">
-          <div className="flex items-center gap-x-2">
-            <TimerIcon className="size-6 p-1 rounded-md text-primary bg-primary/10" />
-            <p className="text-sm text-muted-foreground">{data.position}h</p>
+          <div className={cn("flex items-center mt-3", hasVideo && hasWalkthrough ? "space-x-2" : "")}>
+            {hasVideo ? (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary/10 text-primary text-xs font-medium">
+                <PlayIcon className="size-4" />
+                Video
+              </span>
+            ) : (
+              <span className="inline-flex items-center py-1"></span>
+            )}
+            {hasWalkthrough ? (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary/10 text-primary text-xs font-medium">
+                <School className="size-4 mr-1" />
+                Walkthrough
+              </span>
+            ) : (
+              <span className="inline-flex items-center py-1"></span>
+            )}
           </div>
 
-          <div className="flex items-center gap-x-2">
-            <School className="size-6 p-1 rounded-md text-primary bg-primary/10" />
-            <p className="text-sm text-muted-foreground">{data.chapter.course.slug}</p>
+          {/* <p className="text-sm text-muted-foreground line-clamp-2 leading-tight mt-2"> */}
+          {/* {data.} */}
+          {/* </p> */}
+
+          <div className="mt-4">
+            <ForwardButton
+              variant="secondary"
+              label="View Lesson"
+              useLink={false}
+              className="w-full"
+            />
           </div>
-        </div>
-        {/* <Link
-          href={`/courses/${data.slug}`}
-          className={buttonVariants({ className: "w-full mt-4" })}
-        >
-          View Course
-        </Link> */}
-        <div className="mt-4">
-          <ForwardButton
-            variant="secondary"
-            label="View Lesson"
-            href={`/dashboard/${data.chapter.course.slug}/${data.id}`}
-            className="w-full"
-          />
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
 

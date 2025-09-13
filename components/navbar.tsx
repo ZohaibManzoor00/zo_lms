@@ -45,22 +45,17 @@ const navigationLinks: NavigationLink[] = [
   { href: "/dashboard", label: "Dashboard" },
   {
     label: "Courses",
-    submenu: true,
+    submenu: false,
     type: "description",
     icon: "BookOpenIcon",
     href: "/courses",
-    items: [
-      {
-        href: "/courses",
-        label: "Courses",
-        description: "Browse all courses",
-      },
-      {
-        href: "/lessons",
-        label: "Lessons",
-        description: "Browse all lessons",
-      },
-    ],
+  },
+  {
+    label: "Lessons",
+    submenu: false,
+    type: "description",
+    icon: "BookOpenIcon",
+    href: "/lessons",
   },
   {
     label: "Projects",
@@ -81,10 +76,28 @@ const navigationLinks: NavigationLink[] = [
     ],
   },
   {
-    label: "About",
+    label: "Code Snippets",
     submenu: false,
+    type: "Helpful Code Snippets",
+    href: "/code-snippets",
+  },
+  {
+    label: "About",
+    submenu: true,
     type: "simple",
     href: "/about",
+    items: [
+      {
+        href: "/about",
+        label: "About",
+        description: "About the project",
+      },
+      {
+        href: "/projects",
+        label: "My Projects",
+        description: "My Projects",
+      },
+    ],
   },
 ];
 
@@ -217,12 +230,10 @@ export default function Navbar() {
                     ...(isAdmin ? adminLinks : []),
                   ] as NavigationLink[]
                 ).map((link, index) => {
-                  // Check if this is an admin link
                   const isAdminLink = adminLinks.some(
                     (adminLink) => adminLink.href === link.href
                   );
 
-                  // Check if this link is active (current page)
                   const isActive = link.href && pathname === link.href;
 
                   return (
@@ -233,20 +244,18 @@ export default function Navbar() {
                             className={cn(
                               "bg-transparent px-2 py-1.5 font-medium *:[svg]:-me-0.5 *:[svg]:size-3.5",
                               isActive
-                                ? "text-primary bg-accent" // Active state: primary text with background
+                                ? "text-primary bg-accent"
                                 : isAdminLink
-                                ? "text-primary hover:text-primary/80" // Admin links: primary by default
-                                : "text-muted-foreground hover:text-primary" // Regular links: normal behavior
+                                ? "text-primary hover:text-primary/80"
+                                : "text-muted-foreground hover:text-primary"
                             )}
                             onPointerDown={(e) => {
-                              // Check if the menu is already open and this trigger has an href
                               const trigger = e.currentTarget;
                               const isExpanded =
                                 trigger.getAttribute("aria-expanded") ===
                                 "true";
 
                               if (isExpanded && link.href) {
-                                // If menu is already open and we have an href, navigate
                                 e.preventDefault();
                                 router.push(link.href);
                               }
@@ -268,7 +277,6 @@ export default function Navbar() {
                                     href={item.href}
                                     className="py-1.5"
                                   >
-                                    {/* Display icon if present */}
                                     {link.type === "icon" && "icon" in item && (
                                       <div className="flex items-center gap-2">
                                         {item.icon === "BookOpenIcon" && (
@@ -296,7 +304,6 @@ export default function Navbar() {
                                       </div>
                                     )}
 
-                                    {/* Display label with description if present */}
                                     {link.type === "description" &&
                                     "description" in item ? (
                                       <div className="space-y-1">
@@ -308,7 +315,6 @@ export default function Navbar() {
                                         </p>
                                       </div>
                                     ) : (
-                                      // Display simple label if not icon or description type
                                       !link.type ||
                                       (link.type !== "icon" &&
                                         link.type !== "description" && (
@@ -327,10 +333,10 @@ export default function Navbar() {
                           className={cn(
                             "py-1.5 font-medium",
                             isActive
-                              ? "text-primary bg-accent" // Active state: primary text with background
+                              ? "text-primary bg-accent"
                               : isAdminLink
-                              ? "text-primary hover:text-primary/80 bg-accent" // Admin links: primary by default
-                              : "text-muted-foreground hover:text-primary" // Regular links: normal behavior
+                              ? "text-primary hover:text-primary/80 bg-accent"
+                              : "text-muted-foreground hover:text-primary"
                           )}
                         >
                           {link.label}

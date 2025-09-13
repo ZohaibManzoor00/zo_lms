@@ -21,6 +21,22 @@ export const getAllLessons = async () => {
             thumbnailKey: true,
             videoKey: true,
             position: true,
+            walkthroughs: {
+                select: {
+                    id: true,
+                },
+                orderBy: {
+                    position: "asc",
+                },
+                where: {
+                    walkthrough: {
+                        audioKey: {
+                            not: "",
+                        },
+                    },
+                },
+                take: 1,
+            },
             chapter: {
                 select: {
                     course: {

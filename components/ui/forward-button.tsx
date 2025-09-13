@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { ButtonProps, buttonVariants } from "@/components/ui/button";
+import { Button, ButtonProps, buttonVariants } from "@/components/ui/button";
 import { ArrowRightIcon, LucideIcon } from "lucide-react";
 
 type ForwardButtonProps = {
@@ -9,6 +9,7 @@ type ForwardButtonProps = {
   label?: string;
   icon?: LucideIcon;
   variant?: ButtonProps["variant"];
+  useLink?: boolean;
   onClick?: () => void;
 };
 
@@ -18,9 +19,10 @@ export const ForwardButton = ({
   icon: Icon,
   href = "/",
   variant = "secondary",
+  useLink = true,
   onClick,
 }: ForwardButtonProps) => {
-  return (
+  return useLink ? (
     <Link
       className={cn(
         "group flex items-center gap-x-2",
@@ -38,5 +40,21 @@ export const ForwardButton = ({
         aria-hidden="true"
       />
     </Link>
+  ) : (
+    <Button
+      className={cn(
+        "group flex items-center gap-x-2",
+        buttonVariants({ variant }),
+        className
+      )}
+    >
+      {Icon && <Icon className="-ms-1 opacity" size={16} aria-hidden="true" />}
+      {label}
+      <ArrowRightIcon
+        className="-me-1 opacity-60 transition-transform group-hover:translate-x-0.5"
+        size={16}
+        aria-hidden="true"
+      />
+    </Button>
   );
 };

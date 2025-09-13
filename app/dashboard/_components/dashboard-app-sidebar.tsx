@@ -10,6 +10,7 @@ import {
   IconSearch,
   IconSettings,
   IconBook,
+  IconBook2,
 } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
@@ -38,6 +39,11 @@ const data = {
       url: "/courses",
       icon: IconBook,
     },
+    {
+      title: "Lessons",
+      url: "/lessons",
+      icon: IconBook2,
+    }
   ],
   navClouds: [
     {
