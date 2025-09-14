@@ -1,17 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import Link from "next/link";
-import { useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { lessonSchema, LessonSchemaType } from "@/lib/zod-schemas";
-import { AdminLessonType } from "@/app/data/admin/admin-get-lesson";
-import { updateLesson } from "../actions";
 import { tryCatch } from "@/hooks/try-catch";
+import { createStandaloneLesson } from "../actions";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useConfetti } from "@/hooks/use-confetti";
+import {
+  standaloneLessonSchema,
+  StandaloneLessonSchemaType,
+} from "@/lib/zod-schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CodeWalkThroughModal } from "../../../courses/[courseId]/[chapterId]/[lessonId]/_components/code-walkthrough-modal";
+import { useConstructUrl } from "@/hooks/use-construct-url";
+import dynamic from "next/dynamic";
+import { AdminWalkthroughType } from "@/app/data/admin/admin-get-walkthroughs";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { ArrowLeft, Loader2, Eye } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -30,74 +38,63 @@ import {
 import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
 import { Uploader } from "@/components/file-uploader/uploader";
-import { BackButton } from "@/components/ui/back-button";
-import { CodeWalkThroughModal } from "./code-walkthrough-modal";
-import { AdminWalkthroughType } from "@/app/data/admin/admin-get-walkthroughs";
 import { Pill } from "@/components/ui/pill";
-import dynamic from "next/dynamic";
-import { useConstructUrl } from "@/hooks/use-construct-url";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { buildRecordingSession } from "@/lib/build-recording-session";
 
 interface Props {
-  lesson: AdminLessonType;
-  chapterId: string;
-  courseId: string;
   allWalkthroughs: AdminWalkthroughType;
 }
 
-export function LessonForm({
-  lesson,
-  chapterId,
-  courseId,
-  allWalkthroughs,
-}: Props) {
-  const [pending, startTransition] = useTransition();
-
-  const createLessonForm = useForm<LessonSchemaType>({
-    resolver: zodResolver(lessonSchema),
-    defaultValues: {
-      title: lesson.title,
-      chapterId,
-      courseId,
-      videoKey: lesson.videoKey ?? undefined,
-      thumbnailKey: lesson.thumbnailKey ?? undefined,
-      description: lesson.description ?? undefined,
-      walkthroughIds: Array.isArray(lesson.walkthroughs)
-        ? lesson.walkthroughs.map((w) => w.walkthroughId)
-        : [],
-    },
-  });
-
-  const selectedWalkthroughIds = createLessonForm.watch("walkthroughIds") || [];
-  const setSelectedWalkthroughIds = (ids: string[]) =>
-    createLessonForm.setValue("walkthroughIds", ids, { shouldDirty: true });
-  const selectedWalkthroughs = allWalkthroughs.filter((w) =>
-    selectedWalkthroughIds.includes(w.id)
-  );
-
+export function StandaloneLessonForm({ allWalkthroughs }: Props) {
+  const [isCreatingLesson, startTransition] = useTransition();
+  const [selectedWalkthroughIds, setSelectedWalkthroughIds] = useState<
+    string[]
+  >([]);
   const [previewId, setPreviewId] = useState<string | null>(null);
+  const router = useRouter();
+  const { triggerConfetti } = useConfetti();
   const getAudioUrl = useConstructUrl;
+
   const CodePlayback = dynamic(
     () => import("@/components/code-walkthrough/code-playback"),
     { ssr: false }
   );
 
-  const onSubmit = (values: LessonSchemaType) => {
-    startTransition(async () => {
-      const { data: result, error } = await tryCatch(
-        updateLesson({ formData: values, lessonId: lesson.id })
-      );
+  const createLessonForm = useForm<StandaloneLessonSchemaType>({
+    resolver: zodResolver(standaloneLessonSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      videoKey: "",
+      thumbnailKey: "",
+      walkthroughIds: [],
+    },
+  });
 
+  const selectedWalkthroughs = allWalkthroughs.filter((w) =>
+    selectedWalkthroughIds.includes(w.id)
+  );
+
+  const onSubmit = (values: StandaloneLessonSchemaType) => {
+    startTransition(async () => {
+      const formData = {
+        ...values,
+        walkthroughIds: selectedWalkthroughIds,
+      };
+
+      const { data: result, error } = await tryCatch(
+        createStandaloneLesson(formData)
+      );
       if (error) {
         toast.error("An unexpected error occurred. Please try again.");
         return;
@@ -105,7 +102,10 @@ export function LessonForm({
 
       if (result.status === "success") {
         toast.success(result.message);
-        // router.back();
+        triggerConfetti();
+        createLessonForm.reset();
+        setSelectedWalkthroughIds([]);
+        router.push("/admin/lessons");
       } else if (result.status === "error") {
         toast.error(result.message);
       }
@@ -113,40 +113,23 @@ export function LessonForm({
   };
 
   return (
-    <div>
-      <div className="mb-6">
-        <BackButton href={`/admin/courses/${courseId}/edit`} />
+    <>
+      <div className="flex items-center gap-4">
+        <Link
+          href="/admin/lessons"
+          className={buttonVariants({ variant: "outline", size: "icon" })}
+        >
+          <ArrowLeft className="size-4" />
+        </Link>
+
+        <h1>Create Standalone Lesson</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <p>Lesson Configuration</p>
-            <div className="flex items-center gap-2">
-              <Link
-                href={`/dashboard/${lesson.id}`}
-                className={buttonVariants({ variant: "outline", size: "sm" })}
-              >
-                Preview User View
-              </Link>
-              {createLessonForm.formState.isDirty ? (
-                <Button type="submit" disabled={pending} size="sm">
-                  {pending ? "Saving..." : "Save Changes"}
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  disabled={true}
-                  variant="outline"
-                  size="sm"
-                >
-                  No changes detected
-                </Button>
-              )}
-            </div>
-          </CardTitle>
+          <CardTitle>Lesson Configuration</CardTitle>
           <CardDescription>
-            Configure the video and description for this lesson.
+            Create a standalone lesson that can be accessed independently.
           </CardDescription>
         </CardHeader>
 
@@ -161,11 +144,11 @@ export function LessonForm({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor={field.name}>Lesson Title</FormLabel>
+                    <FormLabel>Lesson Title</FormLabel>
                     <FormControl>
                       <Input
-                        {...field}
                         placeholder="Enter the title of the lesson"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -178,9 +161,7 @@ export function LessonForm({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor={field.name}>
-                      Lesson Description
-                    </FormLabel>
+                    <FormLabel>Lesson Description</FormLabel>
                     <FormControl>
                       <RichTextEditor field={field} />
                     </FormControl>
@@ -189,6 +170,43 @@ export function LessonForm({
                 )}
               />
 
+              <FormField
+                control={createLessonForm.control}
+                name="thumbnailKey"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Lesson Thumbnail</FormLabel>
+                    <FormControl>
+                      <Uploader
+                        value={field.value}
+                        onChange={field.onChange}
+                        fileTypeAccepted="image"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={createLessonForm.control}
+                name="videoKey"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Lesson Video</FormLabel>
+                    <FormControl>
+                      <Uploader
+                        value={field.value}
+                        onChange={field.onChange}
+                        fileTypeAccepted="video"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Walkthrough Selection Section */}
               <FormField
                 control={createLessonForm.control}
                 name="walkthroughIds"
@@ -219,6 +237,7 @@ export function LessonForm({
                                     {idx + 1}
                                   </span>
                                   {w.name}
+                                  <Eye className="w-3 h-3" />
                                 </Pill>
                               </DialogTrigger>
 
@@ -260,59 +279,24 @@ export function LessonForm({
                 )}
               />
 
-              <FormField
-                control={createLessonForm.control}
-                name="thumbnailKey"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor={field.name}>Lesson Thumbnail</FormLabel>
-                    <FormControl>
-                      <Uploader
-                        value={field.value}
-                        onChange={field.onChange}
-                        fileTypeAccepted="image"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={isCreatingLesson}
+              >
+                {isCreatingLesson ? (
+                  <>
+                    Creating...
+                    <Loader2 className="size-4 animate-spin ml-2" />
+                  </>
+                ) : (
+                  "Create Lesson"
                 )}
-              />
-
-              <FormField
-                control={createLessonForm.control}
-                name="videoKey"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor={field.name}>Lesson Video</FormLabel>
-                    <FormControl>
-                      <Uploader
-                        value={field.value}
-                        onChange={field.onChange}
-                        fileTypeAccepted="video"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {createLessonForm.formState.isDirty ? (
-                <Button type="submit" disabled={pending} size="sm">
-                  {pending ? "Saving..." : "Save Changes"}
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  disabled={true}
-                  variant="outline"
-                  size="sm"
-                >
-                  No changes detected
-                </Button>
-              )}
+              </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
-    </div>
+    </>
   );
 }

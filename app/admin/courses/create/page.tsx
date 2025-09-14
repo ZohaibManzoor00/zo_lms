@@ -226,7 +226,6 @@ export default function CourseCreationPage() {
                             <SelectValue placeholder="Select Category" />
                           </SelectTrigger>
                         </FormControl>
-
                         <SelectContent>
                           {courseCategorySchema.map((category) => (
                             <SelectItem key={category} value={category}>

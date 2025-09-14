@@ -74,6 +74,15 @@ export const lessonSchema = z.object({
   walkthroughIds: z.string().array().optional(),
 });
 
+export const standaloneLessonSchema = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  videoKey: z.string().optional(),
+  thumbnailKey: z.string().optional(),
+  walkthroughIds: z.string().array().optional(),
+});
+
 export type CourseSchemaType = z.infer<typeof courseSchema>;
 export type ChapterSchemaType = z.infer<typeof chapterSchema>;
 export type LessonSchemaType = z.infer<typeof lessonSchema>;
+export type StandaloneLessonSchemaType = z.infer<typeof standaloneLessonSchema>;

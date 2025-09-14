@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useState } from "react";
+import { useTransition, useState, useRef } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
@@ -19,11 +19,14 @@ import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const [githubPending, startGithubTransition] = useTransition();
-  const [email, setEmail] = useState("");
   const [emailPending, startEmailTransition] = useTransition();
+  const [githubLocked, setGithubLocked] = useState(false);
+  const [email, setEmail] = useState("");
   const router = useRouter();
 
   const signInWithGithub = async () => {
+    if (githubLocked) return;
+    setGithubLocked(true);
     startGithubTransition(async () => {
       await authClient.signIn.social({
         provider: "github",
@@ -34,6 +37,7 @@ export default function LoginForm() {
           },
           onError: () => {
             toast.error("Something went wrong");
+            setGithubLocked(false);
           },
         },
       });
@@ -67,12 +71,12 @@ export default function LoginForm() {
 
       <CardContent className="flex flex-col gap-2">
         <Button
-          disabled={githubPending}
+          disabled={githubPending || githubLocked}
           className="w-full"
           variant="outline"
           onClick={signInWithGithub}
         >
-          {githubPending ? (
+          {githubPending || githubLocked ? (
             <>
               <Loader2 className="size-4 animate-spin" />
               <span>Signing in with Github...</span>
@@ -106,7 +110,7 @@ export default function LoginForm() {
           </div>
 
           <Button
-            disabled={emailPending}
+            disabled={emailPending || email === ""}
             className="w-full"
             onClick={signInWithEmail}
           >

@@ -9,12 +9,19 @@ export const getStandaloneLessonContent = async (lessonId: string) => {
 
   const lesson = await prisma.lesson.findUnique({
     where: {
-      id: lessonId,
-      chapter: {
-        course: {
-          status: "Published",
+      OR: [
+        {
+          chapterId: null,
         },
-      },
+        {
+          chapter: {
+            course: {
+              status: "Published",
+            },
+          },
+        },
+      ],
+      id: lessonId,
     },
     select: {
       id: true,

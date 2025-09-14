@@ -40,11 +40,18 @@ export const getRecentLessons = unstable_cache(
   async (limit: number = 3) => {
     const data = await prisma.lesson.findMany({
       where: {
-        chapter: {
-          course: {
-            status: "Published",
+        OR: [
+          {
+            chapterId: null,
           },
-        },
+          {
+            chapter: {
+              course: {
+                status: "Published",
+              },
+            },
+          },
+        ],
       },
       orderBy: {
         createdAt: "desc",
@@ -98,9 +105,6 @@ export const getRecentLessons = unstable_cache(
 export const getRecentCodeSnippets = unstable_cache(
   async (limit: number = 3) => {
     const data = await prisma.codeSnippet.findMany({
-      where: {
-        isPublic: true,
-      },
       orderBy: {
         createdAt: "desc",
       },

@@ -4,9 +4,6 @@ import { prisma } from "@/lib/db";
 
 export const getAllCodeSnippets = async () => {
   const data = await prisma.codeSnippet.findMany({
-    where: {
-      isPublic: true,
-    },
     orderBy: {
       createdAt: "desc",
     },

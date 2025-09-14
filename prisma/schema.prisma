@@ -155,14 +155,15 @@ model Lesson {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  chapterId String
+  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  chapterId String?
 
   lessonProgress LessonProgress[]
   walkthroughs   LessonWalkthrough[]
   codeSnippets   LessonCodeSnippet[]
 
   @@index([chapterId, position])
+  @@index([position])
 }
 
 model Enrollment {
@@ -254,7 +255,6 @@ model CodeSnippet {
 
   clickCount Int @default(0)
 
-  isPublic   Boolean @default(true)
   isFeatured Boolean @default(false)
 
   createdAt DateTime @default(now())
@@ -267,7 +267,6 @@ model CodeSnippet {
 
   @@index([authorId])
   @@index([language])
-  @@index([isPublic])
   @@index([isFeatured])
   @@index([createdAt])
 }
