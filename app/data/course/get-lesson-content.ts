@@ -71,7 +71,7 @@ export const getLessonContent = async (lessonId: string) => {
     where: {
       userId_courseId: {
         userId: user.id,
-        courseId: lesson.chapter.courseId,
+        courseId: lesson.chapter?.courseId ?? '',
       },
     },
     select: {

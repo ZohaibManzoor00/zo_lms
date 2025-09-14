@@ -92,7 +92,7 @@ export function StandaloneLessonContent({ data }: Props) {
       );
 
       const { data: result, error } = await tryCatch(
-        markLessonComplete(data.id, data.chapter.course.slug)
+        markLessonComplete(data.id, data.chapter?.course.slug ?? '')
       );
 
       if (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useState, useRef } from "react";
+import { useTransition, useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
