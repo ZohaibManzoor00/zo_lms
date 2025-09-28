@@ -1,16 +1,14 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ArrowRight, LucideIcon } from "lucide-react";
 import {
   RecentCourseType,
   RecentLessonType,
   RecentCodeSnippetType,
 } from "@/app/data/homepage/get-recent-resources";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { ResourceItem } from "./client-resource-item";
 
-interface ResourceItem {
+export interface ResourceItemType {
   id: string;
   title: string;
   createdAt: Date;
@@ -21,7 +19,7 @@ interface ResourceItem {
 interface RecentResourcesCardProps {
   title: string;
   icon: LucideIcon;
-  items: ResourceItem[];
+  items: ResourceItemType[];
   viewAllHref: string;
   emptyMessage: string;
 }
@@ -34,11 +32,13 @@ export function RecentResourcesCard({
   emptyMessage,
 }: RecentResourcesCardProps) {
   return (
-    <Card className="bg-background/10 h-full flex flex-col">
+    <Card className="bg-gradient-to-br from-background/10 to-background/5 h-full flex flex-col border-2 border-border dark:border-muted-foreground/30 shadow-lg hover:shadow-xl hover:border-primary/60 dark:hover:border-primary/70 transition-all duration-300 backdrop-blur-sm">
       <CardHeader className="flex-shrink-0">
         <CardTitle className="flex items-center gap-2">
-          <Icon className="h-5 w-5 text-primary" />
-          {title}
+          <Icon className="h-5 w-5 text-primary drop-shadow-sm" />
+          <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+            {title}
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
@@ -59,9 +59,9 @@ export function RecentResourcesCard({
                     {item ? (
                       <ResourceItem item={item} />
                     ) : (
-                      <div className="h-16 rounded-lg border-2 border-dashed border-muted-foreground/20 flex items-center justify-center">
+                      <div className="h-16 rounded-lg border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-gradient-to-r from-muted/20 to-muted/10">
                         <span className="text-xs text-muted-foreground/50">
-                          No more items
+                          Coming soon
                         </span>
                       </div>
                     )}
@@ -72,13 +72,13 @@ export function RecentResourcesCard({
           </div>
         )}
 
-        <div className="mt-4 pt-3 border-t flex-shrink-0">
+        <div className="mt-4 pt-3 border-t border-border dark:border-muted-foreground/30 flex-shrink-0">
           <Link
             href={viewAllHref}
-            className="inline-flex items-center text-sm text-primary hover:underline"
+            className="inline-flex items-center text-sm text-primary hover:text-primary/80 hover:underline transition-colors duration-200 font-medium"
           >
             View all {title.toLowerCase()}
-            <ArrowRight className="ml-1 h-3 w-3" />
+            <ArrowRight className="ml-1 h-3 w-3 transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
         </div>
       </CardContent>
@@ -86,44 +86,12 @@ export function RecentResourcesCard({
   );
 }
 
-// Generic resource item renderer
-function ResourceItem({ item }: { item: ResourceItem }) {
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-    }).format(new Date(date));
-  };
-
-  return (
-    <Link
-      href={item.href}
-      className={cn(
-        buttonVariants({ variant: "outline" }),
-        "flex items-center justify-between w-full px-4 py-3 rounded-lg shadow-sm group transition-colors hover:bg-accent/60 h-16"
-      )}
-    >
-      <div className="flex gap-x-2 items-center min-w-0 flex-1">
-        <p className="font-semibold text-sm group-hover:text-primary transition-colors truncate">
-          {item.title}
-        </p>
-        <p className="text-xs text-muted-foreground whitespace-nowrap">
-          {formatDate(item.createdAt)}
-        </p>
-      </div>
-      <div className="flex-shrink-0 ml-4">
-        <Badge variant="secondary" className="text-xs px-2 py-0.5 min-w-fit">
-          {item.type}
-        </Badge>
-      </div>
-    </Link>
-  );
-}
+// Generic resource item renderer with enhanced styling
 
 // Helper functions to transform data into ResourceItem format
 export function transformCourseToResourceItem(
   course: RecentCourseType
-): ResourceItem {
+): ResourceItemType {
   return {
     id: course.id,
     title: course.title,
@@ -135,7 +103,7 @@ export function transformCourseToResourceItem(
 
 export function transformLessonToResourceItem(
   lesson: RecentLessonType
-): ResourceItem {
+): ResourceItemType {
   const hasVideo = !!lesson.videoKey;
   const hasWalkthrough = lesson.walkthroughs && lesson.walkthroughs.length > 0;
 
@@ -157,7 +125,7 @@ export function transformLessonToResourceItem(
 
 export function transformCodeSnippetToResourceItem(
   snippet: RecentCodeSnippetType
-): ResourceItem {
+): ResourceItemType {
   return {
     id: snippet.id,
     title: snippet.title,

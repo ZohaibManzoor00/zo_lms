@@ -16,11 +16,16 @@ export function PublicCourseCard({ data }: Props) {
   const thumbnailUrl = useConstructUrl(data.fileKey);
 
   return (
-    <Link href={`/courses/${data.slug}`} className="group hover:scale-[1.02] transition-all duration-300">
-      <Card className="group relative py-0 gap-0">
+    <Link
+      href={`/courses/${data.slug}`}
+      className="group hover:scale-[1.02] transition-all duration-300"
+    >
+      <Card className="group relative py-0 gap-0 !border-2 !border-border dark:!border-muted-foreground/30 hover:!border-primary/60 dark:hover:!border-primary/70 shadow-lg hover:shadow-xl transition-all duration-300">
         <Badge className="absolute top-2 right-2 z-10">{data.level}</Badge>
         <Image
-          src={thumbnailUrl}
+          src={
+            data.fileKey ? thumbnailUrl : "/placeholder-lesson-thumbnail.jpg"
+          }
           alt="Thumbnail for course"
           width={600}
           height={400}
@@ -28,9 +33,7 @@ export function PublicCourseCard({ data }: Props) {
         />
 
         <CardContent className="p-6">
-          <h3
-            className="font-medium text-lg group-hover:underline line-clamp-1 hover:underline group-hover:text-primary transition-colors"
-          >
+          <h3 className="font-medium text-lg group-hover:underline line-clamp-1 hover:underline group-hover:text-primary transition-colors">
             {data.title}
           </h3>
 
@@ -66,7 +69,7 @@ export function PublicCourseCard({ data }: Props) {
 
 export function PublicCourseCardSkeleton() {
   return (
-    <Card className="group relative py-0 gap-0">
+    <Card className="group relative py-0 gap-0 !border-2 !border-border dark:!border-muted-foreground/30 shadow-lg">
       <div className="absolute top-2 right-2 z-10 flex items-center">
         <Skeleton className="h-6 w-20 rounded-full" />
       </div>

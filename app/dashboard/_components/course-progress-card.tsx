@@ -32,7 +32,7 @@ export function CourseProgressCard({ data }: Props) {
       href={`/dashboard/${data.course.slug}`}
       className="group hover:scale-[1.02] transition-all duration-300"
     >
-      <Card className="group relative py-0 gap-0">
+      <Card className="group relative py-0 gap-0 !border-2 !border-border dark:!border-muted-foreground/30 hover:!border-primary/60 dark:hover:!border-primary/70 shadow-lg hover:shadow-xl transition-all duration-300">
         <Badge className="absolute top-2 right-2 z-10">
           {data.course.level}
         </Badge>
@@ -46,9 +46,7 @@ export function CourseProgressCard({ data }: Props) {
 
         <CardContent className="p-6">
           <div className="flex justify-between items-center">
-            <h3
-              className="font-medium group-hover:underline text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors"
-            >
+            <h3 className="font-medium group-hover:underline text-lg line-clamp-2 hover:underline group-hover:text-primary transition-colors">
               {data.course.title}
             </h3>
             {isCourseComplete && <Award className="size-5 text-yellow-400" />}
@@ -73,11 +71,11 @@ export function CourseProgressCard({ data }: Props) {
                   {completedLessons}/{totalLessons} lessons
                 </p>
                 {progressPercentage > 0 && (
-                <p
-                  className={cn(
-                    "font-medium",
-                    isCourseComplete && "text-primary"
-                  )}
+                  <p
+                    className={cn(
+                      "font-medium",
+                      isCourseComplete && "text-primary"
+                    )}
                   >
                     {progressPercentage}%
                   </p>
@@ -105,7 +103,7 @@ export function CourseProgressCard({ data }: Props) {
 
 export function PublicCourseCardSkeleton() {
   return (
-    <Card className="group relative py-0 gap-0">
+    <Card className="group relative py-0 gap-0 !border-2 !border-border dark:!border-muted-foreground/30 shadow-lg">
       <div className="absolute top-2 right-2 z-10 flex items-center">
         <Skeleton className="h-6 w-20 rounded-full" />
       </div>

@@ -2,13 +2,14 @@ import { Suspense } from "react";
 import { BookOpen, Code, GraduationCap } from "lucide-react";
 
 import { getHomepageData } from "@/app/data/homepage/get-recent-resources";
+
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   RecentResourcesCard,
   transformCodeSnippetToResourceItem,
   transformCourseToResourceItem,
   transformLessonToResourceItem,
-} from "@/app/(public)/_components/recent-resources-card";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "./_components/recent-resources-card";
 
 export default async function Homepage() {
   return (

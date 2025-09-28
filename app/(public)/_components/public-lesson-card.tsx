@@ -20,7 +20,7 @@ export function PublicLessonCard({ data }: Props) {
 
   return (
     <Link href={`/dashboard/lessons/${data.id}`} className="group">
-      <Card className="group relative py-0 gap-0 hover:scale-[1.02] transition-all duration-300">
+      <Card className="group relative py-0 gap-0 hover:scale-[1.02] transition-all duration-300 !border-2 !border-border dark:!border-muted-foreground/30 hover:!border-primary/60 dark:hover:!border-primary/70 shadow-lg hover:shadow-xl">
         <Image
           src={
             data.thumbnailKey
@@ -37,7 +37,12 @@ export function PublicLessonCard({ data }: Props) {
             {data.title}
           </h2>
 
-          <div className={cn("flex items-center mt-3", hasVideo && hasWalkthrough ? "space-x-2" : "")}>
+          <div
+            className={cn(
+              "flex items-center mt-3",
+              hasVideo && hasWalkthrough ? "space-x-2" : ""
+            )}
+          >
             {hasVideo ? (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary/10 text-primary text-xs font-medium">
                 <PlayIcon className="size-4" />
@@ -76,7 +81,7 @@ export function PublicLessonCard({ data }: Props) {
 
 export function PublicLessonCardSkeleton() {
   return (
-    <Card className="group relative py-0 gap-0">
+    <Card className="group relative py-0 gap-0 !border-2 !border-border dark:!border-muted-foreground/30 shadow-lg">
       <div className="absolute top-2 right-2 z-10 flex items-center">
         <Skeleton className="h-6 w-20 rounded-full" />
       </div>

@@ -67,7 +67,7 @@ export function CodeSnippetCard({ snippet }: CodeSnippetCardProps) {
   };
 
   const handleCopyCode = async (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
 
     try {
       await navigator.clipboard.writeText(snippet.code);
@@ -93,7 +93,7 @@ export function CodeSnippetCard({ snippet }: CodeSnippetCardProps) {
 
   return (
     <Card
-      className="group hover:shadow-md transition-shadow cursor-pointer"
+      className="group transition-all duration-300 cursor-pointer !border-2 !border-border dark:!border-muted-foreground/30 hover:!border-primary/60 dark:hover:!border-primary/70 shadow-lg hover:shadow-xl hover:scale-[1.01]"
       onClick={handleViewSnippet}
     >
       <CardHeader className="pb-3">
