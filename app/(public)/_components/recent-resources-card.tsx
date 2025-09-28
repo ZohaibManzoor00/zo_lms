@@ -6,7 +6,7 @@ import {
   RecentLessonType,
   RecentCodeSnippetType,
 } from "@/app/data/homepage/get-recent-resources";
-import { ResourceItem } from "./client-resource-item";
+import { ClientResourceItem, ClientResourceItemSkeleton } from "./client-resource-item";
 
 export interface ResourceItemType {
   id: string;
@@ -57,13 +57,14 @@ export function RecentResourcesCard({
                     className="w-full"
                   >
                     {item ? (
-                      <ResourceItem item={item} />
+                      <ClientResourceItem item={item} />
                     ) : (
-                      <div className="h-16 rounded-lg border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-gradient-to-r from-muted/20 to-muted/10">
-                        <span className="text-xs text-muted-foreground/50">
-                          Coming soon
-                        </span>
-                      </div>
+                      <ClientResourceItemSkeleton />
+                      // <div className="h-16 rounded-lg border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-gradient-to-r from-muted/20 to-muted/10">
+                      //   <span className="text-xs text-muted-foreground/50">
+                      //     Coming soon
+                      //   </span>
+                      // </div>
                     )}
                   </div>
                 );

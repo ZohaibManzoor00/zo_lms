@@ -1,12 +1,12 @@
 "use client";
-import { buttonVariants } from "@/components/ui/button";
+
 import { cn } from "@/lib/utils";
 import { ResourceItemType } from "./recent-resources-card";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import ThemeElectricBorder from "@/components/ThemeElectricBorder";
 
-export function ResourceItem({ item }: { item: ResourceItemType }) {
+export function ClientResourceItem({ item }: { item: ResourceItemType }) {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
@@ -21,13 +21,13 @@ export function ResourceItem({ item }: { item: ResourceItemType }) {
       chaos={0.3}
       thickness={3}
       style={{ borderRadius: 16 }}
-    //   className="opacity-75"
+      className="hover:scale-[1.02] transition-all duration-300"
     >
       <Link
         href={item.href}
         className={cn(
-          buttonVariants({ variant: "outline" }),
-          "flex items-center justify-between w-full px-4 py-3 rounded-lg shadow-sm group transition-all duration-200 hover:bg-accent/60 hover:shadow-md hover:scale-[1.02] h-16 border-2 border-border dark:border-foreground/40 hover:border-primary/60 dark:hover:border-primary/70"
+          //   buttonVariants({ variant: "outline" }),
+          "flex items-center justify-between w-full px-4 py-3 group transition-all duration-200 h-16  dark:border-foreground/40"
         )}
       >
         <div className="flex gap-x-2 items-center min-w-0 flex-1">
@@ -47,6 +47,23 @@ export function ResourceItem({ item }: { item: ResourceItemType }) {
           </Badge>
         </div>
       </Link>
+    </ThemeElectricBorder>
+  );
+}
+
+export function ClientResourceItemSkeleton() {
+  return (
+    <ThemeElectricBorder
+      colorTheme="accent"
+      speed={1}
+      chaos={0.3}
+      thickness={3}
+      style={{ borderRadius: 16 }}
+      className="hover:scale-[1.02] transition-all duration-300"
+    >
+      <div className="h-16 rounded-lg border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-gradient-to-r from-muted/20 to-muted/10">
+        <span className="text-xs text-muted-foreground/50">Coming soon</span>
+      </div>
     </ThemeElectricBorder>
   );
 }

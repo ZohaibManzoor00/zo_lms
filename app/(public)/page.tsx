@@ -14,7 +14,7 @@ import {
 export default async function Homepage() {
   return (
     <>
-      <section className="relative pt-15">
+      <section className="relative pt-12">
         <div className="flex flex-col items-center text-center space-y-8">
           {/* <Badge variant="outline">Online learning made easy</Badge> */}
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight">

@@ -21,8 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { authClient } from "@/lib/auth-client";
-import { ThemeToggle } from "./ui/theme-toggle";
-import { ThemeSelector } from "./ui/theme-selector";
+import { UnifiedThemeSelector } from "./ui/unified-theme-selector";
 import { UserDropdown } from "@/app/(public)/_components/user-dropdown";
 
 interface NavigationItem {
@@ -351,8 +350,7 @@ export default function Navbar() {
         </div>
         {/* Right side */}
         <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <ThemeSelector />
+          <UnifiedThemeSelector />
           {isPending ? (
             <div className="w-20 h-10" />
           ) : session ? (

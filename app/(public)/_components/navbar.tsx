@@ -5,8 +5,7 @@ import { authClient } from "@/lib/auth-client";
 
 import { buttonVariants } from "@/components/ui/button";
 import { UserDropdown } from "./user-dropdown";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { ThemeSelector } from "@/components/ui/theme-selector";
+import { UnifiedThemeSelector } from "@/components/ui/unified-theme-selector";
 import { AppLogoFull } from "@/components/ui/app-logo";
 
 const navItems = [
@@ -66,8 +65,7 @@ export function Navbar() {
             )}
           </div>
           <div className="flex items-center gap-x-2">
-            <ThemeSelector />
-            <ThemeToggle />
+            <UnifiedThemeSelector />
 
             {isPending ? (
               <div className="w-20 h-10" />
