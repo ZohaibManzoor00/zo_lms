@@ -3,16 +3,15 @@ import { DeleteCodeSnippetForm } from "./_components/delete-code-snippet-form";
 import { notFound } from "next/navigation";
 
 interface Props {
-  params: {
-    snippetId: string;
-  };
+  params: Promise<{ snippetId: string }>;
 }
 
 export default async function DeleteCodeSnippetPage({ params }: Props) {
-  const snippet = await getCodeSnippetById(params.snippetId);
+  const { snippetId } = await params;
+  const snippet = await getCodeSnippetById(snippetId);
 
   if (!snippet) {
-    notFound();
+    return notFound();
   }
 
   return (

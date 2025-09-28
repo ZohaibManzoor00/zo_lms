@@ -19,7 +19,6 @@ import {
   Pencil,
   Trash2,
   Code2,
-  Hash,
   MousePointer,
   Star,
 } from "lucide-react";

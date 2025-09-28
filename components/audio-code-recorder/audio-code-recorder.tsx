@@ -17,8 +17,6 @@ import {
   Save,
   Loader2,
 } from "lucide-react";
-// @ts-ignore - react-audio-voice-recorder types issue
-import { AudioRecorder } from "react-audio-voice-recorder";
 import {
   useAudioCodeRecorder,
   type AudioCodeSession,
@@ -114,9 +112,11 @@ export function AudioCodeRecorder({
     initialCode,
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditorDidMount = (editor: any, monaco: Monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
@@ -358,9 +358,11 @@ function AudioCodePlayback({ session }: AudioCodePlaybackProps) {
     formatTime,
   } = useAudioCodePlayback({ session });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditorDidMount = (editor: any, monaco: Monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;

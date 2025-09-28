@@ -13,6 +13,7 @@ interface AudioCodePlaybackUrlProps {
 }
 
 export function AudioCodePlaybackUrl({ session }: AudioCodePlaybackUrlProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
 
@@ -30,6 +31,7 @@ export function AudioCodePlaybackUrl({ session }: AudioCodePlaybackUrlProps) {
     formatTime,
   } = useAudioCodePlaybackUrl({ session });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditorDidMount = (editor: any, monaco: Monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;

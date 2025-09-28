@@ -1,17 +1,14 @@
 "use client";
 
 import { useState, useOptimistic, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  ArrowLeft,
   Copy,
   Eye,
   Code2,
-  Hash,
   Star,
   Calendar,
   Check,
@@ -96,7 +93,6 @@ function MonacoEditorSkeleton() {
 }
 
 export function CodeSnippetDetailView({ snippet }: Props) {
-  const router = useRouter();
   const [isCopied, setIsCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isEditorLoading, setIsEditorLoading] = useState(true);

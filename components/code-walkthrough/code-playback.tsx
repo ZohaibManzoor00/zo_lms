@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Play, Pause, Square, Edit3, RotateCcw, Lightbulb } from "lucide-react";
+import { Play, Pause, Square, Edit3, RotateCcw } from "lucide-react";
 import type { RecordingSession } from "./code-recorder";
 import { CopyButton } from "@/components/ui/copy-button";
 import { useCodePlayback } from "@/hooks/use-code-playback";

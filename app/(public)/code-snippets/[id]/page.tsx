@@ -3,16 +3,15 @@ import { getCodeSnippetById } from "@/app/data/code-snippet/get-code-snippet-by-
 import { CodeSnippetDetailView } from "./_components/code-snippet-detail-view";
 
 interface Props {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default async function CodeSnippetViewPage({ params }: Props) {
-  const snippet = await getCodeSnippetById(params.id);
+  const { id } = await params;
+  const snippet = await getCodeSnippetById(id);
 
   if (!snippet) {
-    notFound();
+    return notFound();
   }
 
   return (

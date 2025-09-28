@@ -20,7 +20,6 @@ import { ArrowLeft, Loader2, X } from "lucide-react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -86,7 +85,7 @@ export function CodeSnippetForm() {
     },
   });
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: CreateCodeSnippetSchemaType) => {
     startTransition(async () => {
       const { data: result, error } = await tryCatch(createCodeSnippet(values));
       if (error) {

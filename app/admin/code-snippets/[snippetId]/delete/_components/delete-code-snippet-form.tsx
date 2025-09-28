@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { deleteCodeSnippet } from "../actions";
 import { CodeSnippetType } from "@/app/data/code-snippet/get-all-code-snippets";
-import { Code2, Hash, AlertTriangle } from "lucide-react";
+import { Code2, AlertTriangle } from "lucide-react";
 
 interface Props {
   snippet: CodeSnippetType;

@@ -32,8 +32,8 @@ import { updateCodeSnippet } from "../actions";
 import { CodeSnippetType } from "@/app/data/code-snippet/get-all-code-snippets";
 import {
   updateCodeSnippetSchema,
-  UpdateCodeSnippetSchemaType,
   PROGRAMMING_LANGUAGES,
+  UpdateCodeSnippetSchemaType,
 } from "@/lib/zod-schemas";
 import { X } from "lucide-react";
 
@@ -58,7 +58,7 @@ export function EditCodeSnippetForm({ snippet }: Props) {
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: UpdateCodeSnippetSchemaType) => {
     setIsSubmitting(true);
     try {
       await updateCodeSnippet(snippet.id, data);

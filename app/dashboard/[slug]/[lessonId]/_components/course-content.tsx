@@ -18,7 +18,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { buildRecordingSession } from "@/lib/build-recording-session";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const CodePlayback = dynamic(
