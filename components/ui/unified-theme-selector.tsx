@@ -59,39 +59,39 @@ export function UnifiedThemeSelector({
     styleElement.textContent = css;
   }, []);
 
-  const toggleLightDark = React.useCallback(() => {
-    const animation = createAnimation(variant, start, url);
-    updateStyles(animation.css);
+  // const toggleLightDark = React.useCallback(() => {
+  //   const animation = createAnimation(variant, start, url);
+  //   updateStyles(animation.css);
 
-    if (typeof window === "undefined") return;
+  //   if (typeof window === "undefined") return;
 
-    const switchTheme = () => {
-      if (!theme) {
-        setTheme("dark");
-        return;
-      }
+  //   const switchTheme = () => {
+  //     if (!theme) {
+  //       setTheme("dark");
+  //       return;
+  //     }
 
-      if (theme === "light") {
-        setTheme("dark");
-      } else if (theme === "dark") {
-        setTheme("light");
-      } else if (theme.endsWith("-dark")) {
-        const baseTheme = theme.replace("-dark", "");
-        setTheme(baseTheme);
-      } else if (customThemes.includes(theme)) {
-        setTheme(`${theme}-dark`);
-      } else {
-        setTheme("dark");
-      }
-    };
+  //     if (theme === "light") {
+  //       setTheme("dark");
+  //     } else if (theme === "dark") {
+  //       setTheme("light");
+  //     } else if (theme.endsWith("-dark")) {
+  //       const baseTheme = theme.replace("-dark", "");
+  //       setTheme(baseTheme);
+  //     } else if (customThemes.includes(theme)) {
+  //       setTheme(`${theme}-dark`);
+  //     } else {
+  //       setTheme("dark");
+  //     }
+  //   };
 
-    if (!document.startViewTransition) {
-      switchTheme();
-      return;
-    }
+  //   if (!document.startViewTransition) {
+  //     switchTheme();
+  //     return;
+  //   }
 
-    document.startViewTransition(switchTheme);
-  }, [theme, setTheme, variant, start, url, updateStyles]);
+  //   document.startViewTransition(switchTheme);
+  // }, [theme, setTheme, variant, start, url, updateStyles]);
 
   const handleThemeSelect = (selectedTheme: string) => {
     const currentIsDark = isDarkVariant(originalTheme || theme);
