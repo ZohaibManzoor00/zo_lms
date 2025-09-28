@@ -2,10 +2,10 @@ import "server-only";
 
 import { prisma } from "@/lib/db";
 
-export const getAllCodeSnippets = async () => {
-  const data = await prisma.codeSnippet.findMany({
-    orderBy: {
-      createdAt: "desc",
+export const getCodeSnippetById = async (id: string) => {
+  const snippet = await prisma.codeSnippet.findUnique({
+    where: {
+      id,
     },
     select: {
       id: true,
@@ -17,16 +17,19 @@ export const getAllCodeSnippets = async () => {
       clickCount: true,
       isFeatured: true,
       createdAt: true,
+      updatedAt: true,
     },
   });
 
+  if (!snippet) return null;
+
   // Ensure language always has a value
-  return data.map((snippet) => ({
+  return {
     ...snippet,
     language: snippet.language ?? "bash",
-  }));
+  };
 };
 
-export type CodeSnippetType = Awaited<
-  ReturnType<typeof getAllCodeSnippets>
->[number];
+export type CodeSnippetDetailType = Awaited<
+  ReturnType<typeof getCodeSnippetById>
+>;

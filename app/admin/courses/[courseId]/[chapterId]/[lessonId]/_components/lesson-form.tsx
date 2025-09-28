@@ -53,6 +53,7 @@ interface Props {
   chapterId: string;
   courseId: string;
   allWalkthroughs: AdminWalkthroughType;
+  backHref?: string;
 }
 
 export function LessonForm({
@@ -60,6 +61,7 @@ export function LessonForm({
   chapterId,
   courseId,
   allWalkthroughs,
+  backHref = `/admin/courses/${courseId}/edit`,
 }: Props) {
   const [pending, startTransition] = useTransition();
 
@@ -115,7 +117,7 @@ export function LessonForm({
   return (
     <div>
       <div className="mb-6">
-        <BackButton href={`/admin/courses/${courseId}/edit`} />
+        <BackButton href={backHref} />
       </div>
 
       <Card>

@@ -17,7 +17,7 @@ const BackButton = ({
   href = "/",
 }: BackButtonProps) => {
   return (
-    <Button className={cn("group", className)} variant="outline">
+    <Button className={cn("group", className)} variant="outline" asChild>
       <Link href={href} className="flex items-center gap-x-2">
         {icon && (
           <ArrowLeftIcon

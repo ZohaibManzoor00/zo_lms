@@ -30,10 +30,10 @@ async function RenderLessons() {
     <>
       {lessons.length === 0 ? (
         <EmptyCourseState
-          title="No courses found"
-          description="You haven't created any courses yet."
-          buttonText="Create Course"
-          href="/admin/courses/create"
+          title="No lessons found"
+          description="You haven't created any lessons yet."
+          buttonText="Create Lesson"
+          href="/admin/lessons/create"
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-7">

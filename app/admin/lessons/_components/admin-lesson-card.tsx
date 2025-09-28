@@ -57,7 +57,7 @@ export function AdminLessonCard({ data }: Props) {
 
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href={`/admin/lessons/${data.id}/edit`}>
+              <Link href={`/admin/lessons/${data.id}`}>
                 <Pencil className="size-4 text-yellow-600" />
                 Edit Lesson
               </Link>
@@ -125,8 +125,8 @@ export function AdminLessonCard({ data }: Props) {
         </div>
 
         <ForwardButton
-          href={`/admin/lessons/${data.id}/edit`}
-          label="Edit Course"
+          href={`/admin/lessons/${data.id}`}
+          label="Edit Lesson"
           variant="default"
           className="w-full mt-4"
         />

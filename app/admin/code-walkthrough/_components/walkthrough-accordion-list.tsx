@@ -12,11 +12,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { buildRecordingSession } from "@/lib/build-recording-session";
+import { convertWalkthroughToSession } from "@/lib/audio-recording-utils";
 import { AdminWalkthroughType } from "@/app/data/admin/admin-get-walkthroughs";
 
-const CodePlayback = dynamic(
-  () => import("@/components/code-walkthrough/code-playback"),
+const AudioCodePlaybackUrl = dynamic(
+  () =>
+    import("@/components/audio-code-recorder/audio-code-playback-url").then(
+      (mod) => ({ default: mod.AudioCodePlaybackUrl })
+    ),
   { ssr: false }
 );
 
@@ -60,7 +63,7 @@ export function WalkthroughAccordionList({
               </div>
             </Button>
           </DialogTrigger>
-          <DialogContent className="flex flex-col gap-0 p-0 max-w-6xl w-[90vw] max-h-[85vh] h-[85vh] [&>button:last-child]:top-3.5">
+          <DialogContent className="flex flex-col gap-0 p-0 !max-w-[98vw] !w-[98vw] max-h-[92vh] h-[92vh] sm:!max-w-[98vw] md:!max-w-[98vw] lg:!max-w-[98vw] xl:!max-w-[98vw] [&>button:last-child]:top-3.5">
             <DialogHeader className="contents space-y-0 text-left">
               <DialogTitle className="border-b px-6 py-4 text-base">
                 {w.name}
@@ -73,8 +76,11 @@ export function WalkthroughAccordionList({
                         {w.description}
                       </div>
                     )}
-                    <CodePlayback
-                      session={buildRecordingSession(w, getAudioUrl)}
+                    <AudioCodePlaybackUrl
+                      session={convertWalkthroughToSession(
+                        w,
+                        getAudioUrl(w.audioKey)
+                      )}
                     />
                   </div>
                 </DialogDescription>

@@ -60,6 +60,11 @@ const data = {
       icon: IconVideo,
     },
     {
+      title: "Code Snippets",
+      url: "/admin/code-snippets",
+      icon: IconFileAi,
+    },
+    {
       title: "Analytics",
       url: "#",
       icon: IconChartBar,

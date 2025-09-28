@@ -1,67 +1,41 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mic, Pause, Play, Square, Video } from "lucide-react";
+import { useCodeRecording } from "@/hooks/use-code-recording";
+import type { RecordingSession } from "@/hooks/use-code-recording";
 
-export interface CodeEvent {
-  timestamp: number;
-  type: "keypress" | "delete" | "paste";
-  data?: string;
-  position?: number;
-  audioUrl?: string;
-}
-
-export interface AudioEvent {
-  timestamp: number;
-  type: "start" | "stop" | "pause" | "resume";
-}
-
-export interface RecordingSession {
-  id: string;
-  startTime: number;
-  endTime: number;
-  codeEvents: CodeEvent[];
-  audioEvents: AudioEvent[];
-  initialCode: string;
-  finalCode: string;
-  audioBlob?: Blob;
-  audioUrl?: string;
-}
+// Re-export types for backward compatibility
+export type {
+  CodeEvent,
+  AudioEvent,
+  RecordingSession,
+} from "@/hooks/use-code-recording";
 
 interface CodeRecorderProps {
   onSessionComplete?: (session: RecordingSession) => void;
 }
 
-type RecordingState = "idle" | "recording" | "paused";
-
-declare global {
-  interface Window {
-    createSessionAfterAudio?: () => void;
-  }
-}
-
 export function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
-  const [code, setCode] = useState("// Add your starter code here...\n");
-  const [initialCode, setInitialCode] = useState("");
-  const [recordingState, setRecordingState] = useState<RecordingState>("idle");
-  const [isAudioRecording, setIsAudioRecording] = useState(false);
-  const [codeEvents, setCodeEvents] = useState<CodeEvent[]>([]);
-  const [audioEvents, setAudioEvents] = useState<AudioEvent[]>([]);
-  const [recordingTime, setRecordingTime] = useState(0);
-  const [sessionStartTime, setSessionStartTime] = useState(0);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const {
+    code,
+    setCode,
+    recordingState,
+    isAudioRecording,
+    codeEvents,
+    audioEvents,
+    recordingTime,
+    handleCodeChange,
+    handlePrimaryButtonClick,
+    stopRecording,
+    formatTime,
+  } = useCodeRecording({ onSessionComplete });
 
-  const audioBlobRef = useRef<Blob | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const editorRef = useRef<MonacoEditor>(null);
   const monacoRef = useRef<Monaco | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const lastRecordedCodeRef = useRef<string>("");
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   type MonacoEditor = any;
@@ -74,198 +48,7 @@ export function CodeRecorder({ onSessionComplete }: CodeRecorderProps) {
   const handleEditorChange = (value: string | undefined) => {
     if (!value) return;
     setCode(value);
-    if (recordingState !== "recording") return;
-
-    if (value === initialCode) return;
-
-    if (value === lastRecordedCodeRef.current) return;
-
-    const newEvent: CodeEvent = {
-      timestamp: Date.now(),
-      type: "keypress",
-      data: value,
-    };
-    setCodeEvents((prev) => [...prev, newEvent]);
-    lastRecordedCodeRef.current = value;
-  };
-
-  const startAudioRecording = async () => {
-    try {
-      setAudioBlob(null);
-      audioBlobRef.current = null;
-      chunksRef.current = [];
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      let mimeType = "audio/webm;codecs=opus";
-      if (!MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = "audio/webm";
-      }
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
-        }
-      };
-      mediaRecorder.onstop = () => {
-        if (chunksRef.current.length === 0) return;
-        const blob = new Blob(chunksRef.current, { type: mimeType });
-        setAudioBlob(blob);
-        audioBlobRef.current = blob;
-        if (window.createSessionAfterAudio) {
-          window.createSessionAfterAudio();
-        }
-      };
-      mediaRecorder.onerror = (event) => {
-        console.error("MediaRecorder error:", event);
-      };
-      mediaRecorder.start(1000);
-      setIsAudioRecording(true);
-      const audioStartTime = sessionStartTime || Date.now();
-      setAudioEvents((prev) => [
-        ...prev,
-        { timestamp: audioStartTime, type: "start" },
-      ]);
-    } catch (error) {
-      console.error("Error starting audio recording:", error);
-      alert(
-        "Failed to start audio recording. Please check microphone permissions."
-      );
-    }
-  };
-
-  const stopAudioRecording = () => {
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state !== "inactive"
-    ) {
-      mediaRecorderRef.current.stop();
-      setAudioEvents((prev) => [
-        ...prev,
-        { timestamp: Date.now(), type: "stop" },
-      ]);
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    setIsAudioRecording(false);
-  };
-
-  const startRecording = () => {
-    const startTime = Date.now();
-    setInitialCode(code);
-    setRecordingState("recording");
-    setSessionStartTime(startTime);
-    setCodeEvents([]);
-    setAudioEvents([]);
-    setAudioBlob(null);
-    audioBlobRef.current = null;
-    chunksRef.current = [];
-    lastRecordedCodeRef.current = code;
-
-    const initialCodeEvent: CodeEvent = {
-      timestamp: startTime,
-      type: "keypress",
-      data: code,
-    };
-    setCodeEvents([initialCodeEvent]);
-
-    timerRef.current = setInterval(() => {
-      setRecordingTime((prev) => prev + 1);
-    }, 1000);
-    startAudioRecording();
-  };
-
-  const pauseRecording = () => {
-    if (recordingState !== "recording") return;
-    setRecordingState("paused");
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state === "recording"
-    ) {
-      mediaRecorderRef.current.pause();
-      setAudioEvents((prev) => [
-        ...prev,
-        { timestamp: Date.now(), type: "pause" },
-      ]);
-    }
-  };
-
-  const resumeRecording = () => {
-    if (recordingState !== "paused") return;
-    setRecordingState("recording");
-    timerRef.current = setInterval(() => {
-      setRecordingTime((prev) => prev + 1);
-    }, 1000);
-    if (
-      mediaRecorderRef.current &&
-      mediaRecorderRef.current.state === "paused"
-    ) {
-      mediaRecorderRef.current.resume();
-      setAudioEvents((prev) => [
-        ...prev,
-        { timestamp: Date.now(), type: "resume" },
-      ]);
-    }
-  };
-
-  const stopRecording = () => {
-    setRecordingState("idle");
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      setRecordingTime(0);
-    }
-    if (isAudioRecording) {
-      stopAudioRecording();
-    }
-    lastRecordedCodeRef.current = "";
-    const createSession = () => {
-      const finalAudioBlob = audioBlobRef.current || audioBlob;
-      const session: RecordingSession = {
-        id: `session-${Date.now()}`,
-        startTime: sessionStartTime,
-        endTime: Date.now(),
-        codeEvents,
-        audioEvents,
-        initialCode: initialCode,
-        finalCode: code,
-        audioBlob: finalAudioBlob || undefined,
-        audioUrl: undefined,
-      };
-      onSessionComplete?.(session);
-    };
-    window.createSessionAfterAudio = createSession;
-    if (audioBlobRef.current || audioBlob) {
-      createSession();
-    } else {
-      setTimeout(() => {
-        if (!audioBlobRef.current && !audioBlob) {
-          createSession();
-        }
-      }, 1000);
-    }
-  };
-
-  const handlePrimaryButtonClick = () => {
-    if (recordingState === "idle") {
-      startRecording();
-    } else if (recordingState === "recording") {
-      pauseRecording();
-    } else if (recordingState === "paused") {
-      resumeRecording();
-    }
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
+    handleCodeChange(value);
   };
 
   return (

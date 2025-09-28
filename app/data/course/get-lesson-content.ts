@@ -41,12 +41,12 @@ export const getLessonContent = async (lessonId: string) => {
               updatedAt: true,
               steps: {
                 select: {
-                  code: true, 
-                  timestamp: true, 
-                  stepIndex: true
+                  code: true,
+                  timestamp: true,
+                  stepIndex: true,
                 },
-                orderBy: { stepIndex: "asc" }
-              }
+                orderBy: { stepIndex: "asc" },
+              },
             },
           },
         },
@@ -71,7 +71,7 @@ export const getLessonContent = async (lessonId: string) => {
     where: {
       userId_courseId: {
         userId: user.id,
-        courseId: lesson.chapter?.courseId ?? '',
+        courseId: lesson.chapter?.courseId ?? "",
       },
     },
     select: {

@@ -82,7 +82,55 @@ export const standaloneLessonSchema = z.object({
   walkthroughIds: z.string().array().optional(),
 });
 
+// Programming languages array for consistency across the app
+export const PROGRAMMING_LANGUAGES = [
+  "javascript",
+  "typescript",
+  "python",
+  "java",
+  "cpp",
+  "c",
+  "rust",
+  "go",
+  "php",
+  "ruby",
+  "swift",
+  "kotlin",
+  "html",
+  "css",
+  "sql",
+  "bash",
+  "shell",
+  "json",
+  "yaml",
+  "xml",
+] as const;
+
+export const createCodeSnippetSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  code: z.string().min(1, "Code is required"),
+  language: z.string().min(1, "Language is required"),
+  tags: z.array(z.string()).optional(),
+  isFeatured: z.boolean().optional().default(false),
+});
+
+export const updateCodeSnippetSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  code: z.string().min(1, "Code is required"),
+  language: z.string().min(1, "Language is required"),
+  tags: z.array(z.string()).optional(),
+  isFeatured: z.boolean().optional().default(false),
+});
+
 export type CourseSchemaType = z.infer<typeof courseSchema>;
 export type ChapterSchemaType = z.infer<typeof chapterSchema>;
 export type LessonSchemaType = z.infer<typeof lessonSchema>;
 export type StandaloneLessonSchemaType = z.infer<typeof standaloneLessonSchema>;
+export type CreateCodeSnippetSchemaType = z.infer<
+  typeof createCodeSnippetSchema
+>;
+export type UpdateCodeSnippetSchemaType = z.infer<
+  typeof updateCodeSnippetSchema
+>;

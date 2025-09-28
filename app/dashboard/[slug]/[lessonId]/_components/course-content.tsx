@@ -85,7 +85,7 @@ export function CourseContent({ data }: Props) {
       );
 
       const { data: result, error } = await tryCatch(
-        markLessonComplete(data.id, data.chapter?.course.slug ?? '')
+        markLessonComplete(data.id, data.chapter?.course.slug ?? "")
       );
 
       if (error) {
@@ -113,10 +113,10 @@ export function CourseContent({ data }: Props) {
 
   return (
     <div className="flex flex-col h-full bg-background pl-6">
-        <VideoPlayer
-          thumbnailKey={data.thumbnailKey ?? ""}
-          videoKey={data.videoKey ?? ""}
-        />
+      <VideoPlayer
+        thumbnailKey={data.thumbnailKey ?? ""}
+        videoKey={data.videoKey ?? ""}
+      />
       <div className="flex justify-between items-center border-b py-0">
         {/* <div className="flex gap-x-1 items-center">
           <MotionIcon
@@ -127,18 +127,19 @@ export function CourseContent({ data }: Props) {
           />
         </div> */}
         <div className="py-4">
-        {data.lessonProgress.length > 0 && data.lessonProgress[0].completed ? (
-          <Button variant="outline" onClick={onSubmit} disabled={pending}>
-            <XCircle className="size-4 text-red-500" />
-            Mark as incomplete
-          </Button>
-        ) : (
-          <Button variant="outline" onClick={onSubmit} disabled={pending}>
-            <CheckCircle className="size-4 text-primary" />
-            Mark as complete
-          </Button>
-        )}
-      </div>
+          {data.lessonProgress.length > 0 &&
+          data.lessonProgress[0].completed ? (
+            <Button variant="outline" onClick={onSubmit} disabled={pending}>
+              <XCircle className="size-4 text-red-500" />
+              Mark as incomplete
+            </Button>
+          ) : (
+            <Button variant="outline" onClick={onSubmit} disabled={pending}>
+              <CheckCircle className="size-4 text-primary" />
+              Mark as complete
+            </Button>
+          )}
+        </div>
         <HeartButton
           initialCount={0}
           maxClicks={10}
@@ -185,13 +186,13 @@ function LessonCodeWalkthrough({ data }: Props) {
               className="dark:bg-accent/40 bg-accent rounded mb-2"
             >
               <CollapsibleTrigger
-                className={cn(
-                  "w-full flex items-center rounded justify-between px-4 py-2 text-left font-semibold bg-muted hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-                  // "w-full flex items-center rounded justify-between px-4 py-2 text-left text-primary font-medium border border-primary/20 bg-primary/20 ",
-                  openIndex === idx &&
-                    "bg-primary/10 hover:text-primary hover:bg-primary/20 hover:rounded hover:rounded-b-none rounded dark:bg-accent dark:text-accent-foreground text-primary border-t-accent-foreground rounded-b-none"
-                  // "border border-primary/20 rounded-b-none text-primary font-semibold"
-                )}
+              // className={cn(
+              //   "w-full flex items-center rounded justify-between px-4 py-2 text-left font-semibold bg-muted hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+              //   // "w-full flex items-center rounded justify-between px-4 py-2 text-left text-primary font-medium border border-primary/20 bg-primary/20 ",
+              //   openIndex === idx &&
+              //     "bg-primary/10 hover:text-primary hover:bg-primary/20 hover:rounded hover:rounded-b-none rounded dark:bg-accent dark:text-accent-foreground text-primary border-t-accent-foreground rounded-b-none"
+              //   // "border border-primary/20 rounded-b-none text-primary font-semibold"
+              // )}
               >
                 <span>{lw.walkthrough.name}</span>
                 <ChevronDown
@@ -210,7 +211,6 @@ function LessonCodeWalkthrough({ data }: Props) {
                   </>
                 )}
                 <CodePlayback
-                  showGuide
                   session={buildRecordingSession(lw.walkthrough, getAudioUrl)}
                 />
               </CollapsibleContent>

@@ -1,4 +1,4 @@
-import { WalkthroughRecorderClient } from "../walkthrough-recorder-client";
+import { NewWalkthroughRecorderClient } from "../new-walkthrough-recorder-client";
 import { adminCreateWalkthrough } from "@/app/data/admin/admin-create-walkthrough";
 
 export default function CodeWalkthroughRecordPage() {
@@ -8,5 +8,5 @@ export default function CodeWalkthroughRecordPage() {
     "use server";
     return await adminCreateWalkthrough(data);
   }
-  return <WalkthroughRecorderClient saveWalkthrough={saveWalkthrough} />;
+  return <NewWalkthroughRecorderClient saveWalkthrough={saveWalkthrough} />;
 }

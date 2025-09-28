@@ -1,3 +1,6 @@
+import { getAllCodeSnippets } from "@/app/data/code-snippet/get-all-code-snippets";
+import { CodeSnippetCard } from "../_components/code-snippet-card";
+
 export default function PublicCodeSnippetsPage() {
   return (
     <>
@@ -6,7 +9,8 @@ export default function PublicCodeSnippetsPage() {
           Explore Code Snippets
         </h1>
         <p className="text-muted-foreground">
-          Discover a wide range of code snippets I&apos;ve built/used in my projects and career
+          Discover a wide range of code snippets I&apos;ve built/used in my
+          projects and career
         </p>
       </div>
 
@@ -15,10 +19,15 @@ export default function PublicCodeSnippetsPage() {
   );
 }
 
-const RenderCodeSnippets = () => {
+const RenderCodeSnippets = async () => {
+  const codeSnippets = await getAllCodeSnippets();
   return (
-    <div>
-      <h1>Code Snippets</h1>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {codeSnippets.map((snippet) => (
+        <div key={snippet.id}>
+          <CodeSnippetCard snippet={snippet} />
+        </div>
+      ))}
     </div>
   );
 };

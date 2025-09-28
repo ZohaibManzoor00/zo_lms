@@ -221,7 +221,6 @@ function LessonCodeWalkthrough({ data }: Props) {
                   </>
                 )}
                 <CodePlayback
-                  showGuide
                   session={buildRecordingSession(lw.walkthrough, getAudioUrl)}
                 />
               </CollapsibleContent>

@@ -2,7 +2,7 @@
 
 import { trackSnippetUsage } from "@/app/data/code-snippet/actions";
 import { UsageType } from "@/app/data/code-snippet/increment-snippet-usage";
-import { useOptimistic } from "react";
+import { useOptimistic, startTransition } from "react";
 import { toast } from "sonner";
 import { tryCatch } from "./try-catch";
 
@@ -24,7 +24,9 @@ export function useTrackSnippet(initialUsage: SnippetUsage) {
   );
 
   const trackUsage = async (snippetId: string, type: UsageType) => {
-    addOptimisticUsage(type);
+    startTransition(() => {
+      addOptimisticUsage(type);
+    });
 
     const { data: result, error } = await tryCatch(
       trackSnippetUsage(snippetId, type)
