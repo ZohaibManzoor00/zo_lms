@@ -15,7 +15,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CodeWalkThroughModal } from "../../../courses/[courseId]/[chapterId]/[lessonId]/_components/code-walkthrough-modal";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import dynamic from "next/dynamic";
 import { AdminWalkthroughType } from "@/app/data/admin/admin-get-walkthroughs";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -49,7 +48,8 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { buildRecordingSession } from "@/lib/build-recording-session";
+import { convertWalkthroughToAudioRecording } from "@/lib/convert-walkthrough-to-audio-recording";
+import { AudioPlayback } from "@/components/audio-code-walkthrough";
 
 interface Props {
   allWalkthroughs: AdminWalkthroughType;
@@ -64,11 +64,6 @@ export function StandaloneLessonForm({ allWalkthroughs }: Props) {
   const router = useRouter();
   const { triggerConfetti } = useConfetti();
   const getAudioUrl = useConstructUrl;
-
-  const CodePlayback = dynamic(
-    () => import("@/components/code-walkthrough/code-playback"),
-    { ssr: false }
-  );
 
   const createLessonForm = useForm<StandaloneLessonSchemaType>({
     resolver: zodResolver(standaloneLessonSchema),
@@ -254,10 +249,10 @@ export function StandaloneLessonForm({ allWalkthroughs }: Props) {
                                             {w.description}
                                           </div>
                                         )}
-                                        <CodePlayback
-                                          session={buildRecordingSession(
+                                        <AudioPlayback
+                                          recording={convertWalkthroughToAudioRecording(
                                             w,
-                                            getAudioUrl
+                                            getAudioUrl(w.audioKey)
                                           )}
                                         />
                                       </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import dynamic from "next/dynamic";
 import { tryCatch } from "@/hooks/try-catch";
 import { markLessonComplete } from "../actions";
 import { toast } from "sonner";
@@ -17,13 +16,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { buildRecordingSession } from "@/lib/build-recording-session";
+import { convertWalkthroughToAudioRecording } from "@/lib/convert-walkthrough-to-audio-recording";
+import { AudioPlayback } from "@/components/audio-code-walkthrough";
 import { Button } from "@/components/ui/button";
-
-const CodePlayback = dynamic(
-  () => import("@/components/code-walkthrough/code-playback"),
-  { ssr: false }
-);
 
 interface Props {
   data: LessonContentType;
@@ -209,8 +204,11 @@ function LessonCodeWalkthrough({ data }: Props) {
                     </div>
                   </>
                 )}
-                <CodePlayback
-                  session={buildRecordingSession(lw.walkthrough, getAudioUrl)}
+                <AudioPlayback
+                  recording={convertWalkthroughToAudioRecording(
+                    lw.walkthrough,
+                    getAudioUrl(lw.walkthrough.audioKey)
+                  )}
                 />
               </CollapsibleContent>
             </Collapsible>

@@ -20,6 +20,7 @@ interface AudioRecording {
   finalCode: string;
   createdAt: Date;
   language?: string;
+  audioUrl?: string; // Optional direct URL for existing recordings
 }
 
 export function useAudioCodePlayback(recording: AudioRecording) {
@@ -62,14 +63,21 @@ export function useAudioCodePlayback(recording: AudioRecording) {
   }, [recording.codeEvents]);
 
   // Create audio URL and setup audio element
+  // Create audio URL from blob or use existing URL
   useEffect(() => {
-    const url = URL.createObjectURL(recording.audioBlob);
-    setAudioUrl(url);
+    if (recording.audioUrl) {
+      // Use existing URL for database recordings
+      setAudioUrl(recording.audioUrl);
+    } else if (recording.audioBlob) {
+      // Create blob URL for new recordings
+      const url = URL.createObjectURL(recording.audioBlob);
+      setAudioUrl(url);
 
-    return () => {
-      URL.revokeObjectURL(url);
-    };
-  }, [recording.audioBlob]);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    }
+  }, [recording.audioBlob, recording.audioUrl]);
 
   // Setup audio element when URL is ready
   useEffect(() => {

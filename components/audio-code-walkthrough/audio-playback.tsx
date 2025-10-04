@@ -41,7 +41,6 @@ interface AudioPlaybackProps {
   recording: AudioRecording;
 }
 
-
 const getLanguageColor = (language: string) => {
   return (
     languageColors[language.toLowerCase()] ||
@@ -281,11 +280,11 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
                 <span>{playbackRate}x</span>
               </Button>
             </div>
-
-            {/* Help Text */}
           </div>
         </CardContent>
       </Card>
     </div>
   );
 }
+
+export type { CodeEvent, AudioRecording, AudioPlaybackProps };

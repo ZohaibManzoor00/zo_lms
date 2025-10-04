@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import dynamic from "next/dynamic";
 import { useConstructUrl } from "@/hooks/use-construct-url";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,16 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { convertWalkthroughToSession } from "@/lib/audio-recording-utils";
+import { AudioPlayback } from "@/components/audio-code-walkthrough";
+import { convertWalkthroughToAudioRecording } from "@/lib/convert-walkthrough-to-audio-recording";
 import { AdminWalkthroughType } from "@/app/data/admin/admin-get-walkthroughs";
-
-const AudioCodePlaybackUrl = dynamic(
-  () =>
-    import("@/components/audio-code-recorder/audio-code-playback-url").then(
-      (mod) => ({ default: mod.AudioCodePlaybackUrl })
-    ),
-  { ssr: false }
-);
 
 export function WalkthroughAccordionList({
   walkthroughs,
@@ -76,8 +68,8 @@ export function WalkthroughAccordionList({
                         {w.description}
                       </div>
                     )}
-                    <AudioCodePlaybackUrl
-                      session={convertWalkthroughToSession(
+                    <AudioPlayback
+                      recording={convertWalkthroughToAudioRecording(
                         w,
                         getAudioUrl(w.audioKey)
                       )}

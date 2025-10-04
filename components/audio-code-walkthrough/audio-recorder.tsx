@@ -445,3 +445,5 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
     </Card>
   );
 }
+
+export type { CodeEvent };

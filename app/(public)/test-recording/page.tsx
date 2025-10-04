@@ -1,31 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { AudioRecorder } from "./components/audio-recorder";
-import { AudioPlayback } from "./components";
-import { SaveRecordingDialog } from "./components/save-recording-dialog";
+import {
+  AudioRecorder,
+  AudioPlayback,
+  SaveRecordingDialog,
+  CodeEvent,
+  AudioRecording,
+} from "@/components/audio-code-walkthrough";
 import { saveTestRecording } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-
-interface CodeEvent {
-  timestamp: number;
-  type: "keypress" | "delete" | "paste";
-  data: string;
-  position?: number;
-}
-
-interface AudioRecording {
-  id: string;
-  audioBlob: Blob;
-  duration: number;
-  codeEvents: CodeEvent[];
-  initialCode: string;
-  finalCode: string;
-  createdAt: Date;
-  language?: string;
-}
 
 export default function TestRecordingPage() {
   const [recordings, setRecordings] = useState<AudioRecording[]>([]);

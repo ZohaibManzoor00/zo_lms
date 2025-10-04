@@ -46,7 +46,8 @@ import {
   DialogClose,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { buildRecordingSession } from "@/lib/build-recording-session";
+import { convertWalkthroughToAudioRecording } from "@/lib/convert-walkthrough-to-audio-recording";
+import { AudioPlayback } from "@/components/audio-code-walkthrough";
 
 interface Props {
   lesson: AdminLessonType;
@@ -89,10 +90,6 @@ export function LessonForm({
 
   const [previewId, setPreviewId] = useState<string | null>(null);
   const getAudioUrl = useConstructUrl;
-  const CodePlayback = dynamic(
-    () => import("@/components/code-walkthrough/code-playback"),
-    { ssr: false }
-  );
 
   const onSubmit = (values: LessonSchemaType) => {
     startTransition(async () => {
@@ -237,10 +234,10 @@ export function LessonForm({
                                             {w.description}
                                           </div>
                                         )}
-                                        <CodePlayback
-                                          session={buildRecordingSession(
+                                        <AudioPlayback
+                                          recording={convertWalkthroughToAudioRecording(
                                             w,
-                                            getAudioUrl
+                                            getAudioUrl(w.audioKey)
                                           )}
                                         />
                                       </div>

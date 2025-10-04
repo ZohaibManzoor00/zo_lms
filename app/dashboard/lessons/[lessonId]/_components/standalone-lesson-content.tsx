@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import dynamic from "next/dynamic";
 import { tryCatch } from "@/hooks/try-catch";
 import { markLessonComplete } from "@/app/dashboard/[slug]/[lessonId]/actions";
 import { toast } from "sonner";
@@ -23,15 +22,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { buildRecordingSession } from "@/lib/build-recording-session";
+import { convertWalkthroughToAudioRecording } from "@/lib/convert-walkthrough-to-audio-recording";
+import { AudioPlayback } from "@/components/audio-code-walkthrough";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-const CodePlayback = dynamic(
-  () => import("@/components/code-walkthrough/code-playback"),
-  { ssr: false }
-);
 
 interface Props {
   data: StandaloneLessonContentType;
@@ -92,7 +87,7 @@ export function StandaloneLessonContent({ data }: Props) {
       );
 
       const { data: result, error } = await tryCatch(
-        markLessonComplete(data.id, data.chapter?.course.slug ?? '')
+        markLessonComplete(data.id, data.chapter?.course.slug ?? "")
       );
 
       if (error) {
@@ -220,8 +215,11 @@ function LessonCodeWalkthrough({ data }: Props) {
                     </div>
                   </>
                 )}
-                <CodePlayback
-                  session={buildRecordingSession(lw.walkthrough, getAudioUrl)}
+                <AudioPlayback
+                  recording={convertWalkthroughToAudioRecording(
+                    lw.walkthrough,
+                    getAudioUrl(lw.walkthrough.audioKey)
+                  )}
                 />
               </CollapsibleContent>
             </Collapsible>
