@@ -22,7 +22,7 @@ interface CodeSnippetCardProps {
   };
 }
 
-const languageColors: Record<string, string> = {
+export const languageColors: Record<string, string> = {
   javascript: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20",
   typescript: "bg-blue-500/10 text-blue-700 border-blue-500/20",
   python: "bg-green-500/10 text-green-700 border-green-500/20",
