@@ -411,14 +411,12 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
   return (
     <div
       className={`transition-all duration-300 ${
-        isFullscreen
-          ? "fixed inset-0 z-50 bg-background flex items-center justify-center p-[5vh]"
-          : ""
+        isFullscreen ? "fixed inset-0 z-50 bg-background p-4" : ""
       }`}
     >
       <Card
         className={`border-0 shadow-lg overflow-hidden ${
-          isFullscreen ? "w-full h-full rounded-xl" : "rounded-xl"
+          isFullscreen ? "w-full h-full rounded-xl flex flex-col" : "rounded-xl"
         }`}
       >
         {/* Header */}
@@ -453,12 +451,12 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="p-0">
+        <CardContent
+          className={`p-0 ${isFullscreen ? "flex-1 flex flex-col" : ""}`}
+        >
           {/* Code Editor */}
           <div
-            className={`w-full border-b ${
-              isFullscreen ? "h-[calc(100%-180px)]" : "h-96"
-            }`}
+            className={`w-full border-b ${isFullscreen ? "flex-1" : "h-96"}`}
           >
             <Editor
               height="100%"
@@ -483,7 +481,9 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
           </div>
 
           {/* Controls */}
-          <div className="p-4 bg-muted/20">
+          <div
+            className={`p-4 bg-muted/20 ${isFullscreen ? "flex-shrink-0" : ""}`}
+          >
             {/* Progress Bar */}
             <div className="space-y-2 mb-4">
               <Slider
@@ -505,58 +505,53 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
             </div>
 
             {/* Control Buttons */}
-            <div className="flex justify-center items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={skipBackward}
-                className="h-10 w-10 p-0 rounded-full"
-              >
-                <SkipBack className="h-4 w-4" />
-              </Button>
-
-              <Button
-                onClick={stop}
-                variant="outline"
-                size="sm"
-                disabled={!isPlaying && currentTime === 0}
-              >
-                <Square className="h-4 w-4 mr-2" />
-                Stop
-              </Button>
-
-              <Button
-                onClick={togglePlayPause}
-                size="lg"
-                className="h-12 w-12 p-0 rounded-full"
-                disabled={!isFinite(duration) || duration <= 0}
-              >
-                {isPlaying ? (
-                  <Pause className="h-6 w-6" />
-                ) : (
-                  <Play className="h-6 w-6 ml-0.5" />
-                )}
-              </Button>
-
+            <div className="flex justify-between items-center">
+              {/* Left: Reset */}
               <Button onClick={() => seekTo(0)} variant="outline" size="sm">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset
               </Button>
 
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={skipForward}
-                className="h-10 w-10 p-0 rounded-full"
-              >
-                <SkipForward className="h-4 w-4" />
-              </Button>
+              {/* Center: Skip Back, Play/Pause, Skip Forward */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={skipBackward}
+                  className="h-12 w-12 p-0 rounded-full"
+                >
+                  <SkipBack className="h-5 w-5" />
+                </Button>
 
+                <Button
+                  onClick={togglePlayPause}
+                  size="lg"
+                  className="h-14 w-14 p-0 rounded-full shadow-lg"
+                  disabled={!isFinite(duration) || duration <= 0}
+                >
+                  {isPlaying ? (
+                    <Pause className="h-7 w-7" />
+                  ) : (
+                    <Play className="h-7 w-7 ml-0.5" />
+                  )}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={skipForward}
+                  className="h-12 w-12 p-0 rounded-full"
+                >
+                  <SkipForward className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Right: Speed */}
               <Button
                 onClick={togglePlaybackSpeed}
                 variant="outline"
                 size="sm"
-                className="font-mono min-w-[60px]"
+                className="font-mono min-w-[70px]"
               >
                 <Gauge className="h-4 w-4 mr-1" />
                 {playbackRate}x
@@ -564,13 +559,6 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
             </div>
 
             {/* Help Text */}
-            {!isPlaying && (
-              <div className="text-center text-xs text-muted-foreground mt-3">
-                {isUserEditing
-                  ? "Your changes will be reverted when you play the recording"
-                  : "Pause to edit the code - changes revert when you resume playback"}
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
