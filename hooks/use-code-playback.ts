@@ -32,24 +32,24 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
   const playbackStartTimeRef = useRef<number>(0);
   const pausedAtTimeRef = useRef<number>(0);
 
-  // Calculate total duration in milliseconds - fix for negative duration
-  // buildRecordingSession sets startTime to 0 and endTime to last event timestamp
+  // Calculate total duration in milliseconds - use effective recording time
   let totalDuration = session.endTime - session.startTime;
 
+  // For sessions with audio events (pause/resume), the duration should already be effective
+  // For legacy sessions without audio events, calculate from last event
   if (totalDuration <= 0 && session.codeEvents.length > 0) {
-    // Fallback: calculate duration from code events
     const lastEvent = session.codeEvents[session.codeEvents.length - 1];
     totalDuration = Math.max(lastEvent.timestamp, 5000); // Minimum 5 seconds
   }
 
   totalDuration = Math.max(totalDuration, 1000); // Minimum 1 second
 
-  // Debug session data
   console.log("Session debug:", {
     startTime: session.startTime,
     endTime: session.endTime,
     calculatedDuration: totalDuration,
     codeEventsLength: session.codeEvents.length,
+    audioEventsLength: session.audioEvents.length,
     hasAudio: !!session.audioUrl || !!session.audioBlob,
     firstEvent: session.codeEvents[0],
     lastEvent: session.codeEvents[session.codeEvents.length - 1],
@@ -57,12 +57,16 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
 
   // Memoize sorted code events to avoid recomputing on every render
   const sortedCodeEvents = useRef<CodeEvent[]>([]);
+  const sortedAudioEvents = useRef<AudioEvent[]>([]);
 
   useEffect(() => {
     sortedCodeEvents.current = [...session.codeEvents].sort(
       (a, b) => a.timestamp - b.timestamp
     );
-  }, [session.codeEvents]);
+    sortedAudioEvents.current = [...session.audioEvents].sort(
+      (a, b) => a.timestamp - b.timestamp
+    );
+  }, [session.codeEvents, session.audioEvents]);
 
   useEffect(() => {
     if (session.audioUrl) {
@@ -101,35 +105,90 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
     }
   }, [session.audioBlob, session.audioUrl]);
 
-  // Find the code state at a specific time
+  // Create a mapping function to convert audio time to effective recording time
+  const audioTimeToEffectiveTime = useCallback((audioTime: number): number => {
+    const audioEvents = sortedAudioEvents.current;
+    if (audioEvents.length === 0) {
+      return audioTime; // No pause events, time is 1:1
+    }
+
+    let effectiveTime = audioTime;
+    let totalPausedDuration = 0;
+    let currentPauseStart = 0;
+    let isPaused = false;
+
+    for (const audioEvent of audioEvents) {
+      if (audioEvent.timestamp > audioTime) break;
+
+      if (audioEvent.type === "pause") {
+        currentPauseStart = audioEvent.timestamp;
+        isPaused = true;
+      } else if (audioEvent.type === "resume" && isPaused) {
+        totalPausedDuration += audioEvent.timestamp - currentPauseStart;
+        isPaused = false;
+      }
+    }
+
+    // If we're currently in a paused section, subtract that duration
+    if (isPaused && currentPauseStart > 0) {
+      totalPausedDuration += audioTime - currentPauseStart;
+    }
+
+    return audioTime - totalPausedDuration;
+  }, []);
+
+  // Create reverse mapping: effective time to audio time
+  const effectiveTimeToAudioTime = useCallback(
+    (effectiveTime: number): number => {
+      const audioEvents = sortedAudioEvents.current;
+      if (audioEvents.length === 0) {
+        return effectiveTime; // No pause events, time is 1:1
+      }
+
+      let audioTime = effectiveTime;
+      let addedPauseDuration = 0;
+      let currentPauseStart = 0;
+      let isPaused = false;
+
+      for (const audioEvent of audioEvents) {
+        if (audioEvent.type === "pause") {
+          if (audioEvent.timestamp <= effectiveTime + addedPauseDuration) {
+            currentPauseStart = audioEvent.timestamp;
+            isPaused = true;
+          } else {
+            break;
+          }
+        } else if (audioEvent.type === "resume" && isPaused) {
+          if (audioEvent.timestamp <= effectiveTime + addedPauseDuration) {
+            addedPauseDuration += audioEvent.timestamp - currentPauseStart;
+            isPaused = false;
+          } else {
+            break;
+          }
+        }
+      }
+
+      return effectiveTime + addedPauseDuration;
+    },
+    []
+  );
+  // Find the code state at a specific effective time
   const getCodeAtTime = useCallback(
-    (time: number): string => {
+    (effectiveTime: number): string => {
       const events = sortedCodeEvents.current;
       let code = session.initialCode;
 
-      // Since buildRecordingSession creates events with timestamps starting from 0,
-      // we can use the time directly without adding session.startTime
-      console.log("Getting code at time:", {
-        time,
+      console.log("Getting code at effective time:", {
+        effectiveTime,
         eventsCount: events.length,
       });
 
+      // Find the latest code event that should be applied at this effective time
+      // Code events are already stored in effective time (excluding pauses)
       for (let i = 0; i < events.length; i++) {
         const event = events[i];
-        console.log("Checking event:", {
-          timestamp: event.timestamp,
-          time,
-          shouldApply: event.timestamp <= time,
-        });
-
-        if (event.timestamp <= time && event.data) {
+        if (event.timestamp <= effectiveTime && event.data) {
           code = event.data;
-          console.log(
-            "Applied event at",
-            event.timestamp,
-            "code length:",
-            event.data.length
-          );
         } else {
           break;
         }
@@ -149,49 +208,48 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
       return;
     }
 
-    let playbackTime: number;
+    let effectiveTime: number;
 
     if (audioRef.current && audioUrl) {
-      // Get current time from audio element (most reliable sync source)
-      playbackTime = audioRef.current.currentTime * 1000; // Convert to milliseconds
-      console.log(
-        "Using audio time:",
-        audioRef.current.currentTime,
-        "seconds =",
-        playbackTime,
-        "ms"
-      );
+      // Get current time from audio element and convert to effective time
+      const audioTime = audioRef.current.currentTime * 1000; // Convert to milliseconds
+      effectiveTime = audioTimeToEffectiveTime(audioTime);
+      console.log("Audio time mapping:", {
+        audioTime,
+        effectiveTime,
+        audioSeconds: audioRef.current.currentTime,
+      });
     } else {
-      // No audio - use performance timing
+      // No audio - use performance timing (already in effective time)
       const elapsed = performance.now() - playbackStartTimeRef.current;
-      playbackTime = pausedAtTimeRef.current + elapsed;
+      effectiveTime = pausedAtTimeRef.current + elapsed;
       console.log("Using performance timing:", {
         elapsed,
         pausedAt: pausedAtTimeRef.current,
-        playbackTime,
+        effectiveTime,
       });
     }
 
-    playbackTime = Math.min(playbackTime, totalDuration);
+    effectiveTime = Math.min(effectiveTime, totalDuration);
 
     console.log("Update playback:", {
-      playbackTime,
+      effectiveTime,
       totalDuration,
       hasAudio: !!audioUrl,
       audioCurrentTime: audioRef.current?.currentTime,
     });
 
-    setCurrentTime(playbackTime);
+    setCurrentTime(effectiveTime);
 
-    // Update code based on current time
-    const newCode = getCodeAtTime(playbackTime);
+    // Update code based on effective time
+    const newCode = getCodeAtTime(effectiveTime);
     if (newCode !== currentCode) {
-      console.log("Code changed at time", playbackTime);
+      console.log("Code changed at effective time", effectiveTime);
       setCurrentCode(newCode);
     }
 
     // Check if playback is complete
-    if (playbackTime >= totalDuration) {
+    if (effectiveTime >= totalDuration) {
       console.log("Playback complete");
       setIsPlaying(false);
       setCurrentTime(totalDuration);
@@ -213,6 +271,7 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
     session.finalCode,
     audioUrl,
     currentCode,
+    audioTimeToEffectiveTime,
   ]);
 
   const startPlayback = useCallback(async () => {
@@ -220,30 +279,39 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
 
     console.log("Starting playback...");
 
-    let timeToStartFrom = currentTime;
-    if (timeToStartFrom >= totalDuration) {
-      timeToStartFrom = 0;
+    let effectiveTimeToStartFrom = currentTime;
+    if (effectiveTimeToStartFrom >= totalDuration) {
+      effectiveTimeToStartFrom = 0;
       setCurrentTime(0);
     }
 
     // Set initial code state
-    const initialCode = getCodeAtTime(timeToStartFrom);
+    const initialCode = getCodeAtTime(effectiveTimeToStartFrom);
     setCurrentCode(initialCode);
     setIsPlaying(true);
 
     console.log("Playback setup:", {
-      timeToStartFrom,
+      effectiveTimeToStartFrom,
       hasAudio: !!audioUrl,
       totalDuration,
     });
 
     // Always start the animation loop regardless of audio
     playbackStartTimeRef.current = performance.now();
-    pausedAtTimeRef.current = timeToStartFrom;
+    pausedAtTimeRef.current = effectiveTimeToStartFrom;
 
     // Start audio at the correct position if available
     if (audioUrl && audioRef.current) {
-      audioRef.current.currentTime = timeToStartFrom / 1000;
+      // Convert effective time to audio time for seeking
+      const audioTimeToSeek = effectiveTimeToAudioTime(
+        effectiveTimeToStartFrom
+      );
+      audioRef.current.currentTime = audioTimeToSeek / 1000;
+      console.log("Audio seek:", {
+        effectiveTime: effectiveTimeToStartFrom,
+        audioTime: audioTimeToSeek,
+        audioSeconds: audioTimeToSeek / 1000,
+      });
       try {
         await audioRef.current.play();
         console.log("Audio started successfully");
@@ -266,6 +334,7 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
     audioUrl,
     getCodeAtTime,
     updatePlayback,
+    effectiveTimeToAudioTime,
   ]);
 
   const stopPlayback = useCallback(
@@ -330,8 +399,11 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
   }, [currentTime]);
 
   const seekTo = useCallback(
-    async (time: number) => {
-      const targetTime = Math.max(0, Math.min(time, totalDuration));
+    async (effectiveTime: number) => {
+      const targetEffectiveTime = Math.max(
+        0,
+        Math.min(effectiveTime, totalDuration)
+      );
       const wasPlaying = isPlaying;
 
       // Stop current playback
@@ -340,15 +412,21 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
         animationFrameRef.current = null;
       }
 
-      setCurrentTime(targetTime);
+      setCurrentTime(targetEffectiveTime);
 
-      // Find the correct code state at this time
-      const newCode = getCodeAtTime(targetTime);
+      // Find the correct code state at this effective time
+      const newCode = getCodeAtTime(targetEffectiveTime);
       setCurrentCode(newCode);
 
-      // Seek audio to the correct position
+      // Seek audio to the correct position (convert to audio time)
       if (audioRef.current && audioUrl) {
-        audioRef.current.currentTime = targetTime / 1000;
+        const audioTimeToSeek = effectiveTimeToAudioTime(targetEffectiveTime);
+        audioRef.current.currentTime = audioTimeToSeek / 1000;
+        console.log("Seek audio:", {
+          targetEffectiveTime,
+          audioTimeToSeek,
+          audioSeconds: audioTimeToSeek / 1000,
+        });
       }
 
       // Resume playback if it was playing
@@ -357,9 +435,20 @@ export function useCodePlayback({ session }: UseCodePlaybackOptions) {
         setTimeout(() => {
           startPlayback();
         }, 100);
+      } else {
+        // Update timing references for paused state
+        playbackStartTimeRef.current = performance.now();
+        pausedAtTimeRef.current = targetEffectiveTime;
       }
     },
-    [isPlaying, audioUrl, totalDuration, getCodeAtTime, startPlayback]
+    [
+      isPlaying,
+      audioUrl,
+      totalDuration,
+      getCodeAtTime,
+      startPlayback,
+      effectiveTimeToAudioTime,
+    ]
   );
 
   const toggleInteractiveMode = useCallback(() => {

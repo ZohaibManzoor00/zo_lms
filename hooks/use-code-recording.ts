@@ -59,6 +59,8 @@ export function useCodeRecording({
   const audioContextRef = useRef<AudioContext | null>(null);
   const recordingStartTimeRef = useRef<number>(0);
   const audioStartTimeRef = useRef<number>(0);
+  const pausedTimeRef = useRef<number>(0);
+  const totalPausedDurationRef = useRef<number>(0);
 
   // Initialize high-precision timing
   useEffect(() => {
@@ -76,13 +78,17 @@ export function useCodeRecording({
   // Get high-precision timestamp relative to recording start
   const getRelativeTimestamp = useCallback((): number => {
     if (!audioContextRef.current || recordingStartTimeRef.current === 0) {
-      return Date.now() - recordingStartTimeRef.current;
+      return (
+        Date.now() -
+        recordingStartTimeRef.current -
+        totalPausedDurationRef.current
+      );
     }
 
     // Use AudioContext's currentTime for high precision (microsecond accuracy)
     const audioTime = audioContextRef.current.currentTime;
     const relativeTime = (audioTime - audioStartTimeRef.current) * 1000; // Convert to milliseconds
-    return Math.max(0, relativeTime);
+    return Math.max(0, relativeTime - totalPausedDurationRef.current);
   }, []);
 
   const handleCodeChange = useCallback(
@@ -220,6 +226,10 @@ export function useCodeRecording({
       chunksRef.current = [];
       lastRecordedCodeRef.current = code;
 
+      // Reset pause tracking
+      pausedTimeRef.current = 0;
+      totalPausedDurationRef.current = 0;
+
       // Record initial code state at timestamp 0
       const initialCodeEvent: CodeEvent = {
         timestamp: 0,
@@ -246,7 +256,19 @@ export function useCodeRecording({
     if (recordingState !== "recording") return;
 
     const pauseTimestamp = getRelativeTimestamp();
+    pausedTimeRef.current = performance.now(); // Store when we paused
     setRecordingState("paused");
+
+    // Capture the current editor state before pausing
+    if (code !== lastRecordedCodeRef.current) {
+      const finalPauseEvent: CodeEvent = {
+        timestamp: pauseTimestamp,
+        type: "keypress",
+        data: code,
+      };
+      setCodeEvents((prev) => [...prev, finalPauseEvent]);
+      lastRecordedCodeRef.current = code;
+    }
 
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -262,13 +284,23 @@ export function useCodeRecording({
         { timestamp: pauseTimestamp, type: "pause" },
       ]);
     }
-  }, [recordingState, getRelativeTimestamp]);
+  }, [recordingState, getRelativeTimestamp, code]);
 
   const resumeRecording = useCallback(() => {
     if (recordingState !== "paused") return;
 
+    // Calculate how long we were paused and add to total paused duration
+    if (pausedTimeRef.current > 0) {
+      const pauseDuration = performance.now() - pausedTimeRef.current;
+      totalPausedDurationRef.current += pauseDuration;
+      pausedTimeRef.current = 0;
+    }
+
     const resumeTimestamp = getRelativeTimestamp();
     setRecordingState("recording");
+
+    // Ensure we continue from the current editor state
+    lastRecordedCodeRef.current = code;
 
     timerRef.current = setInterval(() => {
       setRecordingTime((prev) => prev + 1);
@@ -284,10 +316,11 @@ export function useCodeRecording({
         { timestamp: resumeTimestamp, type: "resume" },
       ]);
     }
-  }, [recordingState, getRelativeTimestamp]);
+  }, [recordingState, getRelativeTimestamp, code]);
 
   const stopRecording = useCallback(() => {
-    const endTime = Date.now();
+    // Calculate the effective recording duration (excluding paused time)
+    const effectiveEndTime = getRelativeTimestamp();
 
     setRecordingState("idle");
 
@@ -308,8 +341,8 @@ export function useCodeRecording({
 
       const session: RecordingSession = {
         id: `session-${Date.now()}`,
-        startTime: sessionStartTime,
-        endTime,
+        startTime: 0, // Always start from 0 for effective time
+        endTime: effectiveEndTime, // Use effective recording time
         codeEvents,
         audioEvents,
         initialCode,
@@ -321,10 +354,10 @@ export function useCodeRecording({
       onSessionComplete?.(session);
     }, 500); // Give audio processing time to complete
   }, [
+    getRelativeTimestamp,
     isAudioRecording,
     stopAudioRecording,
     audioBlob,
-    sessionStartTime,
     codeEvents,
     audioEvents,
     initialCode,

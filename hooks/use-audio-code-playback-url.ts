@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { CodeEvent, AudioCodeSession } from "./use-audio-code-recorder";
+import { AudioEvent } from "./use-code-recording";
 
 interface UseAudioCodePlaybackUrlOptions {
-  session: AudioCodeSession & { audioUrl?: string };
+  session: AudioCodeSession & { audioUrl?: string; audioEvents?: AudioEvent[] };
 }
 
 export function useAudioCodePlaybackUrl({
@@ -21,22 +22,61 @@ export function useAudioCodePlaybackUrl({
 
   // Memoize sorted code events
   const sortedCodeEvents = useRef<CodeEvent[]>([]);
+  const sortedAudioEvents = useRef<AudioEvent[]>([]);
 
   useEffect(() => {
     sortedCodeEvents.current = [...session.codeEvents].sort(
       (a, b) => a.timestamp - b.timestamp
     );
-  }, [session.codeEvents]);
+    // Handle sessions that might have audio events for pause/resume tracking
+    if (session.audioEvents) {
+      sortedAudioEvents.current = [...session.audioEvents].sort(
+        (a, b) => a.timestamp - b.timestamp
+      );
+    }
+  }, [session.codeEvents, session.audioEvents]);
 
-  // Find the code state at a specific time
+  // Find the code state at a specific time, accounting for pause/resume events
   const getCodeAtTime = useCallback(
     (time: number): string => {
       const events = sortedCodeEvents.current;
+      const audioEvents = sortedAudioEvents.current;
       let code = session.initialCode;
 
+      // For sessions with audio events, we need to calculate effective time
+      // For sessions without audio events, use time directly
+      let effectiveTime = time;
+
+      if (audioEvents && audioEvents.length > 0) {
+        let pausedDuration = 0;
+        let currentPauseStart = 0;
+        let isPaused = false;
+
+        // Process audio events to calculate effective time
+        for (const audioEvent of audioEvents) {
+          if (audioEvent.timestamp > time) break;
+
+          if (audioEvent.type === "pause") {
+            currentPauseStart = audioEvent.timestamp;
+            isPaused = true;
+          } else if (audioEvent.type === "resume" && isPaused) {
+            pausedDuration += audioEvent.timestamp - currentPauseStart;
+            isPaused = false;
+          }
+        }
+
+        // If we're currently in a paused section, add that to paused duration
+        if (isPaused && currentPauseStart > 0) {
+          pausedDuration += time - currentPauseStart;
+        }
+
+        effectiveTime = time - pausedDuration;
+      }
+
+      // Find the latest code event that should be applied at this effective time
       for (let i = 0; i < events.length; i++) {
         const event = events[i];
-        if (event.timestamp <= time && event.data) {
+        if (event.timestamp <= effectiveTime && event.data) {
           code = event.data;
         } else {
           break;
