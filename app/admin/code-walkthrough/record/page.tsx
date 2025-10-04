@@ -94,13 +94,13 @@ export default function CodeWalkthroughRecordPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="space-y-8">
-        <div className="text-center">
+        {/* <div className="text-center">
           <h1 className="text-3xl font-bold mb-2">Record Code Walkthrough</h1>
           <p className="text-muted-foreground">
             Create professional code walkthroughs with synchronized audio and
             code changes
           </p>
-        </div>
+        </div> */}
 
         {/* Audio Recorder */}
         <div className="bg-card rounded-lg border p-6">

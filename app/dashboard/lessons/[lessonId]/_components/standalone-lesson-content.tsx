@@ -1,22 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { tryCatch } from "@/hooks/try-catch";
-import { markLessonComplete } from "@/app/dashboard/[slug]/[lessonId]/actions";
-import { toast } from "sonner";
+import { useState } from "react";
 import { StandaloneLessonContentType } from "@/app/data/lesson/get-standalone-lesson-content";
-import { useOptimistic } from "react";
+// import { useOptimistic } from "react";
 
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import {
-  BookIcon,
-  CheckCircle,
-  ChevronDown,
-  XCircle,
-  ArrowLeft,
-} from "lucide-react";
-import { HeartButton } from "@/components/ui/heart-button";
+import { BookIcon, ChevronDown, ArrowLeft } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -27,18 +17,42 @@ import { AudioPlayback } from "@/components/audio-code-walkthrough";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+
+// const getLanguageColor = (language: string) => {
+//   return (
+//     languageColors[language.toLowerCase()] ||
+//     "bg-gray-500/10 text-gray-700 border-gray-500/20"
+//   );
+// };
+
+const formatDurationInMinutes = (seconds: number) => {
+  if (seconds < 60) {
+    const roundedSeconds = Math.round(seconds);
+    return `${roundedSeconds} second${roundedSeconds !== 1 ? "s" : ""}`;
+  }
+  const minutes = Math.round(seconds / 60);
+  return `${minutes} minute${minutes !== 1 ? "s" : ""}`;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const calculateWalkthroughDuration = (walkthrough: any) => {
+  if (!walkthrough.steps || walkthrough.steps.length === 0) return 5; // Default 5 seconds
+  const lastStep = walkthrough.steps[walkthrough.steps.length - 1];
+  return Math.max(lastStep.timestamp, 1); // At least 1 second
+};
 
 interface Props {
   data: StandaloneLessonContentType;
 }
 
 export function StandaloneLessonContent({ data }: Props) {
-  const [pending, startTransition] = useTransition();
-  const initialIsCompleted =
-    data.lessonProgress.length > 0 && data.lessonProgress[0].completed;
+  // const [, startTransition] = useTransition();
+  // const initialIsCompleted =
+  //   data.lessonProgress.length > 0 && data.lessonProgress[0].completed;
 
-  const [optimisticIsCompleted, setOptimisticIsCompleted] =
-    useOptimistic(initialIsCompleted);
+  // const [optimisticIsCompleted, setOptimisticIsCompleted] =
+  //   useOptimistic(initialIsCompleted);
 
   const VideoPlayer = ({
     thumbnailKey,
@@ -77,41 +91,41 @@ export function StandaloneLessonContent({ data }: Props) {
     );
   };
 
-  const onSubmit = () => {
-    startTransition(async () => {
-      setOptimisticIsCompleted(!optimisticIsCompleted);
-      const currentToastId = toast.loading(
-        `Marking lesson as ${
-          optimisticIsCompleted ? "incomplete" : "complete"
-        }...`
-      );
+  // const onSubmit = () => {
+  //   startTransition(async () => {
+  //     setOptimisticIsCompleted(!optimisticIsCompleted);
+  //     const currentToastId = toast.loading(
+  //       `Marking lesson as ${
+  //         optimisticIsCompleted ? "incomplete" : "complete"
+  //       }...`
+  //     );
 
-      const { data: result, error } = await tryCatch(
-        markLessonComplete(data.id, data.chapter?.course.slug ?? "")
-      );
+  //     const { data: result, error } = await tryCatch(
+  //       markLessonComplete(data.id, data.chapter?.course.slug ?? "")
+  //     );
 
-      if (error) {
-        toast.error(
-          "An unexpected error occurred while marking the lesson as complete",
-          { id: currentToastId }
-        );
-        setOptimisticIsCompleted(initialIsCompleted);
-        return;
-      }
+  //     if (error) {
+  //       toast.error(
+  //         "An unexpected error occurred while marking the lesson as complete",
+  //         { id: currentToastId }
+  //       );
+  //       setOptimisticIsCompleted(initialIsCompleted);
+  //       return;
+  //     }
 
-      if (result?.status === "success") {
-        toast.success(
-          `Lesson marked as ${
-            optimisticIsCompleted ? "incomplete" : "complete"
-          }`,
-          { id: currentToastId }
-        );
-      } else if (result?.status === "error") {
-        toast.error(result.message, { id: currentToastId });
-        setOptimisticIsCompleted(initialIsCompleted);
-      }
-    });
-  };
+  //     if (result?.status === "success") {
+  //       toast.success(
+  //         `Lesson marked as ${
+  //           optimisticIsCompleted ? "incomplete" : "complete"
+  //         }`,
+  //         { id: currentToastId }
+  //       );
+  //     } else if (result?.status === "error") {
+  //       toast.error(result.message, { id: currentToastId });
+  //       setOptimisticIsCompleted(initialIsCompleted);
+  //     }
+  //   });
+  // };
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -131,7 +145,7 @@ export function StandaloneLessonContent({ data }: Props) {
           videoKey={data.videoKey ?? ""}
         />
 
-        <div className="flex justify-between items-center border-b pb-4">
+        {/* <div className="flex justify-between items-center border-b pb-4">
           <div className="py-4">
             {data.lessonProgress.length > 0 &&
             data.lessonProgress[0].completed ? (
@@ -153,20 +167,22 @@ export function StandaloneLessonContent({ data }: Props) {
               console.log(count);
             }}
           />
-        </div>
-
-        {data.walkthroughs && data.walkthroughs.length > 0 && (
-          <LessonCodeWalkthrough data={data} />
-        )}
-
+        </div> */}
         <div className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             {data.title}
           </h1>
+
           {data.description && (
             <RenderDescription json={JSON.parse(data.description)} />
           )}
         </div>
+
+        <div className="border-b" />
+
+        {data.walkthroughs && data.walkthroughs.length > 0 && (
+          <LessonCodeWalkthrough data={data} />
+        )}
       </div>
     </div>
   );
@@ -179,55 +195,94 @@ function LessonCodeWalkthrough({ data }: Props) {
   return (
     <>
       {data.walkthroughs && data.walkthroughs.length > 0 && (
-        <div className="mt-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
+        <div className="mt-8">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">
               Interactive Code Walkthroughs
             </h2>
+            <p className="text-muted-foreground">
+              {data.walkthroughs.length} walkthrough
+              {data.walkthroughs.length > 1 ? "s" : ""} available
+            </p>
           </div>
-          {data.walkthroughs.map((lw, idx) => (
-            <Collapsible
-              key={lw.id}
-              open={openIndex === idx}
-              onOpenChange={(open) => setOpenIndex(open ? idx : null)}
-              className="dark:bg-accent/40 bg-accent rounded mb-2"
-            >
-              <CollapsibleTrigger
-                className={cn(
-                  "w-full flex items-center rounded justify-between px-4 py-2 text-left font-semibold bg-muted hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-                  openIndex === idx &&
-                    "bg-primary/10 hover:text-primary hover:bg-primary/20 hover:rounded hover:rounded-b-none rounded dark:bg-accent dark:text-accent-foreground text-primary border-t-accent-foreground rounded-b-none"
-                )}
+
+          <div className="space-y-4">
+            {data.walkthroughs.map((lw, idx) => (
+              <div
+                key={lw.id}
+                className="group border border-border rounded-lg overflow-hidden bg-card shadow-sm hover:shadow-md transition-all duration-200"
               >
-                <span>{lw.walkthrough.name}</span>
-                <ChevronDown
-                  className={`ml-2 size-5 text-bg-accent-foreground transition-transform duration-200 ${
-                    openIndex === idx ? "rotate-180" : "rotate-0"
-                  }`}
-                  aria-hidden="true"
-                />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="">
-                {lw.walkthrough.description && (
-                  <>
-                    <div className="text-muted-foreground p-4 text-sm">
-                      {lw.walkthrough.description}
+                <Collapsible
+                  open={openIndex === idx}
+                  onOpenChange={(open) => setOpenIndex(open ? idx : null)}
+                >
+                  <CollapsibleTrigger
+                    className={cn(
+                      "w-full flex items-center justify-between p-6 text-left hover:bg-muted/50 transition-colors duration-200",
+                      openIndex === idx && "bg-muted/30 border-b border-border"
+                    )}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold text-sm">
+                        {lw.position || idx + 1}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                            {lw.walkthrough.name}
+                          </h3>
+                          {/* <Badge
+                            variant="secondary"
+                            className={`text-xs ${getLanguageColor(
+                              lw.walkthrough?.language || "python"
+                            )}`}
+                          >
+                            {capitalizeFirstLetterInWord(
+                              lw.walkthrough.language || "python"
+                            )}
+                          </Badge> */}
+                        </div>
+                        {lw.walkthrough.description && (
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
+                            {lw.walkthrough.description}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </>
-                )}
-                <AudioPlayback
-                  recording={convertWalkthroughToAudioRecording(
-                    lw.walkthrough,
-                    getAudioUrl(lw.walkthrough.audioKey)
-                  )}
-                />
-              </CollapsibleContent>
-            </Collapsible>
-          ))}
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        Duration:{" "}
+                        {formatDurationInMinutes(
+                          calculateWalkthroughDuration(lw.walkthrough)
+                        )}
+                      </Badge>
+                      <ChevronDown
+                        className={cn(
+                          "size-5 text-muted-foreground transition-transform duration-200",
+                          openIndex === idx && "rotate-180"
+                        )}
+                      />
+                    </div>
+                  </CollapsibleTrigger>
+
+                  <CollapsibleContent>
+                    <>
+                      <div className="border border-border rounded-none overflow-hidden bg-background">
+                        <AudioPlayback
+                          recording={convertWalkthroughToAudioRecording(
+                            lw.walkthrough,
+                            getAudioUrl(lw.walkthrough.audioKey)
+                          )}
+                        />
+                      </div>
+                    </>
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            ))}
+          </div>
         </div>
       )}
-
-      <div className="border-b pb-4 pt-2" />
     </>
   );
 }

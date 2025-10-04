@@ -74,6 +74,27 @@ export const lessonSchema = z.object({
   walkthroughIds: z.string().array().optional(),
 });
 
+export const lessonUpdateSchema = z.object({
+  title: z.string().min(3, { message: "Title must be at least 3 characters" }),
+  chapterId: z
+    .string()
+    .uuid({ message: "Invalid chapter ID" })
+    .min(1, { message: "Chapter is required" })
+    .optional(),
+  courseId: z
+    .string()
+    .uuid({ message: "Invalid course ID" })
+    .min(1, { message: "Course is required" })
+    .optional(),
+  description: z
+    .string()
+    .min(3, { message: "Description must be at least 3 characters" })
+    .optional(),
+  videoKey: z.string().optional(),
+  thumbnailKey: z.string().optional(),
+  walkthroughIds: z.string().array().optional(),
+});
+
 export const standaloneLessonSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
@@ -127,6 +148,7 @@ export const updateCodeSnippetSchema = z.object({
 export type CourseSchemaType = z.infer<typeof courseSchema>;
 export type ChapterSchemaType = z.infer<typeof chapterSchema>;
 export type LessonSchemaType = z.infer<typeof lessonSchema>;
+export type LessonUpdateSchemaType = z.infer<typeof lessonUpdateSchema>;
 export type StandaloneLessonSchemaType = z.infer<typeof standaloneLessonSchema>;
 export type CreateCodeSnippetSchemaType = z.infer<
   typeof createCodeSnippetSchema

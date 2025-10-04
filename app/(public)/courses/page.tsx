@@ -3,7 +3,7 @@ import { PublicCourseCard } from "../_components/public-course-card";
 
 export default function PublicCoursesPage() {
   return (
-    <>
+    <div className="pb-10">
       <div className="flex flex-col space-y-2 mb-10">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tighter">
           Explore Courses
@@ -15,7 +15,7 @@ export default function PublicCoursesPage() {
       </div>
 
       <RenderCourses />
-    </>
+    </div>
   );
 }
 

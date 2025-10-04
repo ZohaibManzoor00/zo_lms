@@ -10,7 +10,7 @@ export function ThumbnailImageClient({ thumbnail, title }: Props) {
   const thumbnailUrl = useConstructUrl(thumbnail);
   return (
     <Image
-      src={thumbnailUrl}
+      src={thumbnail ? thumbnailUrl : "/placeholder-lesson-thumbnail.jpg"}
       alt={title}
       fill
       className="object-cover"

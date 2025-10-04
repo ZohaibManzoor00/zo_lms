@@ -20,7 +20,7 @@ export default function ThemeElectricBorder({
   customColor,
   speed = 1,
   chaos = 1,
-  thickness = 2,
+  thickness = 1.5,
   className,
   style,
 }: ThemeElectricBorderProps) {

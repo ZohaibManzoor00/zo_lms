@@ -6,7 +6,7 @@ export default async function PublicLessonsPage() {
   const lessons = await getAllLessons();
 
   return (
-    <>
+    <div className="pb-10">
       <div className="flex flex-col space-y-2 mb-10">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tighter">
           Explore Lessons
@@ -25,12 +25,12 @@ export default async function PublicLessonsPage() {
           href="/courses"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {lessons.map((lesson) => (
-            <PublicLessonCard key={lesson.id} data={lesson} />
+            <PublicLessonCard key={lesson.id} data={lesson} isPublic={true} />
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 }

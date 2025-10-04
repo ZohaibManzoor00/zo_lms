@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { lessonSchema, LessonSchemaType } from "@/lib/zod-schemas";
+import { lessonUpdateSchema, LessonUpdateSchemaType } from "@/lib/zod-schemas";
 import { AdminLessonType } from "@/app/data/admin/admin-get-lesson";
 import { updateLesson } from "../actions";
 import { tryCatch } from "@/hooks/try-catch";
@@ -65,8 +65,8 @@ export function LessonForm({
 }: Props) {
   const [pending, startTransition] = useTransition();
 
-  const createLessonForm = useForm<LessonSchemaType>({
-    resolver: zodResolver(lessonSchema),
+  const createLessonForm = useForm<LessonUpdateSchemaType>({
+    resolver: zodResolver(lessonUpdateSchema),
     defaultValues: {
       title: lesson.title,
       chapterId,
@@ -90,7 +90,9 @@ export function LessonForm({
   const [previewId, setPreviewId] = useState<string | null>(null);
   const getAudioUrl = useConstructUrl;
 
-  const onSubmit = (values: LessonSchemaType) => {
+  const onSubmit = (values: LessonUpdateSchemaType) => {
+    console.log("🎯 onSubmit called with values:", values);
+    console.log("values", values);
     startTransition(async () => {
       const { data: result, error } = await tryCatch(
         updateLesson({ formData: values, lessonId: lesson.id })
@@ -128,7 +130,25 @@ export function LessonForm({
                 Preview User View
               </Link>
               {createLessonForm.formState.isDirty ? (
-                <Button type="submit" disabled={pending} size="sm">
+                <Button
+                  type="button"
+                  disabled={pending}
+                  size="sm"
+                  onClick={() => {
+                    console.log("Button clicked!");
+                    console.log(
+                      "Form is dirty:",
+                      createLessonForm.formState.isDirty
+                    );
+                    console.log(
+                      "Form errors:",
+                      createLessonForm.formState.errors
+                    );
+                    console.log("Form values:", createLessonForm.getValues());
+                    console.log("About to call handleSubmit...");
+                    createLessonForm.handleSubmit(onSubmit)();
+                  }}
+                >
                   {pending ? "Saving..." : "Save Changes"}
                 </Button>
               ) : (

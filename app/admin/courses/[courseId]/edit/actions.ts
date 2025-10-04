@@ -219,20 +219,31 @@ export const createLesson = async (
     }
 
     await prisma.$transaction(async (tx) => {
-      const maxPosition = await tx.lesson.findFirst({
+      // Get max position for lessons in this chapter (via junction table)
+      const maxPosition = await tx.chapterLesson.findFirst({
         where: { chapterId: result.data.chapterId },
         select: { position: true },
         orderBy: { position: "desc" },
       });
 
-      await tx.lesson.create({
+      // Create the lesson
+      const lesson = await tx.lesson.create({
         data: {
           title: result.data.title,
           description: result.data.description,
           videoKey: result.data.videoKey,
           thumbnailKey: result.data.thumbnailKey,
-          position: (maxPosition?.position ?? 0) + 1,
+          position: (maxPosition?.position ?? 0) + 1, // Keep for backward compatibility
+          chapterId: result.data.chapterId, // Keep old relationship for now
+        },
+      });
+
+      // Create junction table relationship
+      await tx.chapterLesson.create({
+        data: {
           chapterId: result.data.chapterId,
+          lessonId: lesson.id,
+          position: (maxPosition?.position ?? 0) + 1,
         },
       });
     });
@@ -241,12 +252,12 @@ export const createLesson = async (
 
     return {
       status: "success",
-      message: "Chapter created successfully",
+      message: "Lesson created successfully",
     };
   } catch {
     return {
       status: "error",
-      message: "Failed to create chapter",
+      message: "Failed to create lesson",
     };
   }
 };
@@ -266,17 +277,28 @@ export const createChapter = async (
     }
 
     await prisma.$transaction(async (tx) => {
-      const maxPosition = await tx.chapter.findFirst({
+      // Get max position for chapters in this course (via junction table)
+      const maxPosition = await tx.courseChapter.findFirst({
         where: { courseId: result.data.courseId },
         select: { position: true },
         orderBy: { position: "desc" },
       });
 
-      await tx.chapter.create({
+      // Create the chapter
+      const chapter = await tx.chapter.create({
         data: {
           title: result.data.title,
-          position: (maxPosition?.position ?? 0) + 1,
+          position: (maxPosition?.position ?? 0) + 1, // Keep for backward compatibility
+          courseId: result.data.courseId, // Keep old relationship for now
+        },
+      });
+
+      // Create junction table relationship
+      await tx.courseChapter.create({
+        data: {
           courseId: result.data.courseId,
+          chapterId: chapter.id,
+          position: (maxPosition?.position ?? 0) + 1,
         },
       });
     });

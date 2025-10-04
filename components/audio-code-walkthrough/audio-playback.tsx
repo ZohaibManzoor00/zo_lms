@@ -1,8 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Play,
   Pause,
@@ -15,7 +14,6 @@ import {
   RotateCcw,
   Gauge,
 } from "lucide-react";
-import { languageColors } from "@/app/(public)/_components/code-snippet-card";
 import Editor from "@monaco-editor/react";
 import { useAudioCodePlayback } from "@/hooks/use-audio-code-playback-v2";
 
@@ -41,12 +39,12 @@ interface AudioPlaybackProps {
   recording: AudioRecording;
 }
 
-const getLanguageColor = (language: string) => {
-  return (
-    languageColors[language.toLowerCase()] ||
-    "bg-gray-500/10 text-gray-700 border-gray-500/20"
-  );
-};
+// const getLanguageColor = (language: string) => {
+//   return (
+//     languageColors[language.toLowerCase()] ||
+//     "bg-gray-500/10 text-gray-700 border-gray-500/20"
+//   );
+// };
 
 export function AudioPlayback({ recording }: AudioPlaybackProps) {
   const {
@@ -89,16 +87,16 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
   return (
     <div
       className={`transition-all duration-300 ${
-        isFullscreen ? "fixed inset-0 z-50 bg-background p-4" : ""
+        isFullscreen ? "fixed inset-0 z-50 bg-background p-4" : "rounded-none"
       }`}
     >
       <Card
-        className={`border-0 shadow-lg overflow-hidden py-0 gap-0 pb-0 ${
-          isFullscreen ? "w-full h-full rounded-xl flex flex-col" : "rounded-xl"
+        className={`border-0 shadow-lg overflow-hidden py-0 gap-0 rounded-none pb-0 ${
+          isFullscreen && "w-full h-full rounded-xl flex flex-col"
         }`}
       >
         {/* Header */}
-        <CardHeader className="bg-gradient-to-r pt-2 from-primary/5 to-transparent border-b [.border-b]:pb-0">
+        {/* <CardHeader className="bg-gradient-to-r pt-2 from-primary/5 to-transparent border-b [.border-b]:pb-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CardTitle className="text-lg">{recording.id}</CardTitle>
@@ -108,16 +106,10 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
                   recording.language || "python"
                 )}`}
               >
-                {recording.language || "Python"}
+                {capitalizeFirstLetterInWord(recording.language || "python")}
               </Badge>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="font-mono text-xs">
-                {isFinite(duration)
-                  ? formatTime(duration / playbackRate)
-                  : "--:--"}{" "}
-                at {playbackRate}x
-              </Badge>
               <Button
                 variant="ghost"
                 size="sm"
@@ -145,10 +137,10 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
               </Button>
             </div>
           </div>
-        </CardHeader>
+        </CardHeader> */}
 
         <CardContent
-          className={`p-0 ${isFullscreen ? "flex-1 flex flex-col" : ""}`}
+          className={`p-0 rounded-none ${isFullscreen ? "flex-1 flex flex-col" : ""}`}
         >
           {/* Code Editor */}
           <div
@@ -262,16 +254,43 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
                 </Button>
               </div>
 
-              {/* Right: Speed */}
-              <Button
-                onClick={togglePlaybackSpeed}
-                variant="outline"
-                size="sm"
-                className="font-mono w-[75px] flex-shrink-0 justify-between"
-              >
-                <Gauge className="h-4 w-4" />
-                <span>{playbackRate}x</span>
-              </Button>
+              {/* Right: Speed and Controls */}
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={togglePlaybackSpeed}
+                  variant="outline"
+                  size="sm"
+                  className="font-mono w-[75px] flex-shrink-0 justify-between"
+                >
+                  <Gauge className="h-4 w-4" />
+                  <span>{playbackRate}x</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopyCode}
+                  className="h-8 w-8 p-0"
+                  disabled={isCopied}
+                >
+                  {isCopied ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleFullscreen}
+                  className="h-8 w-8 p-0"
+                >
+                  {isFullscreen ? (
+                    <Minimize2 className="h-4 w-4" />
+                  ) : (
+                    <Maximize2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>

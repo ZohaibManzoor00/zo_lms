@@ -11,15 +11,19 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   data: LessonType;
+  isPublic?: boolean;
 }
 
-export function PublicLessonCard({ data }: Props) {
+export function PublicLessonCard({ data, isPublic = false }: Props) {
   const thumbnailUrl = useConstructUrl(data.thumbnailKey || "");
   const hasVideo = !!data.videoKey;
   const hasWalkthrough = data.walkthroughs && data.walkthroughs.length > 0;
 
   return (
-    <Link href={`/dashboard/lessons/${data.id}`} className="group">
+    <Link
+      href={isPublic ? `/lessons/${data.id}` : `/dashboard/lessons/${data.id}`}
+      className="group"
+    >
       <Card className="group relative py-0 gap-0 hover:scale-[1.02] transition-all duration-300 !border-2 !border-border dark:!border-muted-foreground/30 hover:!border-primary/60 dark:hover:!border-primary/70 shadow-lg hover:shadow-xl">
         <Image
           src={

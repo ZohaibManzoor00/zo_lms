@@ -39,7 +39,7 @@ export function convertWalkthroughToAudioRecording(
     initialCode,
     finalCode,
     createdAt: new Date(walkthrough.createdAt),
-    language: "python", // Default language
+    // language: walkthrough.language || "python", // Use actual language from database
     // Add custom property for the URL
     audioUrl,
   } as AudioRecording & { audioUrl: string };

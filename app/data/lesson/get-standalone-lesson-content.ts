@@ -49,6 +49,7 @@ export const getStandaloneLessonContent = async (lessonId: string) => {
               name: true,
               description: true,
               audioKey: true,
+              // language: true,
               createdAt: true,
               updatedAt: true,
               steps: {

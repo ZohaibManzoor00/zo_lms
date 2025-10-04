@@ -35,7 +35,7 @@ export default async function SlugPage({ params }: Params) {
   const isEnrolled = await checkIfCourseBought(course.id);
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mt-5">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 my-5">
       <div className="order-1 lg:col-span-2">
         <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-lg">
           <ThumbnailImageClient

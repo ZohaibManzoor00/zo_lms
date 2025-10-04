@@ -19,7 +19,6 @@ export function ClientResourceItem({ item }: { item: ResourceItemType }) {
       colorTheme="primary"
       speed={1}
       chaos={0.3}
-      thickness={3}
       style={{ borderRadius: 16 }}
       className="hover:scale-[1.02] transition-all duration-300"
     >
@@ -57,7 +56,6 @@ export function ClientResourceItemSkeleton() {
       colorTheme="accent"
       speed={1}
       chaos={0.3}
-      thickness={3}
       style={{ borderRadius: 16 }}
       className="hover:scale-[1.02] transition-all duration-300"
     >

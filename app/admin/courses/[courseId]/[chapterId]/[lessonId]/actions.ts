@@ -3,10 +3,10 @@
 import { requireAdmin } from "@/app/data/admin/require-admin";
 import { prisma } from "@/lib/db";
 import { ApiResponse } from "@/lib/types";
-import { lessonSchema, LessonSchemaType } from "@/lib/zod-schemas";
+import { lessonUpdateSchema, LessonUpdateSchemaType } from "@/lib/zod-schemas";
 
 interface Props {
-  formData: LessonSchemaType;
+  formData: LessonUpdateSchemaType;
   lessonId: string;
 }
 
@@ -17,7 +17,7 @@ export const updateLesson = async ({
   await requireAdmin();
 
   try {
-    const result = lessonSchema.safeParse(formData);
+    const result = lessonUpdateSchema.safeParse(formData);
 
     if (!result.success) {
       return {

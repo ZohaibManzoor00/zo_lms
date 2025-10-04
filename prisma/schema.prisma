@@ -110,6 +110,9 @@ model Course {
   chapter    Chapter[]
   enrollment Enrollment[]
 
+  // Junction table relationships (testing alongside existing relationships)
+  courseChapters CourseChapter[]
+
   @@index([status])
 }
 
@@ -139,6 +142,10 @@ model Chapter {
 
   lesson Lesson[]
 
+  // Junction table relationships (testing alongside existing relationships)
+  courseChapters CourseChapter[]
+  chapterLessons ChapterLesson[]
+
   @@index([courseId, position])
 }
 
@@ -161,6 +168,9 @@ model Lesson {
   lessonProgress LessonProgress[]
   walkthroughs   LessonWalkthrough[]
   codeSnippets   LessonCodeSnippet[]
+
+  // Junction table relationships (testing alongside existing relationships)
+  chapterLessons ChapterLesson[]
 
   @@index([chapterId, position])
   @@index([position])
@@ -285,4 +295,43 @@ model LessonCodeSnippet {
   @@unique([lessonId, snippetId])
   @@index([lessonId])
   @@index([snippetId])
+}
+
+// Junction Tables for Many-to-Many Relationships
+// These are added alongside existing relationships for testing
+
+model CourseChapter {
+  id String @id @default(uuid())
+
+  course    Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId  String
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  chapterId String
+
+  position Int // Position of chapter within this course
+
+  createdAt DateTime @default(now())
+
+  @@unique([courseId, chapterId])
+  @@unique([courseId, position]) // Ensure unique positions per course
+  @@index([courseId])
+  @@index([chapterId])
+}
+
+model ChapterLesson {
+  id String @id @default(uuid())
+
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  chapterId String
+  lesson    Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId  String
+
+  position Int // Position of lesson within this chapter
+
+  createdAt DateTime @default(now())
+
+  @@unique([chapterId, lessonId])
+  @@unique([chapterId, position]) // Ensure unique positions per chapter
+  @@index([chapterId])
+  @@index([lessonId])
 }
