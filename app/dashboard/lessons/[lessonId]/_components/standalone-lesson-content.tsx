@@ -6,7 +6,7 @@ import { StandaloneLessonContentType } from "@/app/data/lesson/get-standalone-le
 
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import { BookIcon, ChevronDown, ArrowLeft } from "lucide-react";
+import { BookIcon, ChevronDown } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -15,8 +15,6 @@ import {
 import { convertWalkthroughToAudioRecording } from "@/lib/convert-walkthrough-to-audio-recording";
 import { AudioPlayback } from "@/components/audio-code-walkthrough";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 
 // const getLanguageColor = (language: string) => {
@@ -128,16 +126,16 @@ export function StandaloneLessonContent({ data }: Props) {
   // };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-background px-6">
       {/* Back to lessons navigation */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <Link href="/dashboard/lessons">
           <Button variant="ghost" className="gap-2">
             <ArrowLeft className="size-4" />
             Back to Lessons
           </Button>
         </Link>
-      </div>
+      </div> */}
 
       <div className="space-y-6">
         <VideoPlayer
@@ -283,6 +281,7 @@ function LessonCodeWalkthrough({ data }: Props) {
           </div>
         </div>
       )}
+      <div className="pt-3" />
     </>
   );
 }

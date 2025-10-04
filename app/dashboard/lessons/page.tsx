@@ -1,33 +1,31 @@
 import { getAllLessons } from "@/app/data/lesson/get-all-lessons";
-import { PublicLessonCard } from "@/app/(public)/_components/public-lesson-card";
 import { EmptyCourseState } from "@/components/general/empty-course-state";
+import { AllLessonsSidebar } from "./[lessonId]/_components/all-lessons-sidebar";
+import { SelectLessonState } from "./_components/select-lesson-state";
 
 export default async function DashboardLessonsPage() {
   const lessons = await getAllLessons();
 
+  if (lessons.length === 0) {
+    return (
+      <EmptyCourseState
+        title="No lessons available"
+        description="There are no published lessons available at the moment"
+        buttonText="Browse Courses"
+        href="/courses"
+      />
+    );
+  }
+
   return (
-    <>
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">All Lessons</h1>
-        <p className="text-muted-foreground">
-          Explore all lessons across all our courses
-        </p>
+    <div className="flex h-[calc(100vh-7rem)]">
+      <div className="border-r border-border shrink-0 overflow-y-auto">
+        <AllLessonsSidebar lessons={lessons} />
       </div>
 
-      {lessons.length === 0 ? (
-        <EmptyCourseState
-          title="No lessons available"
-          description="There are no published lessons available at the moment"
-          buttonText="Browse Courses"
-          href="/courses"
-        />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {lessons.map((lesson) => (
-            <PublicLessonCard key={lesson.id} data={lesson} />
-          ))}
-        </div>
-      )}
-    </>
+      <div className="flex-1 overflow-y-auto">
+        <SelectLessonState />
+      </div>
+    </div>
   );
 }

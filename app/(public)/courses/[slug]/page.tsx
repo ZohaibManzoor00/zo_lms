@@ -30,7 +30,11 @@ interface Params {
 export default async function SlugPage({ params }: Params) {
   const { slug } = await params;
   const course = await getCourse(slug);
-  const totalLessons = course.chapter.reduce((total, chapter) => total + chapter.lesson.length, 0) ?? 0;
+  const totalLessons =
+    course.chapter.reduce(
+      (total, chapter) => total + chapter.lesson.length,
+      0
+    ) ?? 0;
 
   const isEnrolled = await checkIfCourseBought(course.id);
 
@@ -168,9 +172,7 @@ export default async function SlugPage({ params }: Params) {
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xl font-medium">Price:</span>
                 {course.price === 0 ? (
-                  <span className="text-2xl font-bold text-primary">
-                    Free
-                  </span>
+                  <span className="text-2xl font-bold text-primary">Free</span>
                 ) : (
                   <span className="text-2xl font-bold text-primary">
                     {new Intl.NumberFormat("en-US", {
