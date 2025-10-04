@@ -28,7 +28,7 @@ type RecordingState = "idle" | "recording" | "paused" | "stopped";
 export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
   const [recordingState, setRecordingState] = useState<RecordingState>("idle");
   const [recordingTime, setRecordingTime] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  const [, setIsPaused] = useState(false);
   const [code, setCode] = useState("// Start coding here...\n");
 
   // Refs for MediaRecorder and timing
@@ -44,6 +44,7 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
   const codeEventsRef = useRef<CodeEvent[]>([]);
   const initialCodeRef = useRef<string>("");
   const lastRecordedCodeRef = useRef<string>("");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<Monaco | null>(null);
 
@@ -93,6 +94,7 @@ export function AudioRecorder({ onRecordingComplete }: AudioRecorderProps) {
   );
 
   // Handle editor mount
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditorDidMount = useCallback((editor: any, monaco: Monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;

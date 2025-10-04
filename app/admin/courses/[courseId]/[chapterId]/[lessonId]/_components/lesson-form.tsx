@@ -34,7 +34,6 @@ import { BackButton } from "@/components/ui/back-button";
 import { CodeWalkThroughModal } from "./code-walkthrough-modal";
 import { AdminWalkthroughType } from "@/app/data/admin/admin-get-walkthroughs";
 import { Pill } from "@/components/ui/pill";
-import dynamic from "next/dynamic";
 import { useConstructUrl } from "@/hooks/use-construct-url";
 import {
   Dialog,

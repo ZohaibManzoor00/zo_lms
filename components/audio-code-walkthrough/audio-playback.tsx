@@ -50,7 +50,6 @@ const getLanguageColor = (language: string) => {
 
 export function AudioPlayback({ recording }: AudioPlaybackProps) {
   const {
-    // State
     isPlaying,
     currentTime,
     duration,
@@ -59,15 +58,9 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
     progressWidth,
     isDragging,
     currentCode,
-    isUserEditing,
     isFullscreen,
     isCopied,
 
-    // Refs
-    editorRef,
-    monacoRef,
-
-    // Functions
     togglePlayPause,
     skipForward,
     skipBackward,
