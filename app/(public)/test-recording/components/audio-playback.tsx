@@ -16,7 +16,10 @@ import {
   SkipForward,
   Maximize2,
   Minimize2,
+  Copy,
+  Check,
 } from "lucide-react";
+import { toast } from "sonner";
 
 interface CodeEvent {
   timestamp: number;
@@ -33,11 +36,42 @@ interface AudioRecording {
   initialCode: string;
   finalCode: string;
   createdAt: Date;
+  language?: string; // Add language property
 }
 
 interface AudioPlaybackProps {
   recording: AudioRecording;
 }
+
+// Language color mapping (same as code snippet card)
+const languageColors: Record<string, string> = {
+  javascript: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20",
+  typescript: "bg-blue-500/10 text-blue-700 border-blue-500/20",
+  python: "bg-green-500/10 text-green-700 border-green-500/20",
+  java: "bg-orange-500/10 text-orange-700 border-orange-500/20",
+  cpp: "bg-purple-500/10 text-purple-700 border-purple-500/20",
+  c: "bg-gray-500/10 text-gray-700 border-gray-500/20",
+  rust: "bg-red-500/10 text-red-700 border-red-500/20",
+  go: "bg-cyan-500/10 text-cyan-700 border-cyan-500/20",
+  php: "bg-indigo-500/10 text-indigo-700 border-indigo-500/20",
+  ruby: "bg-red-600/10 text-red-800 border-red-600/20",
+  swift: "bg-orange-600/10 text-orange-800 border-orange-600/20",
+  kotlin: "bg-purple-600/10 text-purple-800 border-purple-600/20",
+  html: "bg-orange-400/10 text-orange-600 border-orange-400/20",
+  css: "bg-blue-400/10 text-blue-600 border-blue-400/20",
+  sql: "bg-teal-500/10 text-teal-700 border-teal-500/20",
+  bash: "bg-gray-600/10 text-gray-800 border-gray-600/20",
+  shell: "bg-gray-600/10 text-gray-800 border-gray-600/20",
+  json: "bg-green-400/10 text-green-600 border-green-400/20",
+  yaml: "bg-pink-500/10 text-pink-700 border-pink-500/20",
+};
+
+const getLanguageColor = (language: string) => {
+  return (
+    languageColors[language.toLowerCase()] ||
+    "bg-gray-500/10 text-gray-700 border-gray-500/20"
+  );
+};
 
 export function AudioPlayback({ recording }: AudioPlaybackProps) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -52,9 +86,12 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
   const [userEditedCode, setUserEditedCode] = useState<string | null>(null);
   const [isUserEditing, setIsUserEditing] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [progressWidth, setProgressWidth] = useState(0);
+  const [isCopied, setIsCopied] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Available playback speeds
-  const playbackSpeeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
+  const playbackSpeeds = [1, 1.5, 2, 2.5];
 
   // Refs
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -92,25 +129,11 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
       const audioDuration = audio.duration;
       const recordedDuration = recording.duration / 1000; // Convert to seconds
 
-      console.log("Audio loaded:", {
-        audioDuration: audioDuration,
-        recordedDuration: recordedDuration,
-        isFinite: isFinite(audioDuration),
-        isNull: audioDuration === null,
-        isNaN: isNaN(audioDuration),
-      });
-
       // Use recorded duration as fallback when audio duration is invalid
       let finalDuration = recordedDuration;
       if (isFinite(audioDuration) && audioDuration > 0) {
         // Use the recorded duration as it's more accurate for our use case
         finalDuration = recordedDuration;
-        console.log("Using recorded duration:", finalDuration);
-      } else {
-        console.log(
-          "Audio duration invalid, using recorded duration:",
-          finalDuration
-        );
       }
 
       setDuration(finalDuration);
@@ -118,11 +141,11 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
     };
 
     const handleLoadedData = () => {
-      console.log("Audio data loaded");
+      setIsLoading(false);
     };
 
     const handleCanPlay = () => {
-      console.log("Audio can play");
+      setIsLoading(false);
     };
 
     const handleError = (e: Event) => {
@@ -131,9 +154,10 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
     };
 
     const handleEnded = () => {
-      console.log("Audio ended");
       setIsPlaying(false);
-      setCurrentTime(0);
+      // Set progress to 100% when audio ends
+      setCurrentTime(duration);
+      setProgressWidth(100);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
@@ -156,25 +180,6 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
     };
   }, [audioUrl, recording.duration]);
 
-  // Update current time during playback
-  const updateTime = useCallback(() => {
-    if (audioRef.current && isPlaying && !isSeeking) {
-      const newTime = audioRef.current.currentTime;
-      setCurrentTime(newTime);
-
-      // Update code based on current time (only when not user editing)
-      if (!isUserEditing) {
-        const timeMs = newTime * 1000; // Convert to milliseconds
-        const codeAtTime = getCodeAtTime(timeMs);
-        if (codeAtTime !== currentCode) {
-          setCurrentCode(codeAtTime);
-        }
-      }
-
-      animationFrameRef.current = requestAnimationFrame(updateTime);
-    }
-  }, [isPlaying, isSeeking, currentCode, isUserEditing]);
-
   // Get code state at specific time
   const getCodeAtTime = useCallback(
     (timeMs: number): string => {
@@ -194,6 +199,94 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
     },
     [recording.initialCode]
   );
+
+  // Update current time during playback
+  const updateTime = useCallback(() => {
+    if (audioRef.current && isPlaying && !isSeeking && !isDragging) {
+      const newTime = audioRef.current.currentTime;
+      setCurrentTime(newTime);
+
+      // Calculate and update progress width (only when not dragging)
+      const newProgress = duration > 0 ? (newTime / duration) * 100 : 0;
+      setProgressWidth(newProgress);
+
+      // Update code based on current time (only when not user editing)
+      if (!isUserEditing) {
+        const timeMs = newTime * 1000; // Convert to milliseconds
+        const codeAtTime = getCodeAtTime(timeMs);
+        if (codeAtTime !== currentCode) {
+          setCurrentCode(codeAtTime);
+
+          // Auto-scroll to show the active line at 80% down from top
+          if (editorRef.current && monacoRef.current) {
+            // Find the line where the change occurred by comparing old and new code
+            const oldLines = currentCode.split("\n");
+            const newLines = codeAtTime.split("\n");
+
+            let changedLineNumber = newLines.length; // Default to last line
+
+            // Find the first line that's different
+            for (
+              let i = 0;
+              i < Math.max(oldLines.length, newLines.length);
+              i++
+            ) {
+              if (oldLines[i] !== newLines[i]) {
+                changedLineNumber = i + 1; // Monaco uses 1-based line numbers
+                break;
+              }
+            }
+
+            // If no differences found in existing lines, use the last line with content
+            if (changedLineNumber === newLines.length) {
+              // Find the last non-empty line
+              for (let i = newLines.length - 1; i >= 0; i--) {
+                if (newLines[i].trim() !== "") {
+                  changedLineNumber = i + 1;
+                  break;
+                }
+              }
+            }
+
+            // Use revealLineNearTop to position line at 80% from top
+            // This positions the line closer to the bottom while keeping context above
+            setTimeout(() => {
+              if (editorRef.current) {
+                // Custom scroll to position the changed line at 80% from top
+                const editorHeight = editorRef.current.getLayoutInfo().height;
+                const lineHeight = editorRef.current.getOption(
+                  monacoRef.current?.editor.EditorOption.lineHeight
+                );
+                const targetScrollTop = Math.max(
+                  0,
+                  (changedLineNumber - 1) * lineHeight - editorHeight * 0.8
+                );
+
+                editorRef.current.setScrollTop(targetScrollTop);
+
+                // Position cursor at end of the changed line
+                const position = {
+                  lineNumber: changedLineNumber,
+                  column: newLines[changedLineNumber - 1]?.length + 1 || 1,
+                };
+                editorRef.current.setPosition(position);
+              }
+            }, 50);
+          }
+        }
+      }
+
+      animationFrameRef.current = requestAnimationFrame(updateTime);
+    }
+  }, [
+    isPlaying,
+    isSeeking,
+    isDragging,
+    currentCode,
+    isUserEditing,
+    getCodeAtTime,
+    duration,
+  ]);
 
   // Handle editor mount
   const handleEditorDidMount = useCallback((editor: any, monaco: Monaco) => {
@@ -256,7 +349,6 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
       audioRef.current.playbackRate = playbackRate;
       await audioRef.current.play();
       setIsPlaying(true);
-      console.log("Audio playing at", playbackRate + "x speed");
     } catch (error) {
       console.error("Error playing audio:", error);
     }
@@ -268,7 +360,6 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
 
     audioRef.current.pause();
     setIsPlaying(false);
-    console.log("Audio paused");
   }, []);
 
   // Stop audio
@@ -278,11 +369,11 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
     setCurrentTime(0);
+    setProgressWidth(0);
     setCurrentCode(recording.initialCode); // Reset to initial code
     setIsPlaying(false);
     setIsUserEditing(false);
     setUserEditedCode(null);
-    console.log("Audio stopped");
   }, [recording.initialCode]);
 
   // Seek to specific time
@@ -296,26 +387,18 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
       audioRef.current.playbackRate = playbackRate;
       setCurrentTime(targetTime);
 
-      // Update code to match the seeked time
+      // Update progress and code to match the seeked time
+      const newProgress = duration > 0 ? (targetTime / duration) * 100 : 0;
+      setProgressWidth(newProgress);
       const timeMs = targetTime * 1000;
       const codeAtTime = getCodeAtTime(timeMs);
       setCurrentCode(codeAtTime);
-
-      console.log(
-        "Seeked to:",
-        targetTime,
-        "Duration:",
-        duration,
-        "Speed:",
-        playbackRate + "x"
-      );
     },
     [duration, playbackRate, getCodeAtTime]
   );
 
   // Handle slider change start (when user starts dragging)
   const handleSliderChangeStart = useCallback(() => {
-    console.log("Seeking started, isPlaying:", isPlaying);
     setWasPlayingBeforeSeek(isPlaying);
     setIsSeeking(true);
 
@@ -337,7 +420,6 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
 
   // Handle slider change end (when user releases)
   const handleSliderChangeEnd = useCallback(() => {
-    console.log("Seeking ended, wasPlaying:", wasPlayingBeforeSeek);
     setIsSeeking(false);
 
     if (wasPlayingBeforeSeek) {
@@ -360,8 +442,6 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
     if (audioRef.current) {
       audioRef.current.playbackRate = nextSpeed;
     }
-
-    console.log("Playback speed changed to:", nextSpeed + "x");
   }, [playbackRate, playbackSpeeds]);
 
   // Skip functions
@@ -384,6 +464,111 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
     setIsFullscreen(!isFullscreen);
   }, [isFullscreen]);
 
+  // Copy code functionality
+  const handleCopyCode = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(currentCode);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 1500);
+    } catch {
+      toast.error("Failed to copy code");
+    }
+  }, [currentCode]);
+
+  // Progress bar dragging handlers
+  const handleProgressMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      setIsDragging(true);
+      setWasPlayingBeforeSeek(isPlaying);
+      setIsSeeking(true);
+      if (isPlaying) {
+        pause();
+      }
+
+      // Handle initial click/drag position
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percentage = (clickX / rect.width) * 100;
+      const newTime = (percentage / 100) * duration;
+      if (isFinite(newTime)) {
+        seekTo(newTime);
+        setProgressWidth(percentage);
+      }
+    },
+    [isPlaying, pause, duration, seekTo]
+  );
+
+  const handleProgressMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isDragging) return;
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const moveX = e.clientX - rect.left;
+      const percentage = Math.max(0, Math.min(100, (moveX / rect.width) * 100));
+      const newTime = (percentage / 100) * duration;
+
+      if (isFinite(newTime)) {
+        seekTo(newTime);
+        setProgressWidth(percentage);
+      }
+    },
+    [isDragging, duration, seekTo]
+  );
+
+  const handleProgressMouseUp = useCallback(() => {
+    if (!isDragging) return;
+
+    setIsDragging(false);
+    setIsSeeking(false);
+
+    if (wasPlayingBeforeSeek) {
+      setTimeout(() => {
+        play();
+      }, 50);
+    }
+  }, [isDragging, wasPlayingBeforeSeek, play]);
+
+  // Global mouse event listeners for dragging
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      const progressBar = document.querySelector(
+        "[data-progress-bar]"
+      ) as HTMLElement;
+      if (!progressBar) return;
+
+      const rect = progressBar.getBoundingClientRect();
+      const moveX = e.clientX - rect.left;
+      const percentage = Math.max(0, Math.min(100, (moveX / rect.width) * 100));
+      const newTime = (percentage / 100) * duration;
+
+      if (isFinite(newTime)) {
+        seekTo(newTime);
+        setProgressWidth(percentage);
+      }
+    };
+
+    const handleGlobalMouseUp = () => {
+      setIsDragging(false);
+      setIsSeeking(false);
+
+      if (wasPlayingBeforeSeek) {
+        setTimeout(() => {
+          play();
+        }, 50);
+      }
+    };
+
+    document.addEventListener("mousemove", handleGlobalMouseMove);
+    document.addEventListener("mouseup", handleGlobalMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+      document.removeEventListener("mouseup", handleGlobalMouseUp);
+    };
+  }, [isDragging, duration, seekTo, wasPlayingBeforeSeek, play]);
+
   // Toggle play/pause
   const togglePlayPause = useCallback(() => {
     if (isPlaying) {
@@ -405,9 +590,6 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
     );
   }
 
-  const progress =
-    duration > 0 && isFinite(duration) ? (currentTime / duration) * 100 : 0;
-
   return (
     <div
       className={`transition-all duration-300 ${
@@ -415,26 +597,49 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
       }`}
     >
       <Card
-        className={`border-0 shadow-lg overflow-hidden ${
+        className={`border-0 shadow-lg overflow-hidden py-0 gap-0 pb-0 ${
           isFullscreen ? "w-full h-full rounded-xl flex flex-col" : "rounded-xl"
         }`}
       >
         {/* Header */}
-        <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b">
+        <CardHeader className="bg-gradient-to-r pt-2 from-primary/5 to-transparent border-b [.border-b]:pb-0">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold">
-              Code Walkthrough
-            </CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-lg">{recording.id}</CardTitle>
+              <Badge
+                variant="secondary"
+                className={`text-xs ${getLanguageColor(
+                  recording.language || "python"
+                )}`}
+              >
+                {recording.language || "Python"}
+              </Badge>
+            </div>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="font-mono text-xs">
-                {formatTime(currentTime)} /{" "}
-                {isFinite(duration) ? formatTime(duration) : "--:--"}
+                {isFinite(duration)
+                  ? formatTime(duration / playbackRate)
+                  : "--:--"}{" "}
+                at {playbackRate}x
               </Badge>
-              {!isPlaying && (
+              {/* {!isPlaying && (
                 <Badge variant="secondary" className="text-xs">
                   {isUserEditing ? "Editing" : "Paused"}
                 </Badge>
-              )}
+              )} */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopyCode}
+                className="h-8 w-8 p-0"
+                disabled={isCopied}
+              >
+                {isCopied ? (
+                  <Check className="h-4 w-4 text-green-600" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -456,7 +661,9 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
         >
           {/* Code Editor */}
           <div
-            className={`w-full border-b ${isFullscreen ? "flex-1" : "h-96"}`}
+            className={`w-full ${
+              isFullscreen ? "h-[calc(100vh-180px)]" : "h-96"
+            } relative`}
           >
             <Editor
               height="100%"
@@ -478,37 +685,55 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
                   "'JetBrains Mono', 'Fira Code', 'Consolas', monospace",
               }}
             />
+
+            {/* Integrated Progress Bar */}
+            <div
+              data-progress-bar
+              className="absolute bottom-0 left-0 right-0 h-1 bg-border/50 cursor-pointer group hover:h-3 transition-all duration-200 z-10"
+              onMouseDown={handleProgressMouseDown}
+              onMouseMove={(e) => {
+                if (!isDragging) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const hoverX = e.clientX - rect.left;
+                  const percentage = (hoverX / rect.width) * 100;
+                  const hoverTime = (percentage / 100) * duration;
+                  e.currentTarget.title = `Seek to ${formatTime(hoverTime)}`;
+                }
+              }}
+            >
+              {/* Progress Fill */}
+              <div
+                className="h-full bg-primary relative"
+                style={{
+                  width: `${Math.max(0, Math.min(100, progressWidth))}%`,
+                  transition: isSeeking ? "none" : "none",
+                }}
+              >
+                {/* Progress Handle - only visible on hover */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 -mr-1.5 shadow-lg border-2 border-background" />
+              </div>
+
+              {/* Time indicators on hover */}
+              <div className="absolute -top-8 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs bg-black/90 text-white px-2 py-1 rounded pointer-events-none">
+                {formatTime(currentTime / playbackRate)}
+              </div>
+              <div className="absolute -top-8 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs bg-black/90 text-white px-2 py-1 rounded pointer-events-none">
+                {isFinite(duration)
+                  ? formatTime(duration / playbackRate)
+                  : "--:--"}
+              </div>
+            </div>
           </div>
 
           {/* Controls */}
           <div
             className={`p-4 bg-muted/20 ${isFullscreen ? "flex-shrink-0" : ""}`}
           >
-            {/* Progress Bar */}
-            <div className="space-y-2 mb-4">
-              <Slider
-                value={[progress]}
-                max={100}
-                step={0.1}
-                onValueChange={handleSliderChange}
-                onValueCommit={handleSliderChangeEnd}
-                onPointerDown={handleSliderChangeStart}
-                className="w-full"
-                disabled={!isFinite(duration) || duration <= 0}
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>0:00</span>
-                <span>
-                  {isFinite(duration) ? formatTime(duration) : "--:--"}
-                </span>
-              </div>
-            </div>
-
             {/* Control Buttons */}
             <div className="flex justify-between items-center">
               {/* Left: Reset */}
               <Button onClick={() => seekTo(0)} variant="outline" size="sm">
-                <RotateCcw className="h-4 w-4 mr-2" />
+                <RotateCcw className="h-4 w-4" />
                 Reset
               </Button>
 
@@ -551,10 +776,10 @@ export function AudioPlayback({ recording }: AudioPlaybackProps) {
                 onClick={togglePlaybackSpeed}
                 variant="outline"
                 size="sm"
-                className="font-mono min-w-[70px]"
+                className="font-mono w-[75px] flex-shrink-0 justify-between"
               >
-                <Gauge className="h-4 w-4 mr-1" />
-                {playbackRate}x
+                <Gauge className="h-4 w-4" />
+                <span>{playbackRate}x</span>
               </Button>
             </div>
 

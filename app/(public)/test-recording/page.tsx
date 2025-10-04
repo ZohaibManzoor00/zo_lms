@@ -19,6 +19,7 @@ interface AudioRecording {
   initialCode: string;
   finalCode: string;
   createdAt: Date;
+  language?: string;
 }
 
 export default function TestRecordingPage() {
@@ -41,6 +42,7 @@ export default function TestRecordingPage() {
       initialCode,
       finalCode,
       createdAt: new Date(),
+      language: "python", // Default to python since that's what the editor uses
     };
 
     setRecordings((prev) => [newRecording, ...prev]);
