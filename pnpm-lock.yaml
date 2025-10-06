@@ -180,7 +180,7 @@ importers:
         specifier: ^2.0.5
         version: 2.0.7(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       stripe:
-        specifier: ^18.3.0
+        specifier: ^18.5.0
         version: 18.5.0(@types/node@20.19.19)
       tailwind-merge:
         specifier: ^3.3.1
