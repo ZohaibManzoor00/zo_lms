@@ -42,13 +42,13 @@ interface NavigationLink {
 
 const navigationLinks: NavigationLink[] = [
   { href: "/dashboard", label: "Dashboard" },
-  {
-    label: "Courses",
-    submenu: false,
-    type: "description",
-    icon: "BookOpenIcon",
-    href: "/courses",
-  },
+  // {
+  //   label: "Courses",
+  //   submenu: false,
+  //   type: "description",
+  //   icon: "BookOpenIcon",
+  //   href: "/courses",
+  // },
   {
     label: "Lessons",
     submenu: false,
@@ -80,24 +80,24 @@ const navigationLinks: NavigationLink[] = [
     type: "Helpful Code Snippets I've Used",
     href: "/code-snippets",
   },
-  {
-    label: "About",
-    submenu: true,
-    type: "simple",
-    href: "/about",
-    items: [
-      {
-        href: "/about",
-        label: "Me",
-        description: "About me",
-      },
-      {
-        href: "/projects",
-        label: "My Projects",
-        description: "My Projects",
-      },
-    ],
-  },
+  // {
+  //   label: "About",
+  //   submenu: true,
+  //   type: "simple",
+  //   href: "/about",
+  //   items: [
+  //     {
+  //       href: "/about",
+  //       label: "Me",
+  //       description: "About me",
+  //     },
+  //     {
+  //       href: "/projects",
+  //       label: "My Projects",
+  //       description: "My Projects",
+  //     },
+  //   ],
+  // },
 ];
 
 const adminLinks: NavigationLink[] = [{ href: "/admin", label: "Admin" }];

@@ -37,7 +37,7 @@ export function PublicLessonCard({ data, isPublic = false }: Props) {
           className="w-full rounded-t-xl aspect-video h-full object-cover"
         />
         <CardContent className="p-6">
-          <h2 className="font-medium text-primary text-lg line-clamp-2 group-hover:underline transition-all duration-300">
+          <h2 className="font-medium text-primary text-lg line-clamp-1 group-hover:underline transition-all duration-300">
             {data.title}
           </h2>
 

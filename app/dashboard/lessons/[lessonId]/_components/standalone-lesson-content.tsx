@@ -16,6 +16,7 @@ import { convertWalkthroughToAudioRecording } from "@/lib/convert-walkthrough-to
 import { AudioPlayback } from "@/components/audio-code-walkthrough";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 // const getLanguageColor = (language: string) => {
 //   return (
@@ -62,13 +63,26 @@ export function StandaloneLessonContent({ data }: Props) {
     const videoUrl = useConstructUrl(videoKey);
     const thumbnailUrl = useConstructUrl(thumbnailKey);
 
-    if (!videoKey) {
+    if (!videoKey && !thumbnailKey) {
       return (
         <div className="aspect-video bg-muted rounded-lg flex flex-col items-center justify-center">
           <BookIcon className="size-16 text-primary mx-auto mb-4" />
           <p className="text-muted-foreground">
             This lesson does not have a video yet.
           </p>
+        </div>
+      );
+    }
+
+    if (!videoKey) {
+      return (
+        <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
+          <Image
+            src={thumbnailUrl}
+            alt="Thumbnail"
+            fill
+            className="object-cover"
+          />
         </div>
       );
     }

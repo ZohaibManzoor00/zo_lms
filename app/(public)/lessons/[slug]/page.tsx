@@ -15,7 +15,7 @@ export default async function PublicLessonSlugPage({ params }: Params) {
   const { slug } = await params;
   const lesson = await getPublicLesson(slug);
   const totalRecordings = lesson.walkthroughs.length;
-//   const thumbnailUrl = useConstructUrl(lesson.thumbnailKey || "");
+  //   const thumbnailUrl = useConstructUrl(lesson.thumbnailKey || "");
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 my-5">
@@ -207,7 +207,7 @@ export default async function PublicLessonSlugPage({ params }: Params) {
                 </div>
               )}
 
-              {lesson.chapter?.course ? (
+              {/* {lesson.chapter?.course ? (
                 <ForwardButton
                   href={`/courses/${lesson.chapter.course.slug}`}
                   label="View Full Course"
@@ -221,11 +221,25 @@ export default async function PublicLessonSlugPage({ params }: Params) {
                   variant="default"
                   className="w-full"
                 />
-              )}
+              )} */}
 
-              <p className="text-sm text-center text-muted-foreground mt-4">
+              <div className="space-y-4">
+                <ForwardButton
+                  href={`/dashboard/lessons/${slug}`}
+                  label="View Lesson"
+                  variant="default"
+                  className="w-full"
+                />
+                <ForwardButton
+                  href="/lessons"
+                  label="Browse More Lessons"
+                  variant="secondary"
+                  className="w-full"
+                />
+              </div>
+              {/* <p className="text-sm text-center text-muted-foreground mt-4">
                 Free lesson content
-              </p>
+              </p> */}
             </CardContent>
           </Card>
         </div>
