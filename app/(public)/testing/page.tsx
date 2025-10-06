@@ -74,7 +74,7 @@ import {
   Github,
 } from "lucide-react";
 import { PublicCourseCard } from "@/app/(public)/_components/public-course-card";
-import { PublicLessonCard } from "@/app/(public)/_components/public-lesson-card";
+// import { PublicLessonCard } from "@/app/(public)/_components/public-lesson-card";
 import { CodeSnippetCard } from "@/app/(public)/_components/code-snippet-card";
 import { RecentResourcesCard } from "@/app/(public)/_components/recent-resources-card";
 
@@ -95,22 +95,22 @@ const mockCourse = {
   updatedAt: new Date(),
 };
 
-const mockLesson = {
-  id: "1",
-  title: "Introduction to Custom Hooks",
-  description: "Learn how to create and use custom hooks in React",
-  videoKey: "",
-  thumbnailKey: "",
-  position: 1,
-  chapter: {
-    course: {
-      slug: "react-course",
-    },
-  },
-  walkthroughs: [{ id: "1", title: "Hook Example" }],
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
+// const mockLesson = {
+//   id: "1",
+//   title: "Introduction to Custom Hooks",
+//   description: "Learn how to create and use custom hooks in React",
+//   videoKey: "",
+//   thumbnailKey: "",
+//   position: 1,
+//   chapter: {
+//     course: {
+//       slug: "react-course",
+//     },
+//   },
+//   walkthroughs: [{ id: "1", title: "Hook Example" }],
+//   createdAt: new Date(),
+//   updatedAt: new Date(),
+// };
 
 const mockCodeSnippet = {
   id: "1",
@@ -453,7 +453,7 @@ export default function DesignSystemTestingPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <PublicCourseCard data={mockCourse} />
-            <PublicLessonCard data={mockLesson} />
+            {/* <PublicLessonCard data={mockLesson} /> */}
             <div className="md:col-span-2 lg:col-span-1">
               <CodeSnippetCard snippet={mockCodeSnippet} />
             </div>
