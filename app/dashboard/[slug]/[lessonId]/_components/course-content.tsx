@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { tryCatch } from "@/hooks/try-catch";
 import { markLessonComplete } from "../actions";
 import { toast } from "sonner";
@@ -9,15 +9,9 @@ import { useOptimistic } from "react";
 
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import { BookIcon, CheckCircle, ChevronDown, XCircle } from "lucide-react";
+import { BookIcon, CheckCircle, XCircle } from "lucide-react";
 import { HeartButton } from "@/components/ui/heart-button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { convertWalkthroughToAudioRecording } from "@/lib/convert-walkthrough-to-audio-recording";
-import { AudioPlayback } from "@/components/audio-code-walkthrough";
+import { CodeReviewPlaybackEditorV2 } from "@/components/audio-code-walkthrough";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -160,63 +154,48 @@ export function CourseContent({ data }: Props) {
 }
 
 function LessonCodeWalkthrough({ data }: Props) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const getAudioUrl = useConstructUrl;
+  // Transform the lesson walkthroughs into the format expected by the v2 editor
+  const walkthroughs =
+    data.walkthroughs?.map((lw) => ({
+      ...lw.walkthrough,
+      // Ensure we have all the required fields
+      steps: lw.walkthrough.steps || [],
+    })) || [];
+
+  if (walkthroughs.length === 0) {
+    return null;
+  }
 
   return (
-    <>
-      {data.walkthroughs && data.walkthroughs.length > 0 && (
-        <div className="mt-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground mb-3">
-              Interactive Code Walkthroughs
-            </h2>
-          </div>
-          {data.walkthroughs.map((lw, idx) => (
-            <Collapsible
-              key={lw.id}
-              open={openIndex === idx}
-              onOpenChange={(open) => setOpenIndex(open ? idx : null)}
-              className="dark:bg-accent/40 bg-accent rounded mb-2"
-            >
-              <CollapsibleTrigger
-              // className={cn(
-              //   "w-full flex items-center rounded justify-between px-4 py-2 text-left font-semibold bg-muted hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-              //   // "w-full flex items-center rounded justify-between px-4 py-2 text-left text-primary font-medium border border-primary/20 bg-primary/20 ",
-              //   openIndex === idx &&
-              //     "bg-primary/10 hover:text-primary hover:bg-primary/20 hover:rounded hover:rounded-b-none rounded dark:bg-accent dark:text-accent-foreground text-primary border-t-accent-foreground rounded-b-none"
-              //   // "border border-primary/20 rounded-b-none text-primary font-semibold"
-              // )}
-              >
-                <span>{lw.walkthrough.name}</span>
-                <ChevronDown
-                  className={`ml-2 size-5 text-bg-accent-foreground transition-transform duration-200 ${
-                    openIndex === idx ? "rotate-180" : "rotate-0"
-                  }`}
-                  aria-hidden="true"
-                />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="">
-                {lw.walkthrough.description && (
-                  <>
-                    <div className="text-muted-foreground p-4 text-sm">
-                      {lw.walkthrough.description}
-                    </div>
-                  </>
-                )}
-                <AudioPlayback
-                  recording={convertWalkthroughToAudioRecording(
-                    lw.walkthrough,
-                    getAudioUrl(lw.walkthrough.audioKey)
-                  )}
-                />
-              </CollapsibleContent>
-            </Collapsible>
-          ))}
-        </div>
-      )}
+    <div className="mt-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">
+          Interactive Code Walkthroughs
+        </h2>
+      </div>
+
+      <CodeReviewPlaybackEditorV2
+        walkthroughs={walkthroughs}
+        defaultLanguage="python"
+        defaultCode="# Welcome to the Interactive Code Walkthrough!
+# 
+# This is an editable code editor where you can:
+# 1. Write and edit code freely in edit mode
+# 2. Select a walkthrough above to switch to playback mode
+# 3. Follow along with audio-synchronized code changes
+# 4. Switch back to edit mode anytime to experiment
+#
+# Try selecting a walkthrough from the collection above to get started!
+
+def example_function():
+    print('Hello from the walkthrough!')
+    return 'Ready to learn!'
+
+# Your code here...
+"
+      />
 
       <div className="border-b pb-4 pt-2" />
-    </>
+    </div>
   );
 }

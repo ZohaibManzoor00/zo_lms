@@ -2,25 +2,48 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function LessonSkeleton() {
   return (
-    <div className="flex flex-col h-full px-6">
-      <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-        <Skeleton className="h-full w-full" />
+    <div className="flex flex-col h-full bg-background px-6">
+      <div className="space-y-4 mb-6">
+        {/* Title skeleton */}
+        <Skeleton className="h-9 w-3/4" />
+
+        {/* Lesson metadata badges skeleton */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Difficulty badge */}
+          <Skeleton className="h-6 w-16 rounded-md" />
+
+          {/* Duration with icon */}
+          <div className="flex items-center gap-1.5">
+            <Skeleton className="h-6 w-16 rounded-md" />
+          </div>
+
+          {/* Category with icon */}
+          <div className="flex items-center gap-1.5">
+            <Skeleton className="h-6 w-20 rounded-md" />
+          </div>
+        </div>
       </div>
 
-      <div className="flex-1 space-y-6 mt-6">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
+      <div className="space-y-6 pt-1">
+        {/* Video player skeleton */}
+        <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+          <Skeleton className="h-full w-full" />
         </div>
-        <Skeleton className="h-1 w-full my-4 mb-6" />
+
+        {/* Description content skeleton */}
         <div className="space-y-3">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
-          <Skeleton className="h-4 w-4/6" />
-          <Skeleton className="h-4 w-3/6" />
-          <Skeleton className="h-4 w-2/6" />
-          <Skeleton className="h-4 w-1/6" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-1 w-full" />
         </div>
+
+        <div className="space-y-3">
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-full" />
+        </div>
+        {/* Separator */}
+
+        {/* Code walkthrough section skeleton (if present) */}
       </div>
     </div>
   );

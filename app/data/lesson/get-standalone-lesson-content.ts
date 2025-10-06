@@ -30,6 +30,8 @@ export const getStandaloneLessonContent = async (lessonId: string) => {
       thumbnailKey: true,
       videoKey: true,
       position: true,
+      category: true,
+      difficulty: true,
       lessonProgress: {
         where: {
           userId: user.id,

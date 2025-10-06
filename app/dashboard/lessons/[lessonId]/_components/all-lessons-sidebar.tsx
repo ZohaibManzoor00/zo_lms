@@ -1,22 +1,21 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useOptimistic } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { LessonType } from "@/app/data/lesson/get-all-lessons";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  Search,
-  PlayIcon,
-  School,
-  BookIcon,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { useConstructUrl } from "@/hooks/use-construct-url";
-import Image from "next/image";
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Search, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { IconBook } from "@tabler/icons-react";
+import { ProgressSection } from "./progress-section";
+import { LessonsList } from "./lessons-list";
+import { LessonProgress } from "@/lib/generated/prisma";
 
 interface Props {
   lessons: LessonType[];
@@ -24,19 +23,222 @@ interface Props {
 }
 
 export function AllLessonsSidebar({ lessons, currentLessonId }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+
+  // Optimistic lesson updates for real-time progress
+  const [optimisticLessons, setOptimisticLessons] = useOptimistic(
+    lessons,
+    (
+      currentLessons,
+      { lessonId, completed }: { lessonId: string; completed: boolean }
+    ) => {
+      return currentLessons.map((lesson) =>
+        lesson.id === lessonId
+          ? {
+              ...lesson,
+              completed,
+              lessonProgress:
+                lesson.lessonProgress?.length > 0
+                  ? [{ ...lesson.lessonProgress[0], completed }]
+                  : ([{ completed }] as LessonProgress[]),
+            }
+          : lesson
+      );
+    }
+  );
+
+  // Valid filter options and limits
+  const VALID_LEVELS = ["very-easy", "easy", "medium", "hard", "very-hard"];
+  const VALID_STATUSES = ["completed", "in-progress", "not-started"];
+  const MAX_SEARCH_LENGTH = 100;
+  const MAX_FILTER_SELECTIONS = 10; // Prevent URL manipulation with excessive selections
+
+  // Handle completion change with optimistic update
+  const handleCompletionChange = (lessonId: string, completed: boolean) => {
+    setOptimisticLessons({ lessonId, completed });
+  };
+
+  // Initialize filters from URL params
+  useEffect(() => {
+    const query = searchParams.get("search") || "";
+    const levelsParam = searchParams.get("levels");
+    const statusesParam = searchParams.get("statuses");
+
+    // Validate and filter levels
+    const levels = levelsParam
+      ? levelsParam
+          .split(",")
+          .map((level) => level.trim())
+          .filter((level) => VALID_LEVELS.includes(level))
+          .slice(0, MAX_FILTER_SELECTIONS)
+      : [];
+
+    // Validate and filter statuses
+    const statuses = statusesParam
+      ? statusesParam
+          .split(",")
+          .map((status) => status.trim())
+          .filter((status) => VALID_STATUSES.includes(status))
+          .slice(0, MAX_FILTER_SELECTIONS)
+      : [];
+
+    // Sanitize search query
+    const sanitizedQuery = query
+      .replace(/[<>]/g, "")
+      .replace(/[^\w\s-]/g, "")
+      .trim()
+      .slice(0, MAX_SEARCH_LENGTH);
+
+    // Only update if values are different
+    setSearchQuery((prev) => (prev !== sanitizedQuery ? sanitizedQuery : prev));
+    setSelectedLevels((prev) =>
+      JSON.stringify(prev) !== JSON.stringify(levels) ? levels : prev
+    );
+    setSelectedStatuses((prev) =>
+      JSON.stringify(prev) !== JSON.stringify(statuses) ? statuses : prev
+    );
+  }, [searchParams]);
+
+  // Update URL params when filters change
+  const updateUrlParams = (
+    search: string,
+    levels: string[],
+    statuses: string[]
+  ) => {
+    const params = new URLSearchParams();
+
+    const sanitizedSearch = search
+      .replace(/[<>]/g, "")
+      .replace(/[^\w\s-]/g, "")
+      .trim()
+      .slice(0, MAX_SEARCH_LENGTH);
+    if (sanitizedSearch) params.set("search", sanitizedSearch);
+
+    const validLevels = levels
+      .filter((level) => VALID_LEVELS.includes(level))
+      .slice(0, MAX_FILTER_SELECTIONS);
+    if (validLevels.length) params.set("levels", validLevels.join(","));
+
+    const validStatuses = statuses
+      .filter((status) => VALID_STATUSES.includes(status))
+      .slice(0, MAX_FILTER_SELECTIONS);
+    if (validStatuses.length) params.set("statuses", validStatuses.join(","));
+
+    const newUrl = `${pathname}${
+      params.toString() ? "?" + params.toString() : ""
+    }`;
+    router.replace(newUrl, { scroll: false });
+  };
 
   const filteredLessons = useMemo(() => {
-    if (!searchQuery.trim()) return lessons;
+    let filtered = optimisticLessons;
 
-    return lessons.filter(
-      (lesson) =>
-        lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (lesson.description &&
-          lesson.description.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  }, [lessons, searchQuery]);
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(
+        (lesson) =>
+          lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (lesson.description &&
+            lesson.description
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()))
+      );
+    }
+
+    // Filter by status
+    if (selectedStatuses.length > 0) {
+      filtered = filtered.filter((lesson) => {
+        return selectedStatuses.some((status) => {
+          if (status === "completed")
+            return lesson.completed || lesson.lessonProgress?.[0]?.completed;
+          if (status === "not-started")
+            return !lesson.completed && !lesson.lessonProgress?.[0]?.completed;
+          if (status === "in-progress") return false;
+          return false;
+        });
+      });
+    }
+
+    // Filter by difficulty levels
+    if (selectedLevels.length > 0) {
+      filtered = filtered.filter((lesson) => {
+        if (!lesson.difficulty) return false;
+        const difficultyMap: Record<string, string> = {
+          "very-easy": "VeryEasy",
+          easy: "Easy",
+          medium: "Medium",
+          hard: "Hard",
+          "very-hard": "VeryHard",
+        };
+        return selectedLevels.some(
+          (level) => difficultyMap[level] === lesson.difficulty
+        );
+      });
+    }
+
+    return filtered;
+  }, [optimisticLessons, searchQuery, selectedStatuses, selectedLevels]);
+
+  // Handle search input change
+  const handleSearchChange = (value: string) => {
+    const sanitizedValue = value
+      .replace(/[<>]/g, "")
+      .replace(/[^\w\s-]/g, "")
+      .slice(0, MAX_SEARCH_LENGTH);
+
+    setSearchQuery(sanitizedValue);
+    updateUrlParams(sanitizedValue, selectedLevels, selectedStatuses);
+  };
+
+  // Handle level selection
+  const handleLevelToggle = (level: string) => {
+    if (!VALID_LEVELS.includes(level)) return;
+
+    const newLevels = selectedLevels.includes(level)
+      ? selectedLevels.filter((l) => l !== level)
+      : [...selectedLevels, level].slice(0, MAX_FILTER_SELECTIONS);
+
+    setSelectedLevels(newLevels);
+    updateUrlParams(searchQuery, newLevels, selectedStatuses);
+  };
+
+  // Handle status selection
+  const handleStatusToggle = (status: string) => {
+    if (!VALID_STATUSES.includes(status)) return;
+
+    const newStatuses = selectedStatuses.includes(status)
+      ? selectedStatuses.filter((s) => s !== status)
+      : [...selectedStatuses, status].slice(0, MAX_FILTER_SELECTIONS);
+
+    setSelectedStatuses(newStatuses);
+    updateUrlParams(searchQuery, selectedLevels, newStatuses);
+  };
+
+  // Get display text for filter buttons
+  const getLevelsDisplayText = () => {
+    if (selectedLevels.length === 0) return "All Levels";
+    if (selectedLevels.length === 1)
+      return selectedLevels[0]
+        .replace("-", " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+    return `${selectedLevels.length} Levels`;
+  };
+
+  const getStatusesDisplayText = () => {
+    if (selectedStatuses.length === 0) return "All Status";
+    if (selectedStatuses.length === 1)
+      return selectedStatuses[0]
+        .replace("-", " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+    return `${selectedStatuses.length} Statuses`;
+  };
 
   const handleToggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -52,7 +254,6 @@ export function AllLessonsSidebar({ lessons, currentLessonId }: Props) {
             onClick={handleToggleCollapse}
             className="w-full h-8 p-0 hover:bg-muted transition-colors duration-200"
             onKeyDown={(e) => {
-              // Prevent keyboard activation, only allow mouse clicks
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
               }
@@ -97,7 +298,6 @@ export function AllLessonsSidebar({ lessons, currentLessonId }: Props) {
             onClick={handleToggleCollapse}
             className="h-8 w-8 p-0 hover:bg-muted shrink-0 transition-colors duration-200"
             onKeyDown={(e) => {
-              // Prevent keyboard activation, only allow mouse clicks
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
               }
@@ -107,128 +307,106 @@ export function AllLessonsSidebar({ lessons, currentLessonId }: Props) {
           </Button>
         </div>
 
-        <div className="space-y-2 opacity-100 transition-opacity duration-300 delay-150">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4 transition-all duration-200" />
-            <Input
-              placeholder="Search lessons..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-9 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <p className="text-xs text-muted-foreground transition-all duration-200">
-            {filteredLessons.length} lesson
-            {filteredLessons.length !== 1 ? "s" : ""} found
-          </p>
+        {/* Progress Section */}
+        <ProgressSection
+          lessons={optimisticLessons}
+          filteredLessonsCount={filteredLessons.length}
+        />
+
+        {/* Search */}
+        <div className="relative mt-3">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground size-4 transition-all duration-200" />
+          <Input
+            placeholder="Search lessons..."
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="pl-10 h-9 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+
+        {/* Filter Dropdowns */}
+        <div className="flex gap-2 mt-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex-1 h-9 justify-between">
+                <span className="truncate">{getLevelsDisplayText()}</span>
+                <ChevronDown className="size-4 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              <DropdownMenuCheckboxItem
+                checked={selectedLevels.includes("very-easy")}
+                onCheckedChange={() => handleLevelToggle("very-easy")}
+              >
+                Very Easy
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={selectedLevels.includes("easy")}
+                onCheckedChange={() => handleLevelToggle("easy")}
+              >
+                Easy
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={selectedLevels.includes("medium")}
+                onCheckedChange={() => handleLevelToggle("medium")}
+              >
+                Medium
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={selectedLevels.includes("hard")}
+                onCheckedChange={() => handleLevelToggle("hard")}
+              >
+                Hard
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={selectedLevels.includes("very-hard")}
+                onCheckedChange={() => handleLevelToggle("very-hard")}
+              >
+                Very Hard
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="flex-1 h-9 justify-between">
+                <span className="truncate">{getStatusesDisplayText()}</span>
+                <ChevronDown className="size-4 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              <DropdownMenuCheckboxItem
+                checked={selectedStatuses.includes("completed")}
+                onCheckedChange={() => handleStatusToggle("completed")}
+              >
+                Completed
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={selectedStatuses.includes("in-progress")}
+                onCheckedChange={() => handleStatusToggle("in-progress")}
+              >
+                In Progress
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={selectedStatuses.includes("not-started")}
+                onCheckedChange={() => handleStatusToggle("not-started")}
+              >
+                Not Started
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
       <div className="border-b border-border mr-4" />
 
-      <div className="py-4 pr-4 space-y-3 h-[75dvh] overflow-y-auto opacity-100 transition-opacity duration-300 delay-150">
-        {filteredLessons.length === 0 ? (
-          <div className="text-center py-8 transition-all duration-200">
-            <BookIcon className="size-12 text-muted-foreground mx-auto mb-3 transition-all duration-200" />
-            <p className="text-muted-foreground transition-all duration-200">
-              No lessons found
-            </p>
-            {searchQuery && (
-              <p className="text-sm text-muted-foreground mt-1 transition-all duration-200">
-                Try adjusting your search terms
-              </p>
-            )}
-          </div>
-        ) : (
-          filteredLessons.map((lesson, index) => (
-            <div
-              key={lesson.id}
-              className="opacity-100 transition-all duration-200 relative px-1"
-              style={{
-                animationDelay: `${index * 50}ms`,
-              }}
-            >
-              <LessonSidebarItem
-                lesson={lesson}
-                isActive={lesson.id === currentLessonId}
-              />
-            </div>
-          ))
-        )}
+      <div className="py-4 pr-4 space-y-3 h-[60dvh] overflow-y-auto opacity-100 transition-opacity duration-300 delay-150">
+        <LessonsList
+          lessons={filteredLessons}
+          currentLessonId={currentLessonId}
+          onCompletionChange={handleCompletionChange}
+        />
       </div>
     </div>
-  );
-}
-
-interface LessonSidebarItemProps {
-  lesson: LessonType;
-  isActive: boolean;
-}
-
-function LessonSidebarItem({ lesson, isActive }: LessonSidebarItemProps) {
-  const thumbnailUrl = useConstructUrl(lesson.thumbnailKey || "");
-  const hasVideo = !!lesson.videoKey;
-  const hasWalkthrough = lesson.walkthroughs && lesson.walkthroughs.length > 0;
-
-  return (
-    <Link
-      href={`/dashboard/lessons/${lesson.id}`}
-      className={cn(
-        "w-full p-2.5 h-auto justify-start transition-all duration-300 ease-in-out rounded-md border block transform hover:scale-[1.02] hover:shadow-sm relative hover:z-10",
-        isActive
-          ? "bg-primary/10 dark:bg-primary/20 border-primary/50 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary shadow-sm scale-[1.01] z-10"
-          : "border-border hover:bg-muted/50 hover:border-primary/30 z-0"
-      )}
-    >
-      <div className="flex items-center gap-2.5 w-full min-w-0">
-        <div className="shrink-0">
-          <div className="relative w-8 h-6 rounded overflow-hidden bg-muted transition-all duration-200 hover:shadow-sm">
-            {lesson.thumbnailKey ? (
-              <Image
-                src={thumbnailUrl}
-                alt={lesson.title}
-                fill
-                className="object-cover transition-transform duration-300 hover:scale-110"
-                sizes="32px"
-                unoptimized
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <BookIcon className="size-3 text-muted-foreground transition-all duration-200" />
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p
-            className={cn(
-              "text-xs font-medium truncate leading-tight transition-all duration-200",
-              isActive ? "text-primary font-semibold" : "text-foreground"
-            )}
-          >
-            {lesson.title}
-          </p>
-
-          <div className="flex items-center gap-1 mt-1">
-            {hasVideo && (
-              <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground transition-all duration-200 hover:text-primary">
-                <PlayIcon className="size-2.5 transition-transform duration-200 hover:scale-110" />
-              </span>
-            )}
-            {hasWalkthrough && (
-              <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground transition-all duration-200 hover:text-primary">
-                <School className="size-2.5 transition-transform duration-200 hover:scale-110" />
-              </span>
-            )}
-            {isActive && (
-              <span className="text-xs font-medium text-primary ml-auto transition-all duration-200 animate-pulse">
-                Viewing
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    </Link>
   );
 }

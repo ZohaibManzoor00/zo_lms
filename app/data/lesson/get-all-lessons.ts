@@ -1,8 +1,12 @@
 import "server-only";
 
 import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 export const getAllLessons = async () => {
+  const session = await auth.api.getSession({ headers: await headers() });
+
   const data = await prisma.lesson.findMany({
     where: {
       OR: [
@@ -28,6 +32,9 @@ export const getAllLessons = async () => {
       thumbnailKey: true,
       videoKey: true,
       position: true,
+      completed: true,
+      category: true,
+      difficulty: true,
       walkthroughs: {
         select: {
           id: true,
@@ -53,6 +60,17 @@ export const getAllLessons = async () => {
           },
         },
       },
+      lessonProgress: session?.user?.id
+        ? {
+            where: {
+              userId: session.user.id,
+            },
+            select: {
+              completed: true,
+            },
+            take: 1,
+          }
+        : false,
     },
   });
 

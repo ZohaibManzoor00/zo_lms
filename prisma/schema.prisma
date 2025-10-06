@@ -122,6 +122,14 @@ enum CourseLevel {
   Advanced
 }
 
+enum LessonDifficulty {
+  VeryEasy
+  Easy
+  Medium
+  Hard
+  VeryHard
+}
+
 enum CourseStatus {
   Draft
   Published
@@ -159,6 +167,11 @@ model Lesson {
   position     Int
   isPublished  Boolean @default(false)
 
+  // New fields for lesson metadata
+  completed  Boolean           @default(false)
+  category   String?
+  difficulty LessonDifficulty? @default(Easy)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -174,6 +187,9 @@ model Lesson {
 
   @@index([chapterId, position])
   @@index([position])
+  @@index([completed])
+  @@index([difficulty])
+  @@index([category])
 }
 
 model Enrollment {

@@ -23,7 +23,7 @@ interface AudioRecording {
   audioUrl?: string; // Optional direct URL for existing recordings
 }
 
-export function useAudioCodePlayback(recording: AudioRecording) {
+export function useAudioCodePlayback(recording: AudioRecording | null) {
   // Playback state
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -37,7 +37,7 @@ export function useAudioCodePlayback(recording: AudioRecording) {
   const [isDragging, setIsDragging] = useState(false);
 
   // Code state
-  const [currentCode, setCurrentCode] = useState(recording.initialCode);
+  const [currentCode, setCurrentCode] = useState(recording?.initialCode || "");
   const [userEditedCode, setUserEditedCode] = useState<string | null>(null);
   const [isUserEditing, setIsUserEditing] = useState(false);
 
@@ -57,14 +57,33 @@ export function useAudioCodePlayback(recording: AudioRecording) {
 
   // Sort code events on mount
   useEffect(() => {
-    sortedCodeEvents.current = [...recording.codeEvents].sort(
-      (a, b) => a.timestamp - b.timestamp
-    );
-  }, [recording.codeEvents]);
+    if (recording?.codeEvents) {
+      sortedCodeEvents.current = [...recording.codeEvents].sort(
+        (a, b) => a.timestamp - b.timestamp
+      );
+    } else {
+      sortedCodeEvents.current = [];
+    }
+  }, [recording?.codeEvents]);
+
+  // Update current code when recording changes
+  useEffect(() => {
+    if (recording?.initialCode) {
+      setCurrentCode(recording.initialCode);
+      setUserEditedCode(null);
+      setIsUserEditing(false);
+    }
+  }, [recording?.initialCode]);
 
   // Create audio URL and setup audio element
   // Create audio URL from blob or use existing URL
   useEffect(() => {
+    if (!recording) {
+      setAudioUrl(null);
+      setIsLoading(false);
+      return;
+    }
+
     if (recording.audioUrl) {
       // Use existing URL for database recordings
       setAudioUrl(recording.audioUrl);
@@ -77,7 +96,7 @@ export function useAudioCodePlayback(recording: AudioRecording) {
         URL.revokeObjectURL(url);
       };
     }
-  }, [recording.audioBlob, recording.audioUrl]);
+  }, [recording?.audioBlob, recording?.audioUrl]);
 
   // Setup audio element when URL is ready
   useEffect(() => {
@@ -88,7 +107,7 @@ export function useAudioCodePlayback(recording: AudioRecording) {
 
     const handleLoadedMetadata = () => {
       const audioDuration = audio.duration;
-      const recordedDuration = recording.duration / 1000; // Convert to seconds
+      const recordedDuration = recording ? recording.duration / 1000 : 0; // Convert to seconds
 
       // Use recorded duration as fallback when audio duration is invalid
       let finalDuration = recordedDuration;
@@ -139,11 +158,13 @@ export function useAudioCodePlayback(recording: AudioRecording) {
       audio.removeEventListener("ended", handleEnded);
       audio.pause();
     };
-  }, [audioUrl, recording.duration, duration]);
+  }, [audioUrl, recording?.duration, duration]);
 
   // Get code at specific time
   const getCodeAtTime = useCallback(
     (timeMs: number) => {
+      if (!recording) return "";
+
       let code = recording.initialCode;
 
       for (const event of sortedCodeEvents.current) {
@@ -156,7 +177,7 @@ export function useAudioCodePlayback(recording: AudioRecording) {
 
       return code;
     },
-    [recording.initialCode]
+    [recording?.initialCode]
   );
 
   // Update current time during playback
@@ -326,11 +347,11 @@ export function useAudioCodePlayback(recording: AudioRecording) {
     audioRef.current.currentTime = 0;
     setCurrentTime(0);
     setProgressWidth(0);
-    setCurrentCode(recording.initialCode); // Reset to initial code
+    setCurrentCode(recording?.initialCode || ""); // Reset to initial code
     setIsPlaying(false);
     setIsUserEditing(false);
     setUserEditedCode(null);
-  }, [recording.initialCode]);
+  }, [recording?.initialCode]);
 
   // Seek to specific time
   const seekTo = useCallback(
