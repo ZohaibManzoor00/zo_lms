@@ -16,6 +16,9 @@ export const adminGetLesson = async (lessonId: string) => {
       thumbnailKey: true,
       description: true,
       position: true,
+      categories: true,
+      difficulty: true,
+      leetCodeSlug: true,
       chapter: {
         select: {
           course: {

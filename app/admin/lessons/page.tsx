@@ -1,8 +1,15 @@
 import { Suspense } from "react";
 import { adminGetLessons } from "@/app/data/admin/admin-get-lessons";
-import { AdminLessonCard, AdminLessonCardSkeleton } from "./_components/admin-lesson-card";
+import {
+  AdminLessonCard,
+  AdminLessonCardSkeleton,
+} from "./_components/admin-lesson-card";
 import { EmptyCourseState } from "@/components/general/empty-course-state";
 import { ForwardButton } from "@/components/ui/forward-button";
+
+// Force dynamic rendering to always show fresh data
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default function LessonsPage() {
   return (

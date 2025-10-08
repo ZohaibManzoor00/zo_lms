@@ -2,18 +2,27 @@ import "server-only";
 
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "./require-admin";
-import { notFound } from "next/navigation";
 
 export const adminGetLessons = async () => {
   await requireAdmin();
 
   const lessons = await prisma.lesson.findMany({
     where: {
-      chapter: {
-        course: {
-          status: "Published",
+      OR: [
+        {
+          chapterId: null, // Standalone lessons
         },
-      },
+        {
+          chapter: {
+            course: {
+              status: "Published",
+            },
+          },
+        },
+      ],
+    },
+    orderBy: {
+      createdAt: "desc",
     },
     select: {
       id: true,
@@ -22,6 +31,9 @@ export const adminGetLessons = async () => {
       thumbnailKey: true,
       description: true,
       position: true,
+      categories: true,
+      difficulty: true,
+      leetCodeSlug: true,
       chapter: {
         select: {
           course: {
@@ -41,9 +53,9 @@ export const adminGetLessons = async () => {
     },
   });
 
-  if (!lessons) return notFound();
-
   return lessons;
 };
 
-export type AdminLessonType = Awaited<ReturnType<typeof adminGetLessons>>;
+export type AdminLessonType = Awaited<
+  ReturnType<typeof adminGetLessons>
+>[number];

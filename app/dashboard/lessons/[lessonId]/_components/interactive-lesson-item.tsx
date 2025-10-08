@@ -105,18 +105,31 @@ export function InteractiveLessonItem({
               {lesson.title}
             </p>
 
-            {/* Display category and difficulty */}
+            {/* Display categories and difficulty */}
             <div className="flex items-center gap-1 mt-1">
-              {lesson.category && (
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    "text-xs px-1 py-0 h-auto font-medium text-[10px] leading-tight",
-                    getCategoryColor(lesson.category)
+              {lesson.categories && lesson.categories.length > 0 && (
+                <>
+                  {lesson.categories.slice(0, 2).map((category) => (
+                    <Badge
+                      key={category}
+                      variant="outline"
+                      className={cn(
+                        "text-xs px-1 py-0 h-auto font-medium text-[10px] leading-tight",
+                        getCategoryColor(category)
+                      )}
+                    >
+                      {category}
+                    </Badge>
+                  ))}
+                  {lesson.categories.length > 2 && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs px-1 py-0 h-auto font-medium text-[10px] leading-tight border-border text-muted-foreground"
+                    >
+                      +{lesson.categories.length - 2}
+                    </Badge>
                   )}
-                >
-                  {lesson.category}
-                </Badge>
+                </>
               )}
               {lesson.difficulty && (
                 <Badge

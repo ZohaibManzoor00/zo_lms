@@ -1,10 +1,18 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { AdminLessonType } from "@/app/data/admin/admin-get-lesson";
 import { useConstructUrl } from "@/hooks/use-construct-url";
+import {
+  getDifficultyColor,
+  getCategoryColor,
+  formatDifficulty,
+} from "@/lib/lesson-utils";
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,12 +28,14 @@ import {
   Pencil,
   Trash2,
   School,
+  ExternalLink,
 } from "lucide-react";
 // import { Pill, PillIndicator, PillIndicatorProps } from "@/components/ui/pill";
 import { ForwardButton } from "@/components/ui/forward-button";
+import { AdminLessonType } from "@/app/data/admin/admin-get-lesson";
 
 interface Props {
-  data: AdminLessonType;
+  data: AdminLessonType; // Temporary fix for type issues
 }
 
 // const pillIndicatorMap = {
@@ -91,36 +101,77 @@ export function AdminLessonCard({ data }: Props) {
       />
 
       <CardContent className="p-4">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-start gap-2">
           <Link
             href={`/admin/lessons/${data.id}/edit`}
-            className="font-medium text-lg line-clamp-1 hover:underline group-hover:text-primary transition-colors"
+            className="font-medium text-lg line-clamp-1 hover:underline group-hover:text-primary transition-colors flex-1"
           >
             {data.title}
           </Link>
-          {/* <Pill>
-            <PillIndicator
-              pulse={data.status === "Published"}
-              variant={
-                pillIndicatorMap[data.status] as PillIndicatorProps["variant"]
-              }
-            />
-            {pillLabelMap[data.status]}
-          </Pill> */}
+          {data.leetCodeSlug && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                window.open(
+                  `https://leetcode.com/problems/${data.leetCodeSlug}`,
+                  "_blank"
+                );
+              }}
+              className="flex items-center gap-1 shrink-0"
+            >
+              <ExternalLink className="size-3" />
+              LC
+            </Button>
+          )}
         </div>
-        {/* <p className="line-clamp-2 text-sm text-muted-foreground leading-tight mt-2">
-          {data.smallDescription}
-        </p> */}
+
+        {/* Display difficulty and categories */}
+        <div className="flex items-center gap-1 mt-2 flex-wrap">
+          {data.difficulty && (
+            <Badge
+              variant="outline"
+              className={cn("text-xs", getDifficultyColor(data.difficulty))}
+            >
+              {formatDifficulty(data.difficulty)}
+            </Badge>
+          )}
+          {data.categories && data.categories.length > 0 && (
+            <>
+              {data.categories.slice(0, 2).map((category: string) => (
+                <Badge
+                  key={category}
+                  variant="outline"
+                  className={cn("text-xs", getCategoryColor(category))}
+                >
+                  {category}
+                </Badge>
+              ))}
+              {data.categories.length > 2 && (
+                <Badge
+                  variant="outline"
+                  className="text-xs border-border text-muted-foreground"
+                >
+                  +{data.categories.length - 2}
+                </Badge>
+              )}
+            </>
+          )}
+        </div>
 
         <div className="mt-4 flex items-center gap-x-5">
           <div className="flex items-center gap-x-2">
             <PlayIcon className="size-6 p-1 rounded-md text-primary bg-primary/10" />
-            <p className="text-sm text-muted-foreground">{hasVideo ? "Video" : "No Video"}</p>
+            <p className="text-sm text-muted-foreground">
+              {hasVideo ? "Video" : "No Video"}
+            </p>
           </div>
 
           <div className="flex items-center gap-x-2">
             <School className="size-6 p-1 rounded-md text-primary bg-primary/10" />
-            <p className="text-sm text-muted-foreground">{hasWalkthrough ? "Walkthrough" : "No Walkthrough"}</p>
+            <p className="text-sm text-muted-foreground">
+              {hasWalkthrough ? "Walkthrough" : "No Walkthrough"}
+            </p>
           </div>
         </div>
 

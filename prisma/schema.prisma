@@ -123,7 +123,6 @@ enum CourseLevel {
 }
 
 enum LessonDifficulty {
-  VeryEasy
   Easy
   Medium
   Hard
@@ -167,29 +166,27 @@ model Lesson {
   position     Int
   isPublished  Boolean @default(false)
 
-  // New fields for lesson metadata
   completed  Boolean           @default(false)
-  category   String?
-  difficulty LessonDifficulty? @default(Easy)
+  categories String[]          @default([])
+  difficulty LessonDifficulty @default(Easy)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  chapterId String?
+  chapter      Chapter? @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  leetCodeSlug String?
+  chapterId    String?
 
   lessonProgress LessonProgress[]
   walkthroughs   LessonWalkthrough[]
   codeSnippets   LessonCodeSnippet[]
-
-  // Junction table relationships (testing alongside existing relationships)
   chapterLessons ChapterLesson[]
 
   @@index([chapterId, position])
   @@index([position])
   @@index([completed])
   @@index([difficulty])
-  @@index([category])
+  @@index([categories])
 }
 
 model Enrollment {

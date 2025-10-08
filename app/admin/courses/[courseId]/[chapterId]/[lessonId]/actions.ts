@@ -35,6 +35,9 @@ export const updateLesson = async ({
         description: formData.description,
         thumbnailKey: formData.thumbnailKey,
         videoKey: formData.videoKey,
+        categories: formData.categories || [],
+        difficulty: formData.difficulty,
+        leetCodeSlug: formData.leetCodeSlug,
       },
     });
 

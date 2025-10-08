@@ -17,6 +17,9 @@ export const getPublicLesson = async (lessonId: string) => {
       position: true,
       createdAt: true,
       updatedAt: true,
+      categories: true,
+      difficulty: true,
+      leetCodeSlug: true,
       walkthroughs: {
         select: {
           id: true,
@@ -125,6 +128,9 @@ export const getPublicLesson = async (lessonId: string) => {
       position: lesson.position,
       createdAt: lesson.createdAt,
       updatedAt: lesson.updatedAt,
+      categories: lesson.categories,
+      difficulty: lesson.difficulty,
+      leetCodeSlug: lesson.leetCodeSlug,
       walkthroughs: lesson.walkthroughs,
       chapter: lesson.chapter,
     };

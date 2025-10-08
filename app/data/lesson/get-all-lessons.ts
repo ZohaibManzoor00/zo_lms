@@ -33,8 +33,9 @@ export const getAllLessons = async () => {
       videoKey: true,
       position: true,
       completed: true,
-      category: true,
+      categories: true,
       difficulty: true,
+      leetCodeSlug: true,
       walkthroughs: {
         select: {
           id: true,

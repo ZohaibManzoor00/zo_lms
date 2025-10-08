@@ -1,11 +1,15 @@
 import { getPublicLesson } from "@/app/data/lesson/get-public-lesson";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 import { IconClock, IconVideo, IconMicrophone } from "@tabler/icons-react";
+import { ExternalLink } from "lucide-react";
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { Card, CardContent } from "@/components/ui/card";
 import { ForwardButton } from "@/components/ui/forward-button";
 import { ThumbnailImageClient } from "../../courses/[slug]/_components/thumbnail-image-client";
+import { getDifficultyColor, getCategoryColor, formatDifficulty } from "@/lib/lesson-utils";
+import { cn } from "@/lib/utils";
 
 interface Params {
   params: Promise<{ slug: string }>;
@@ -15,23 +19,11 @@ export default async function PublicLessonSlugPage({ params }: Params) {
   const { slug } = await params;
   const lesson = await getPublicLesson(slug);
   const totalRecordings = lesson.walkthroughs.length;
-  //   const thumbnailUrl = useConstructUrl(lesson.thumbnailKey || "");
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 my-5">
       <div className="order-1 lg:col-span-2">
         <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-lg">
-          {/* <Image
-            src={
-              lesson.thumbnailKey
-                ? thumbnailUrl
-                : "/placeholder-lesson-thumbnail.jpg"
-            }
-            alt={lesson.title}
-            fill
-            className="object-cover"
-            priority
-          /> */}
           <ThumbnailImageClient
             thumbnail={lesson.thumbnailKey || ""}
             title={lesson.title}
@@ -41,9 +33,28 @@ export default async function PublicLessonSlugPage({ params }: Params) {
 
         <div className="mt-8 space-y-6">
           <div className="space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight">
-              {lesson.title}
-            </h1>
+            <div className="flex items-center justify-between">
+              <h1 className="text-4xl font-bold tracking-tight">
+                {lesson.title}
+              </h1>
+              {lesson.leetCodeSlug && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex items-center gap-x-2"
+                  asChild
+                >
+                  <a
+                    href={`https://leetcode.com/problems/${lesson.leetCodeSlug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="size-4" />
+                    LeetCode
+                  </a>
+                </Button>
+              )}
+            </div>
             {lesson.description && (
               <div className="text-muted-foreground text-lg leading-relaxed">
                 <RenderDescription json={JSON.parse(lesson.description)} />
@@ -52,6 +63,33 @@ export default async function PublicLessonSlugPage({ params }: Params) {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            {lesson.difficulty && (
+              <Badge
+                variant="outline"
+                className={cn(
+                  "flex items-center gap-1 px-3 py-1",
+                  getDifficultyColor(lesson.difficulty)
+                )}
+              >
+                {formatDifficulty(lesson.difficulty)}
+              </Badge>
+            )}
+            {lesson.categories && lesson.categories.length > 0 && (
+              <>
+                {lesson.categories.map((category) => (
+                  <Badge
+                    key={category}
+                    variant="outline"
+                    className={cn(
+                      "flex items-center gap-1 px-3 py-1",
+                      getCategoryColor(category)
+                    )}
+                  >
+                    {category}
+                  </Badge>
+                ))}
+              </>
+            )}
             <Badge className="flex items-center gap-1 px-3 py-1">
               <IconClock className="size-4" />
               <span>{new Date(lesson.createdAt).toLocaleDateString()}</span>
@@ -206,23 +244,6 @@ export default async function PublicLessonSlugPage({ params }: Params) {
                   </ul>
                 </div>
               )}
-
-              {/* {lesson.chapter?.course ? (
-                <ForwardButton
-                  href={`/courses/${lesson.chapter.course.slug}`}
-                  label="View Full Course"
-                  variant="default"
-                  className="w-full"
-                />
-              ) : (
-                <ForwardButton
-                  href="/lessons"
-                  label="Browse More Lessons"
-                  variant="default"
-                  className="w-full"
-                />
-              )} */}
-
               <div className="space-y-4">
                 <ForwardButton
                   href={`/dashboard/lessons/${slug}`}
@@ -237,9 +258,6 @@ export default async function PublicLessonSlugPage({ params }: Params) {
                   className="w-full"
                 />
               </div>
-              {/* <p className="text-sm text-center text-muted-foreground mt-4">
-                Free lesson content
-              </p> */}
             </CardContent>
           </Card>
         </div>

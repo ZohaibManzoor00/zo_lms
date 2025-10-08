@@ -5,13 +5,20 @@ import Link from "next/link";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { lessonUpdateSchema, LessonUpdateSchemaType } from "@/lib/zod-schemas";
+import {
+  lessonUpdateSchema,
+  LessonUpdateSchemaType,
+  lessonDifficultySchema,
+  lessonCategorySchema,
+} from "@/lib/zod-schemas";
+import { formatDifficulty } from "@/lib/lesson-utils";
 import { AdminLessonType } from "@/app/data/admin/admin-get-lesson";
 import { updateLesson } from "../actions";
 import { tryCatch } from "@/hooks/try-catch";
 import { toast } from "sonner";
 
 import { Button, buttonVariants } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -31,6 +38,15 @@ import { Input } from "@/components/ui/input";
 import { RichTextEditor } from "@/components/rich-text-editor/editor";
 import { Uploader } from "@/components/file-uploader/uploader";
 import { BackButton } from "@/components/ui/back-button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { CodeWalkThroughModal } from "./code-walkthrough-modal";
 import { AdminWalkthroughType } from "@/app/data/admin/admin-get-walkthroughs";
 import { Pill } from "@/components/ui/pill";
@@ -77,6 +93,10 @@ export function LessonForm({
       walkthroughIds: Array.isArray(lesson.walkthroughs)
         ? lesson.walkthroughs.map((w) => w.walkthroughId)
         : [],
+      categories:
+        (lesson.categories as (typeof lessonCategorySchema)[number][]) || [],
+      difficulty: lesson.difficulty,
+      leetCodeSlug: lesson.leetCodeSlug ?? undefined,
     },
   });
 
@@ -181,10 +201,142 @@ export function LessonForm({
                   <FormItem>
                     <FormLabel htmlFor={field.name}>Lesson Title</FormLabel>
                     <FormControl>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          {...field}
+                          placeholder="Enter the title of the lesson"
+                          className="flex-1"
+                        />
+                        {createLessonForm.watch("leetCodeSlug") && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const slug =
+                                createLessonForm.getValues("leetCodeSlug");
+                              if (slug) {
+                                window.open(
+                                  `https://leetcode.com/problems/${slug}`,
+                                  "_blank"
+                                );
+                              }
+                            }}
+                            className="flex items-center gap-1 shrink-0"
+                          >
+                            <ExternalLink className="size-4" />
+                            LeetCode
+                          </Button>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={createLessonForm.control}
+                name="leetCodeSlug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>LeetCode Problem Slug (Optional)</FormLabel>
+                    <FormControl>
                       <Input
+                        placeholder="e.g., two-sum, valid-parentheses"
                         {...field}
-                        placeholder="Enter the title of the lesson"
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={createLessonForm.control}
+                name="difficulty"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Difficulty</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select difficulty level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {lessonDifficultySchema.map((difficulty) => (
+                          <SelectItem key={difficulty} value={difficulty}>
+                            {formatDifficulty(difficulty)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={createLessonForm.control}
+                name="categories"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Categories</FormLabel>
+                    <FormControl>
+                      <div className="border rounded-md p-4 max-h-60 overflow-y-auto">
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          {lessonCategorySchema.map((category) => (
+                            <div
+                              key={category}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={category}
+                                checked={
+                                  field.value?.includes(category) || false
+                                }
+                                onCheckedChange={(checked) => {
+                                  const currentCategories = field.value || [];
+                                  if (checked) {
+                                    field.onChange([
+                                      ...currentCategories,
+                                      category,
+                                    ]);
+                                  } else {
+                                    field.onChange(
+                                      currentCategories.filter(
+                                        (c) => c !== category
+                                      )
+                                    );
+                                  }
+                                }}
+                              />
+                              <label
+                                htmlFor={category}
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                              >
+                                {category}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                        {field.value && field.value.length > 0 && (
+                          <div className="mt-3 pt-3 border-t">
+                            <div className="flex flex-wrap gap-1">
+                              {field.value.map((category) => (
+                                <Badge
+                                  key={category}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  {category}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

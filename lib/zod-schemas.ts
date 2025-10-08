@@ -14,6 +14,58 @@ export const courseCategorySchema = [
   "Other",
 ] as const;
 
+export const lessonDifficultySchema = [
+  "Easy",
+  "Medium",
+  "Hard",
+  "VeryHard",
+] as const;
+
+export const lessonCategorySchema = [
+  "Array",
+  "String",
+  "Hash Table",
+  "Dynamic Programming",
+  "Math",
+  "Sorting",
+  "Greedy",
+  "Depth-First Search",
+  "Database",
+  "Binary Search",
+  "Tree",
+  "Breadth-First Search",
+  "Matrix",
+  "Two Pointers",
+  "Binary Tree",
+  "Heap (Priority Queue)",
+  "Prefix Sum",
+  "Stack",
+  "Graph",
+  "Design",
+  "Backtracking",
+  "Sliding Window",
+  "Union Find",
+  "Linked List",
+  "Monotonic Stack",
+  "Trie",
+  "Divide and Conquer",
+  "Queue",
+  "Recursion",
+  "Combinatorics",
+  "Hash Function",
+  "Memoization",
+  "Topological Sort",
+  "Binary Search Tree",
+  "Minimum Spanning Tree",
+  "Shortest Path",
+  "Doubly-Linked List",
+  "Probability and Statistics",
+  "Quickselect",
+  "Bucket Sort",
+  "Suffix Array",
+  "Merge Sort",
+] as const;
+
 export const courseSchema = z.object({
   title: z
     .string()
@@ -72,6 +124,9 @@ export const lessonSchema = z.object({
   videoKey: z.string().optional(),
   thumbnailKey: z.string().optional(),
   walkthroughIds: z.string().array().optional(),
+  categories: z.array(z.enum(lessonCategorySchema)).optional(),
+  difficulty: z.enum(lessonDifficultySchema).optional(),
+  leetCodeSlug: z.string().optional(),
 });
 
 export const lessonUpdateSchema = z.object({
@@ -93,6 +148,9 @@ export const lessonUpdateSchema = z.object({
   videoKey: z.string().optional(),
   thumbnailKey: z.string().optional(),
   walkthroughIds: z.string().array().optional(),
+  categories: z.array(z.enum(lessonCategorySchema)).optional(),
+  difficulty: z.enum(lessonDifficultySchema).optional(),
+  leetCodeSlug: z.string().optional(),
 });
 
 export const standaloneLessonSchema = z.object({
@@ -101,6 +159,9 @@ export const standaloneLessonSchema = z.object({
   videoKey: z.string().optional(),
   thumbnailKey: z.string().optional(),
   walkthroughIds: z.string().array().optional(),
+  categories: z.array(z.enum(lessonCategorySchema)).optional(),
+  difficulty: z.enum(lessonDifficultySchema).optional(),
+  leetCodeSlug: z.string().optional(),
 });
 
 // Programming languages array for consistency across the app

@@ -52,6 +52,9 @@ export const createStandaloneLesson = async (
           thumbnailKey: validation.data.thumbnailKey,
           position: (maxPosition?.position ?? 0) + 1,
           chapterId: null, // Standalone lesson
+          categories: validation.data.categories || [],
+          difficulty: validation.data.difficulty,
+          leetCodeSlug: validation.data.leetCodeSlug,
         },
       });
 

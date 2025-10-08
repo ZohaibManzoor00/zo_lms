@@ -4,10 +4,11 @@ import { StandaloneLessonContentType } from "@/app/data/lesson/get-standalone-le
 
 import { RenderDescription } from "@/components/rich-text-editor/render-description";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import { BookIcon, Clock, Target } from "lucide-react";
+import { BookIcon, Clock, Target, ExternalLink } from "lucide-react";
 import { CodeReviewPlaybackEditorV2 } from "@/components/audio-code-walkthrough";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
   getDifficultyColor,
@@ -73,9 +74,27 @@ export function StandaloneLessonContent({ data }: Props) {
   return (
     <div className="flex flex-col h-full bg-background px-6">
       <div className="space-y-4 mb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          {data.title}
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            {data.title}
+          </h1>
+          {data.leetCodeSlug && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                window.open(
+                  `https://leetcode.com/problems/${data.leetCodeSlug}`,
+                  "_blank"
+                );
+              }}
+              className="flex items-center gap-2"
+            >
+              <ExternalLink className="size-4" />
+              LeetCode
+            </Button>
+          )}
+        </div>
 
         {/* Lesson metadata badges */}
         <div className="flex items-center gap-3 flex-wrap">
@@ -101,15 +120,18 @@ export function StandaloneLessonContent({ data }: Props) {
             </Badge>
           </div>
 
-          {data.category && (
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Badge
-                variant="outline"
-                className={cn("font-medium", getCategoryColor(data.category))}
-              >
-                <Target className="size-4" />
-                {data.category}
-              </Badge>
+          {data.categories && data.categories.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {data.categories.map((category) => (
+                <Badge
+                  key={category}
+                  variant="outline"
+                  className={cn("font-medium", getCategoryColor(category))}
+                >
+                  <Target className="size-4" />
+                  {category}
+                </Badge>
+              ))}
             </div>
           )}
         </div>
